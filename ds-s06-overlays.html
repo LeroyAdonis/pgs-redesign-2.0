@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purple Glow Social — Design System §06 Overlays & Dialogs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           RESET
+           ═══════════════════════════════════════════════════════ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box }
+
+        /* ═══════════════════════════════════════════════════════
+           THEME TOKENS — DARK
+           ═══════════════════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --bg: #050507; --bg-elevated: #0A0A0F; --bg-subtle: #0E0E14;
+            --fg: #F0EDE8; --fg-muted: #8A8680; --fg-subtle: #5C5955;
+            --purple: #8B5CF6; --purple-vivid: #A78BFA; --purple-deep: #6D28D9;
+            --purple-surface: rgba(139, 92, 246, 0.12);
+            --success: #4ADE80; --success-surface: rgba(74, 222, 128, 0.1);
+            --warning: #FBBF24; --warning-surface: rgba(251, 191, 36, 0.1);
+            --error: #F87171; --error-surface: rgba(248, 113, 113, 0.1);
+            --info: #60A5FA; --info-surface: rgba(96, 165, 250, 0.1);
+            --border: rgba(255, 255, 255, 0.05); --border-hover: rgba(139, 92, 246, 0.2);
+            --accent: #E8D5B5;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.6);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+            --shadow-glow: 0 0 30px rgba(139,92,246,0.25);
+            --code-bg: rgba(255,255,255,0.04);
+        }
+        [data-theme="light"] {
+            --bg: #F8F6F3; --bg-elevated: #FFFFFF; --bg-subtle: #F0EDE8;
+            --fg: #1A1A1E; --fg-muted: #6B6966; --fg-subtle: #9E9B97;
+            --purple: #7C3AED; --purple-vivid: #8B5CF6; --purple-deep: #5B21B6;
+            --purple-surface: rgba(124, 58, 237, 0.08);
+            --success: #22C55E; --success-surface: rgba(34, 197, 94, 0.08);
+            --warning: #EAB308; --warning-surface: rgba(234, 179, 8, 0.08);
+            --error: #EF4444; --error-surface: rgba(239, 68, 68, 0.08);
+            --info: #3B82F6; --info-surface: rgba(59, 130, 246, 0.08);
+            --border: rgba(0,0,0,0.08); --border-hover: rgba(124, 58, 237, 0.15);
+            --accent: #C4A882;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --shadow-glow: 0 0 30px rgba(124,58,237,0.15);
+            --code-bg: rgba(0,0,0,0.04);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           SHARED TOKENS
+           ═══════════════════════════════════════════════════════ */
+        :root {
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-body: 'Sora', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+            --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+            --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+            --radius-none: 0; --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+            --radius-xl: 16px; --radius-full: 9999px;
+            --duration-fast: 150ms; --duration-base: 250ms; --duration-slow: 500ms;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+            --ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+            --z-dropdown: 100; --z-sticky: 200; --z-modal-backdrop: 300;
+            --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+            --sidebar-w: 260px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           BASE
+           ═══════════════════════════════════════════════════════ */
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased }
+        body {
+            font-family: var(--font-body); background: var(--bg); color: var(--fg);
+            line-height: 1.6; overflow-x: hidden; font-size: 16px;
+            transition: background var(--duration-base) var(--ease-out-expo), color var(--duration-base) var(--ease-out-expo);
+        }
+        a { color: var(--purple); text-decoration: none }
+        a:hover { text-decoration: underline }
+        ::selection { background: var(--purple); color: #fff }
+
+        /* ═══════════════════════════════════════════════════════
+           LAYOUT SHELL
+           ═══════════════════════════════════════════════════════ */
+        .ds-shell { display: flex; min-height: 100vh }
+        .ds-sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w);
+            background: var(--bg-elevated); border-right: 1px solid var(--border);
+            overflow-y: auto; z-index: var(--z-sticky); display: flex; flex-direction: column;
+            transition: background var(--duration-base) var(--ease-out-expo), border-color var(--duration-base) var(--ease-out-expo);
+        }
+        .ds-sidebar__logo {
+            padding: var(--space-6) var(--space-6) var(--space-4); font-family: var(--font-display);
+            font-size: 1.35rem; letter-spacing: -0.02em; border-bottom: 1px solid var(--border); color: var(--fg);
+        }
+        .ds-sidebar__logo span { color: var(--purple) }
+        .ds-sidebar__nav { padding: var(--space-4) 0; flex: 1 }
+        .ds-sidebar__section {
+            padding: var(--space-2) var(--space-6) var(--space-1); font-family: var(--font-mono);
+            font-size: 0.625rem; font-weight: 500; text-transform: uppercase;
+            letter-spacing: 0.12em; color: var(--fg-subtle);
+        }
+        .ds-sidebar__link {
+            display: block; padding: var(--space-2) var(--space-6); font-size: 0.8125rem;
+            color: var(--fg-muted); transition: color var(--duration-fast), background var(--duration-fast);
+            text-decoration: none; border-left: 2px solid transparent;
+        }
+        .ds-sidebar__link:hover { color: var(--fg); background: var(--purple-surface); text-decoration: none }
+        .ds-sidebar__link.is-active { color: var(--purple); border-left-color: var(--purple); background: var(--purple-surface) }
+        .ds-main { margin-left: var(--sidebar-w); flex: 1; padding: var(--space-10) var(--space-12) var(--space-24); max-width: 1100px }
+
+        .ds-theme-toggle {
+            position: fixed; top: var(--space-4); right: var(--space-6); z-index: var(--z-tooltip);
+            width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+            background: var(--bg-elevated); border: 1px solid var(--border); font-size: 1.25rem;
+            cursor: pointer; transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+        .ds-theme-toggle:hover { border-color: var(--purple); box-shadow: var(--shadow-glow) }
+
+        /* ═══════════════════════════════════════════════════════
+           SECTION HEADINGS
+           ═══════════════════════════════════════════════════════ */
+        .ds-section { margin-bottom: var(--space-24); scroll-margin-top: var(--space-10) }
+        .ds-section__id {
+            font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
+            color: var(--purple); letter-spacing: 0.08em; margin-bottom: var(--space-1); text-transform: uppercase;
+        }
+        .ds-section__title {
+            font-family: var(--font-display); font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: var(--space-2);
+        }
+        .ds-section__desc { font-size: 0.9375rem; color: var(--fg-muted); max-width: 640px; line-height: 1.7; margin-bottom: var(--space-10) }
+        .ds-sub { margin-bottom: var(--space-16); scroll-margin-top: var(--space-10) }
+        .ds-sub__title { font-family: var(--font-body); font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-1) }
+        .ds-sub__desc { font-size: 0.8125rem; color: var(--fg-muted); margin-bottom: var(--space-6) }
+
+        .ds-demo-row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-start; margin-bottom: var(--space-6) }
+        .ds-demo-label {
+            font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-2);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           BUTTONS (shared)
+           ═══════════════════════════════════════════════════════ */
+        .ds-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+            font-family: var(--font-body); font-weight: 500; font-size: 0.8125rem; border: none;
+            cursor: pointer; height: 40px; padding: 0 var(--space-6); white-space: nowrap;
+            transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+        .ds-btn--primary { background: var(--purple); color: #fff }
+        .ds-btn--primary:hover { background: var(--purple-vivid) }
+        .ds-btn--secondary { background: transparent; color: var(--fg); border: 1px solid var(--border) }
+        .ds-btn--secondary:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-surface) }
+        .ds-btn--ghost { background: transparent; color: var(--fg-muted) }
+        .ds-btn--ghost:hover { color: var(--fg); background: var(--purple-surface) }
+        .ds-btn--destructive { background: var(--error); color: #fff }
+        .ds-btn--destructive:hover { filter: brightness(1.15) }
+        .ds-btn--sm { height: 32px; padding: 0 var(--space-4); font-size: 0.75rem }
+        .ds-btn svg { flex-shrink: 0 }
+
+        /* ═══════════════════════════════════════════════════════
+           SHARED INPUT STYLES
+           ═══════════════════════════════════════════════════════ */
+        .ds-input, .ds-textarea {
+            font-family: var(--font-body); font-size: 0.875rem; background: var(--bg-subtle);
+            border: 1px solid var(--border); color: var(--fg); padding: var(--space-2) var(--space-3);
+            width: 100%; transition: border-color var(--duration-fast);
+        }
+        .ds-input:focus, .ds-textarea:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-surface) }
+        .ds-textarea { min-height: 80px; resize: vertical; line-height: 1.6 }
+        .ds-field { display: flex; flex-direction: column; gap: var(--space-1) }
+        .ds-field__label { font-size: 0.8125rem; font-weight: 500; color: var(--fg) }
+
+        /* ═══════════════════════════════════════════════════════
+           6a — MODAL DIALOGS
+           ═══════════════════════════════════════════════════════ */
+        .overlay-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); z-index: var(--z-modal-backdrop);
+            opacity: 0; pointer-events: none; transition: opacity var(--duration-base) var(--ease-out-expo);
+        }
+        .overlay-backdrop.is-open { opacity: 1; pointer-events: all }
+
+        .modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.92);
+            background: var(--bg-elevated); border: 1px solid var(--border); z-index: var(--z-modal);
+            box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none;
+            transition: opacity var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo);
+            max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .modal.is-open { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1) }
+        .modal--sm { width: 400px }
+        .modal--md { width: 520px }
+        .modal--lg { width: 680px }
+        .modal__header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border);
+        }
+        .modal__title { font-family: var(--font-body); font-weight: 600; font-size: 1rem }
+        .modal__close {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            background: transparent; border: 1px solid var(--border); color: var(--fg-muted);
+            cursor: pointer; font-size: 1rem; transition: all var(--duration-fast);
+        }
+        .modal__close:hover { border-color: var(--purple); color: var(--fg); background: var(--purple-surface) }
+        .modal__body { padding: var(--space-6); flex: 1 }
+        .modal__footer {
+            padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: var(--space-3);
+        }
+
+        .modal__analytics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-4) }
+        .modal__stat { text-align: center; padding: var(--space-3); background: var(--bg-subtle); border: 1px solid var(--border) }
+        .modal__stat-val { font-family: var(--font-display); font-size: 1.5rem; color: var(--purple) }
+        .modal__stat-label { font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px }
+
+        .modal__img-placeholder {
+            width: 100%; height: 180px; background: var(--bg-subtle); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; color: var(--fg-subtle);
+            font-family: var(--font-mono); font-size: 0.75rem; margin-bottom: var(--space-4);
+        }
+
+        .platform-chips { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2) }
+        .platform-chip {
+            padding: var(--space-1) var(--space-3); font-size: 0.75rem; font-family: var(--font-mono);
+            border: 1px solid var(--border); color: var(--fg-muted); cursor: pointer;
+            transition: all var(--duration-fast);
+        }
+        .platform-chip.is-active { border-color: var(--purple); color: var(--purple); background: var(--purple-surface) }
+        .platform-chip:hover { border-color: var(--purple) }
+
+        /* ═══════════════════════════════════════════════════════
+           6b — DRAWERS / SLIDE-OVER
+           ═══════════════════════════════════════════════════════ */
+        .drawer {
+            position: fixed; top: 0; bottom: 0; background: var(--bg-elevated);
+            border: 1px solid var(--border); z-index: var(--z-modal);
+            box-shadow: var(--shadow-lg); overflow-y: auto;
+            transition: transform var(--duration-base) var(--ease-out-expo);
+            display: flex; flex-direction: column;
+        }
+        .drawer--right { right: 0; transform: translateX(100%) }
+        .drawer--right.is-open { transform: translateX(0) }
+        .drawer--left { left: 0; transform: translateX(-100%) }
+        .drawer--left.is-open { transform: translateX(0) }
+        .drawer--narrow { width: 320px }
+        .drawer--default { width: 480px }
+        .drawer--wide { width: 640px }
+        .drawer__header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--border); flex-shrink: 0;
+        }
+        .drawer__title { font-weight: 600; font-size: 1rem }
+        .drawer__body { padding: var(--space-6); flex: 1; overflow-y: auto }
+        .drawer__footer {
+            padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: var(--space-3); flex-shrink: 0;
+        }
+
+        .filter-group { margin-bottom: var(--space-6) }
+        .filter-group__title {
+            font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.1em; color: var(--fg-subtle); margin-bottom: var(--space-3);
+        }
+        .filter-check {
+            display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0;
+            cursor: pointer; font-size: 0.8125rem; color: var(--fg-muted);
+            transition: color var(--duration-fast);
+        }
+        .filter-check:hover { color: var(--fg) }
+        .filter-check input[type="checkbox"] {
+            appearance: none; width: 18px; height: 18px; border: 1px solid var(--border);
+            background: var(--bg-subtle); cursor: pointer; position: relative; flex-shrink: 0;
+            transition: all var(--duration-fast);
+        }
+        .filter-check input[type="checkbox"]:checked {
+            background: var(--purple); border-color: var(--purple);
+        }
+        .filter-check input[type="checkbox"]:checked::after {
+            content: '✓'; position: absolute; inset: 0; display: flex;
+            align-items: center; justify-content: center; color: #fff; font-size: 0.625rem;
+        }
+        .filter-date-row { display: flex; gap: var(--space-3); margin-top: var(--space-2) }
+        .filter-date-row .ds-input { height: 36px; font-size: 0.8125rem }
+
+        /* ═══════════════════════════════════════════════════════
+           6c — DROPDOWN MENUS
+           ═══════════════════════════════════════════════════════ */
+        .dropdown-wrap { position: relative; display: inline-block }
+        .dropdown-menu {
+            position: absolute; top: calc(100% + 4px); min-width: 220px; background: var(--bg-elevated);
+            border: 1px solid var(--border); box-shadow: var(--shadow-lg); z-index: var(--z-dropdown);
+            padding: var(--space-1) 0; opacity: 0; pointer-events: none;
+            transform: translateY(-4px); transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+        .dropdown-menu.is-open { opacity: 1; pointer-events: all; transform: translateY(0) }
+        .dropdown-menu--left { left: 0 }
+        .dropdown-menu--right { right: 0 }
+        .dropdown-item {
+            display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-4);
+            font-size: 0.8125rem; color: var(--fg-muted); cursor: pointer;
+            transition: all var(--duration-fast); border: none; background: none; width: 100; text-align: left;
+            font-family: var(--font-body);
+        }
+        .dropdown-item:hover { background: var(--purple-surface); color: var(--fg) }
+        .dropdown-item--danger { color: var(--error) }
+        .dropdown-item--danger:hover { background: var(--error-surface); color: var(--error) }
+        .dropdown-item svg { width: 16px; height: 16px; flex-shrink: 0 }
+        .dropdown-item__shortcut { margin-left: auto; font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle) }
+        .dropdown-sep { height: 1px; background: var(--border); margin: var(--space-1) 0 }
+        .dropdown-header {
+            padding: var(--space-2) var(--space-4) var(--space-1); font-family: var(--font-mono);
+            font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-subtle);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           6d — POPOVERS
+           ═══════════════════════════════════════════════════════ */
+        .popover-wrap { position: relative; display: inline-block }
+        .popover {
+            position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(4px);
+            background: var(--bg-elevated); border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+            z-index: var(--z-dropdown); padding: var(--space-4); min-width: 260px;
+            opacity: 0; pointer-events: none; transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+        .popover.is-open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0) }
+        .popover--below { bottom: auto; top: calc(100% + 10px) }
+        .popover::after {
+            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
+            width: 10px; height: 10px; background: var(--bg-elevated); border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .popover--below::after { bottom: auto; top: -6px; border: none; border-top: 1px solid var(--border); border-left: 1px solid var(--border) }
+
+        .popover-profile { display: flex; gap: var(--space-3); align-items: flex-start }
+        .popover-avatar {
+            width: 44px; height: 44px; border-radius: var(--radius-full); background: var(--purple-surface);
+            display: flex; align-items: center; justify-content: center; color: var(--purple);
+            font-family: var(--font-display); font-size: 1.1rem; flex-shrink: 0;
+        }
+        .popover-name { font-weight: 600; font-size: 0.875rem }
+        .popover-handle { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-muted) }
+        .popover-bio { font-size: 0.8125rem; color: var(--fg-muted); margin-top: var(--space-2); line-height: 1.5 }
+        .popover-stats { display: flex; gap: var(--space-6); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border) }
+        .popover-stats__item { text-align: center }
+        .popover-stats__val { font-weight: 600; font-size: 0.875rem }
+        .popover-stats__label { font-family: var(--font-mono); font-size: 0.5625rem; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.1em }
+
+        .popover-actions { display: flex; flex-direction: column; gap: var(--space-1); min-width: 180px; padding: 0 }
+        .popover-action {
+            display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3);
+            font-size: 0.8125rem; color: var(--fg-muted); cursor: pointer; background: none; border: none;
+            font-family: var(--font-body); transition: all var(--duration-fast); text-align: left; width: 100%;
+        }
+        .popover-action:hover { background: var(--purple-surface); color: var(--fg) }
+        .popover-action svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--fg-subtle) }
+
+        /* ═══════════════════════════════════════════════════════
+           6e — COMMAND PALETTE
+           ═══════════════════════════════════════════════════════ */
+        .cmd-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); z-index: 900;
+            opacity: 0; pointer-events: none; transition: opacity var(--duration-base) var(--ease-out-expo);
+        }
+        .cmd-backdrop.is-open { opacity: 1; pointer-events: all }
+
+        .cmd-palette {
+            position: fixed; top: 18%; left: 50%; transform: translateX(-50%) scale(0.96);
+            width: 560px; max-height: 480px; background: var(--bg-elevated); border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg), var(--shadow-glow); z-index: 901;
+            opacity: 0; pointer-events: none; display: flex; flex-direction: column;
+            transition: opacity var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo);
+        }
+        .cmd-palette.is-open { opacity: 1; pointer-events: all; transform: translateX(-50%) scale(1) }
+
+        .cmd-input-wrap {
+            display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--border);
+        }
+        .cmd-input-wrap svg { color: var(--fg-subtle); flex-shrink: 0 }
+        .cmd-input {
+            flex: 1; background: none; border: none; color: var(--fg); font-family: var(--font-body);
+            font-size: 0.9375rem; outline: none;
+        }
+        .cmd-input::placeholder { color: var(--fg-subtle) }
+        .cmd-kbd {
+            font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle);
+            padding: 2px var(--space-2); border: 1px solid var(--border); background: var(--bg-subtle);
+        }
+        .cmd-results { overflow-y: auto; flex: 1; padding: var(--space-2) 0 }
+        .cmd-group-title {
+            padding: var(--space-2) var(--space-5) var(--space-1); font-family: var(--font-mono);
+            font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-subtle);
+        }
+        .cmd-item {
+            display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-5);
+            cursor: pointer; transition: background var(--duration-fast); font-size: 0.8125rem; color: var(--fg-muted);
+        }
+        .cmd-item:hover, .cmd-item.is-active { background: var(--purple-surface); color: var(--fg) }
+        .cmd-item svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--fg-subtle) }
+        .cmd-item__right { margin-left: auto; font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle) }
+        .cmd-item mark { background: var(--purple-surface); color: var(--purple); font-weight: 600 }
+        .cmd-footer {
+            padding: var(--space-2) var(--space-5); border-top: 1px solid var(--border);
+            display: flex; gap: var(--space-6); font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle);
+        }
+        .cmd-footer span { display: flex; align-items: center; gap: var(--space-1) }
+        .cmd-empty { padding: var(--space-10); text-align: center; color: var(--fg-subtle); font-size: 0.875rem }
+
+        /* ═══════════════════════════════════════════════════════
+           UTILITIES
+           ═══════════════════════════════════════════════════════ */
+        .ds-mt-6 { margin-top: var(--space-6) }
+    </style>
+</head>
+
+<body>
+    <!-- ═══ THEME TOGGLE ═══ -->
+    <button class="ds-theme-toggle" id="themeToggle" aria-label="Toggle theme">☀</button>
+
+    <!-- ═══ BACKDROPS ═══ -->
+    <div class="overlay-backdrop" id="modalBackdrop"></div>
+    <div class="cmd-backdrop" id="cmdBackdrop"></div>
+
+    <!-- ═══ SHELL ═══ -->
+    <div class="ds-shell">
+
+        <!-- ═══ SIDEBAR ═══ -->
+        <aside class="ds-sidebar">
+            <div class="ds-sidebar__logo"><span>Purple Glow</span> Design System</div>
+            <nav class="ds-sidebar__nav">
+                <div class="ds-sidebar__section">6 — Overlays</div>
+                <a href="#overlays" class="ds-sidebar__link">Overview</a>
+                <a href="#modals" class="ds-sidebar__link">Modal Dialogs</a>
+                <a href="#drawers" class="ds-sidebar__link">Slide-over Drawers</a>
+                <a href="#dropdowns" class="ds-sidebar__link">Dropdown Menus</a>
+                <a href="#popovers" class="ds-sidebar__link">Popovers</a>
+                <a href="#cmdpalette" class="ds-sidebar__link">Command Palette</a>
+            </nav>
+        </aside>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <main class="ds-main">
+
+            <section class="ds-section" id="overlays">
+                <div class="ds-section__id">Section 06</div>
+                <h1 class="ds-section__title">Overlays & Dialogs</h1>
+                <p class="ds-section__desc">Modal dialogs, slide-over drawers, dropdown menus, popovers, and the command palette — every surface that floats above the page. Built with backdrop blur, focus trapping, and smooth transitions for Mzansi's finest social media platform.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 6a — MODAL DIALOGS
+                 ══════════════════════════════════════════ -->
+            <section class="ds-sub" id="modals">
+                <h2 class="ds-sub__title">Modal Dialogs</h2>
+                <p class="ds-sub__desc">Centered overlays in small, medium, and large sizes. Backdrop blur, scale-up entry animation, close on Escape / backdrop / X button. Focus is trapped within.</p>
+
+                <div class="ds-demo-label">Trigger Buttons</div>
+                <div class="ds-demo-row">
+                    <button class="ds-btn ds-btn--destructive" onclick="openModal('modal-sm')">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                        Delete Post
+                    </button>
+                    <button class="ds-btn ds-btn--primary" onclick="openModal('modal-md')">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                        Create Post
+                    </button>
+                    <button class="ds-btn ds-btn--secondary" onclick="openModal('modal-lg')">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Preview Post
+                    </button>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 6b — DRAWERS
+                 ══════════════════════════════════════════ -->
+            <section class="ds-sub" id="drawers">
+                <h2 class="ds-sub__title">Slide-over / Drawer Panels</h2>
+                <p class="ds-sub__desc">Side-anchored panels that slide in from left or right. Available in narrow (320px), default (480px), and wide (640px) widths.</p>
+
+                <div class="ds-demo-label">Right-side Drawers</div>
+                <div class="ds-demo-row">
+                    <button class="ds-btn ds-btn--secondary" onclick="openDrawer('drawer-right-narrow')">Narrow 320px →</button>
+                    <button class="ds-btn ds-btn--primary" onclick="openDrawer('drawer-right-default')">Default 480px →</button>
+                    <button class="ds-btn ds-btn--secondary" onclick="openDrawer('drawer-right-wide')">Wide 640px →</button>
+                </div>
+                <div class="ds-demo-label">Left-side Drawer</div>
+                <div class="ds-demo-row">
+                    <button class="ds-btn ds-btn--secondary" onclick="openDrawer('drawer-left')">← Filter Panel</button>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 6c — DROPDOWN MENUS
+                 ══════════════════════════════════════════ -->
+            <section class="ds-sub" id="dropdowns">
+                <h2 class="ds-sub__title">Dropdown Menus</h2>
+                <p class="ds-sub__desc">Action menus with icons, keyboard shortcuts, sections, and danger items. Click to toggle, click outside to close.</p>
+
+                <div class="ds-demo-label">Simple Action Dropdown</div>
+                <div class="ds-demo-row">
+                    <div class="dropdown-wrap">
+                        <button class="ds-btn ds-btn--secondary" onclick="toggleDropdown(this)">
+                            Actions
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu--left" id="dd-simple">
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4v14a2 2 0 002 2h12a2 2 0 002-2V7l-5-3z"/><path d="M14 2v5h5M12 12v6M9 15h6"/></svg>
+                                Edit Post
+                                <span class="dropdown-item__shortcut">⌘E</span>
+                            </button>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="8" y="2" width="14" height="14" rx="0"/><path d="M4 8H2v14h14v-2"/></svg>
+                                Duplicate
+                                <span class="dropdown-item__shortcut">⌘D</span>
+                            </button>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+                                Share
+                                <span class="dropdown-item__shortcut">⌘S</span>
+                            </button>
+                            <div class="dropdown-sep"></div>
+                            <button class="dropdown-item dropdown-item--danger" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                                Delete
+                                <span class="dropdown-item__shortcut">⌘⌫</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-wrap">
+                        <button class="ds-btn ds-btn--secondary" onclick="toggleDropdown(this)">
+                            Organize
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu--left" id="dd-sections">
+                            <div class="dropdown-header">Content</div>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                                New Post
+                            </button>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M9 9h6v6H9z"/></svg>
+                                New Story
+                            </button>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-header">Scheduling</div>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                Schedule for Later
+                            </button>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12H2M12 2v20"/></svg>
+                                Add to Queue
+                            </button>
+                            <div class="dropdown-sep"></div>
+                            <div class="dropdown-header">Danger Zone</div>
+                            <button class="dropdown-item dropdown-item--danger" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                                Delete All Drafts
+                                <span class="dropdown-item__shortcut">⌘⇧⌫</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label ds-mt-6">Positioned Right</div>
+                <div class="ds-demo-row" style="justify-content:flex-end">
+                    <div class="dropdown-wrap">
+                        <button class="ds-btn ds-btn--ghost ds-btn--sm" onclick="toggleDropdown(this)">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu--right">
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                View Analytics
+                            </button>
+                            <button class="dropdown-item" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+                                Edit Caption
+                            </button>
+                            <div class="dropdown-sep"></div>
+                            <button class="dropdown-item dropdown-item--danger" onclick="closeAllDropdowns()">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 6d — POPOVERS
+                 ══════════════════════════════════════════ -->
+            <section class="ds-sub" id="popovers">
+                <h2 class="ds-sub__title">Popovers</h2>
+                <p class="ds-sub__desc">Contextual floating surfaces with arrow pointers. Hover to reveal user profiles, click for quick actions.</p>
+
+                <div class="ds-demo-label">User Profile Popover (hover)</div>
+                <div class="ds-demo-row">
+                    <div class="popover-wrap" onmouseenter="showPopover('pop-profile')" onmouseleave="hidePopover('pop-profile')">
+                        <button class="ds-btn ds-btn--secondary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+                            @sipho_codes
+                        </button>
+                        <div class="popover" id="pop-profile">
+                            <div class="popover-profile">
+                                <div class="popover-avatar">S</div>
+                                <div>
+                                    <div class="popover-name">Sipho Ndaba</div>
+                                    <div class="popover-handle">@sipho_codes</div>
+                                </div>
+                            </div>
+                            <div class="popover-bio">Full-stack developer from Joburg 🇿🇦 Building lekker apps for Mzansi. #LocalIsLekker</div>
+                            <div class="popover-stats">
+                                <div class="popover-stats__item"><div class="popover-stats__val">2.4k</div><div class="popover-stats__label">Posts</div></div>
+                                <div class="popover-stats__item"><div class="popover-stats__val">18.7k</div><div class="popover-stats__label">Followers</div></div>
+                                <div class="popover-stats__item"><div class="popover-stats__val">4.2%</div><div class="popover-stats__label">Eng. Rate</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="popover-wrap" onmouseenter="showPopover('pop-profile2')" onmouseleave="hidePopover('pop-profile2')">
+                        <button class="ds-btn ds-btn--secondary">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
+                            @lerato_creates
+                        </button>
+                        <div class="popover" id="pop-profile2">
+                            <div class="popover-profile">
+                                <div class="popover-avatar">L</div>
+                                <div>
+                                    <div class="popover-name">Lerato Molefe</div>
+                                    <div class="popover-handle">@lerato_creates</div>
+                                </div>
+                            </div>
+                            <div class="popover-bio">Content creator • Cape Town vibes ☀️ Helping SA brands glow up with Purple Glow Social.</div>
+                            <div class="popover-stats">
+                                <div class="popover-stats__item"><div class="popover-stats__val">891</div><div class="popover-stats__label">Posts</div></div>
+                                <div class="popover-stats__item"><div class="popover-stats__val">32.1k</div><div class="popover-stats__label">Followers</div></div>
+                                <div class="popover-stats__item"><div class="popover-stats__val">6.8%</div><div class="popover-stats__label">Eng. Rate</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label ds-mt-6">Action Popover (click)</div>
+                <div class="ds-demo-row">
+                    <div class="popover-wrap">
+                        <button class="ds-btn ds-btn--secondary" onclick="togglePopover('pop-actions')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Quick Actions
+                        </button>
+                        <div class="popover popover--below" id="pop-actions" style="padding:var(--space-2) 0">
+                            <div class="popover-actions">
+                                <button class="popover-action" onclick="hidePopover('pop-actions')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    Schedule Post
+                                </button>
+                                <button class="popover-action" onclick="hidePopover('pop-actions')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4v14a2 2 0 002 2h12a2 2 0 002-2V7l-5-3z"/></svg>
+                                    Save as Draft
+                                </button>
+                                <button class="popover-action" onclick="hidePopover('pop-actions')">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8v13H3V8M1 3h22v5H1z"/></svg>
+                                    Move to Archive
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 6e — COMMAND PALETTE
+                 ══════════════════════════════════════════ -->
+            <section class="ds-sub" id="cmdpalette">
+                <h2 class="ds-sub__title">Command Palette</h2>
+                <p class="ds-sub__desc">Full-screen search overlay triggered by <code style="font-family:var(--font-mono);font-size:0.8125rem;background:var(--code-bg);padding:2px 6px">⌘K</code>. Fuzzy search across pages, actions, and posts with keyboard navigation.</p>
+
+                <div class="ds-demo-row">
+                    <button class="ds-btn ds-btn--primary" onclick="openCmdPalette()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        Open Command Palette
+                        <span style="font-family:var(--font-mono);font-size:0.625rem;opacity:0.7;margin-left:var(--space-2)">⌘K</span>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MODAL: Small — Delete Confirmation
+         ═══════════════════════════════════════════════════════ -->
+    <div class="modal modal--sm" id="modal-sm" role="dialog" aria-modal="true" aria-labelledby="modal-sm-title">
+        <div class="modal__header">
+            <span class="modal__title" id="modal-sm-title">Delete this post?</span>
+            <button class="modal__close" onclick="closeModal('modal-sm')" aria-label="Close">✕</button>
+        </div>
+        <div class="modal__body">
+            <p style="font-size:0.875rem;color:var(--fg-muted);line-height:1.7">This will permanently remove your Joburg sunset post and all its analytics data. This action cannot be undone.</p>
+            <div style="margin-top:var(--space-4);padding:var(--space-3);background:var(--error-surface);border:1px solid rgba(248,113,113,0.2)">
+                <p style="font-size:0.8125rem;color:var(--error)">⚠ This post has 2.4k engagements and 847 shares across Instagram and Facebook.</p>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeModal('modal-sm')">Cancel</button>
+            <button class="ds-btn ds-btn--destructive" onclick="closeModal('modal-sm')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+                Delete Post
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MODAL: Medium — Create Post Form
+         ═══════════════════════════════════════════════════════ -->
+    <div class="modal modal--md" id="modal-md" role="dialog" aria-modal="true" aria-labelledby="modal-md-title">
+        <div class="modal__header">
+            <span class="modal__title" id="modal-md-title">Create New Post</span>
+            <button class="modal__close" onclick="closeModal('modal-md')" aria-label="Close">✕</button>
+        </div>
+        <div class="modal__body">
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Post Title</label>
+                <input class="ds-input" type="text" placeholder="e.g. Heritage Day braai special 🔥" />
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Caption</label>
+                <textarea class="ds-textarea" rows="4" placeholder="Write your lekker caption here… #Mzansi #LocalIsLekker"></textarea>
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Schedule (SAST)</label>
+                <input class="ds-input" type="datetime-local" value="2026-09-24T09:00" />
+            </div>
+            <div class="ds-field">
+                <label class="ds-field__label">Platforms</label>
+                <div class="platform-chips">
+                    <span class="platform-chip is-active" onclick="this.classList.toggle('is-active')">Instagram</span>
+                    <span class="platform-chip is-active" onclick="this.classList.toggle('is-active')">Facebook</span>
+                    <span class="platform-chip" onclick="this.classList.toggle('is-active')">X (Twitter)</span>
+                    <span class="platform-chip" onclick="this.classList.toggle('is-active')">LinkedIn</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeModal('modal-md')">Discard</button>
+            <button class="ds-btn ds-btn--secondary" onclick="closeModal('modal-md')">Save Draft</button>
+            <button class="ds-btn ds-btn--primary" onclick="closeModal('modal-md')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+                Publish
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MODAL: Large — Post Preview
+         ═══════════════════════════════════════════════════════ -->
+    <div class="modal modal--lg" id="modal-lg" role="dialog" aria-modal="true" aria-labelledby="modal-lg-title">
+        <div class="modal__header">
+            <span class="modal__title" id="modal-lg-title">Post Preview</span>
+            <button class="modal__close" onclick="closeModal('modal-lg')" aria-label="Close">✕</button>
+        </div>
+        <div class="modal__body">
+            <div class="modal__img-placeholder">
+                <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24" style="opacity:0.4"><rect x="3" y="3" width="18" height="18" rx="0"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:var(--space-2)">Table Mountain Golden Hour 🌅</h3>
+            <p style="font-size:0.875rem;color:var(--fg-muted);line-height:1.7;margin-bottom:var(--space-2)">
+                Caught this lekker sunset over Table Mountain — Cape Town really said "hold my rooibos" today! Nothing beats the Mother City when the light hits just right. 🏔️✨
+            </p>
+            <p style="font-size:0.8125rem;color:var(--purple);margin-bottom:var(--space-4)">#CapeTown #TableMountain #Mzansi #LocalIsLekker #GoldenHour #SouthAfrica</p>
+            <div style="display:flex;gap:var(--space-3);font-family:var(--font-mono);font-size:0.6875rem;color:var(--fg-subtle);margin-bottom:var(--space-4)">
+                <span>Published 2026-02-26 • 14:30 SAST</span>
+                <span style="color:var(--fg-subtle)">•</span>
+                <span>Instagram, Facebook</span>
+            </div>
+            <div class="modal__analytics">
+                <div class="modal__stat">
+                    <div class="modal__stat-val">12.8k</div>
+                    <div class="modal__stat-label">Reach</div>
+                </div>
+                <div class="modal__stat">
+                    <div class="modal__stat-val">2,431</div>
+                    <div class="modal__stat-label">Engagements</div>
+                </div>
+                <div class="modal__stat">
+                    <div class="modal__stat-val">847</div>
+                    <div class="modal__stat-label">Shares</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeModal('modal-lg')">Close</button>
+            <button class="ds-btn ds-btn--secondary" onclick="closeModal('modal-lg')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 3a2.85 2.85 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+                Edit Post
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         DRAWERS
+         ═══════════════════════════════════════════════════════ -->
+    <!-- Right narrow -->
+    <div class="drawer drawer--right drawer--narrow" id="drawer-right-narrow">
+        <div class="drawer__header">
+            <span class="drawer__title">Quick View</span>
+            <button class="modal__close" onclick="closeDrawer('drawer-right-narrow')">✕</button>
+        </div>
+        <div class="drawer__body">
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Post Status</label>
+                <div style="display:inline-flex;align-items:center;gap:var(--space-2);padding:var(--space-1) var(--space-3);background:var(--success-surface);border:1px solid rgba(74,222,128,0.2);font-size:0.75rem;color:var(--success);font-family:var(--font-mono)">● Published</div>
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Title</label>
+                <p style="font-size:0.875rem;color:var(--fg-muted)">Durban beachfront vibes 🏖️</p>
+            </div>
+            <div class="ds-field">
+                <label class="ds-field__label">Platforms</label>
+                <div class="platform-chips" style="margin-top:var(--space-1)">
+                    <span class="platform-chip is-active" style="pointer-events:none;font-size:0.6875rem">Instagram</span>
+                    <span class="platform-chip is-active" style="pointer-events:none;font-size:0.6875rem">Facebook</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right default -->
+    <div class="drawer drawer--right drawer--default" id="drawer-right-default">
+        <div class="drawer__header">
+            <span class="drawer__title">Edit Post</span>
+            <button class="modal__close" onclick="closeDrawer('drawer-right-default')">✕</button>
+        </div>
+        <div class="drawer__body">
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Post Title</label>
+                <input class="ds-input" type="text" value="Soweto street food crawl 🍗" />
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Caption</label>
+                <textarea class="ds-textarea" rows="5">From bunny chow to kotas, Soweto's street food scene is on another level! 🔥 Spent the day exploring Vilakazi Street and beyond. Every bite tells a story of Mzansi's rich culture. #Soweto #StreetFood #Mzansi</textarea>
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Schedule</label>
+                <input class="ds-input" type="datetime-local" value="2026-03-15T12:00" />
+            </div>
+            <div class="ds-field">
+                <label class="ds-field__label">Platforms</label>
+                <div class="platform-chips" style="margin-top:var(--space-1)">
+                    <span class="platform-chip is-active" onclick="this.classList.toggle('is-active')">Instagram</span>
+                    <span class="platform-chip" onclick="this.classList.toggle('is-active')">Facebook</span>
+                    <span class="platform-chip is-active" onclick="this.classList.toggle('is-active')">X (Twitter)</span>
+                    <span class="platform-chip" onclick="this.classList.toggle('is-active')">LinkedIn</span>
+                </div>
+            </div>
+        </div>
+        <div class="drawer__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeDrawer('drawer-right-default')">Cancel</button>
+            <button class="ds-btn ds-btn--primary" onclick="closeDrawer('drawer-right-default')">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Right wide -->
+    <div class="drawer drawer--right drawer--wide" id="drawer-right-wide">
+        <div class="drawer__header">
+            <span class="drawer__title">Post Detail</span>
+            <button class="modal__close" onclick="closeDrawer('drawer-right-wide')">✕</button>
+        </div>
+        <div class="drawer__body">
+            <div class="modal__img-placeholder" style="height:160px;margin-bottom:var(--space-4)">
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24" style="opacity:0.4"><rect x="3" y="3" width="18" height="18" rx="0"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </div>
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:var(--space-2)">Kruger Park sunrise safari 🦁</h3>
+            <p style="font-size:0.875rem;color:var(--fg-muted);line-height:1.7;margin-bottom:var(--space-4)">Early mornings in the Kruger are pure magic. Spotted the Big Five before breakfast — talk about a lekker start to the day! South Africa's wildlife never disappoints. 🌍🐘</p>
+            <div class="modal__analytics" style="margin-top:0;margin-bottom:var(--space-6)">
+                <div class="modal__stat"><div class="modal__stat-val">24.1k</div><div class="modal__stat-label">Reach</div></div>
+                <div class="modal__stat"><div class="modal__stat-val">5,203</div><div class="modal__stat-label">Engagements</div></div>
+                <div class="modal__stat"><div class="modal__stat-val">1,892</div><div class="modal__stat-label">Shares</div></div>
+            </div>
+            <div class="ds-field" style="margin-bottom:var(--space-4)">
+                <label class="ds-field__label">Edit Caption</label>
+                <textarea class="ds-textarea" rows="4">Early mornings in the Kruger are pure magic. Spotted the Big Five before breakfast — talk about a lekker start to the day! 🌍🐘 #KrugerPark #Safari #Mzansi #WildlifeSA</textarea>
+            </div>
+        </div>
+        <div class="drawer__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeDrawer('drawer-right-wide')">Close</button>
+            <button class="ds-btn ds-btn--primary" onclick="closeDrawer('drawer-right-wide')">Update Post</button>
+        </div>
+    </div>
+
+    <!-- Left drawer — Filters -->
+    <div class="drawer drawer--left drawer--narrow" id="drawer-left">
+        <div class="drawer__header">
+            <span class="drawer__title">Filters</span>
+            <button class="modal__close" onclick="closeDrawer('drawer-left')">✕</button>
+        </div>
+        <div class="drawer__body">
+            <div class="filter-group">
+                <div class="filter-group__title">Status</div>
+                <label class="filter-check"><input type="checkbox" checked /> Published</label>
+                <label class="filter-check"><input type="checkbox" checked /> Scheduled</label>
+                <label class="filter-check"><input type="checkbox" /> Draft</label>
+                <label class="filter-check"><input type="checkbox" /> Failed</label>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group__title">Platform</div>
+                <label class="filter-check"><input type="checkbox" checked /> Instagram</label>
+                <label class="filter-check"><input type="checkbox" checked /> Facebook</label>
+                <label class="filter-check"><input type="checkbox" /> X (Twitter)</label>
+                <label class="filter-check"><input type="checkbox" /> LinkedIn</label>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group__title">Date Range</div>
+                <div class="filter-date-row">
+                    <input class="ds-input" type="date" value="2026-02-01" style="flex:1" />
+                    <input class="ds-input" type="date" value="2026-02-28" style="flex:1" />
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-group__title">Region</div>
+                <label class="filter-check"><input type="checkbox" checked /> Johannesburg</label>
+                <label class="filter-check"><input type="checkbox" /> Cape Town</label>
+                <label class="filter-check"><input type="checkbox" /> Durban</label>
+                <label class="filter-check"><input type="checkbox" /> Pretoria</label>
+            </div>
+        </div>
+        <div class="drawer__footer">
+            <button class="ds-btn ds-btn--ghost" onclick="closeDrawer('drawer-left')">Reset</button>
+            <button class="ds-btn ds-btn--primary" onclick="closeDrawer('drawer-left')">Apply Filters</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         COMMAND PALETTE
+         ═══════════════════════════════════════════════════════ -->
+    <div class="cmd-palette" id="cmdPalette" role="dialog" aria-modal="true" aria-label="Command palette">
+        <div class="cmd-input-wrap">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input class="cmd-input" id="cmdInput" type="text" placeholder="Search pages, actions, posts…" autocomplete="off" />
+            <span class="cmd-kbd">ESC</span>
+        </div>
+        <div class="cmd-results" id="cmdResults"></div>
+        <div class="cmd-footer">
+            <span>↑↓ Navigate</span>
+            <span>↵ Select</span>
+            <span>esc Close</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         JAVASCRIPT
+         ═══════════════════════════════════════════════════════ -->
+    <script>
+        /* ── Theme Toggle ── */
+        (function () {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const stored = localStorage.getItem('ds-theme');
+            if (stored) html.dataset.theme = stored;
+            function update() { btn.textContent = html.dataset.theme === 'dark' ? '☀' : '☾' }
+            update();
+            btn.addEventListener('click', () => {
+                html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('ds-theme', html.dataset.theme);
+                update();
+            });
+        })();
+
+        /* ═══════════════════════════════════════════════════════
+           MODALS
+           ═══════════════════════════════════════════════════════ */
+        const backdrop = document.getElementById('modalBackdrop');
+        let activeModal = null;
+
+        function openModal(id) {
+            activeModal = document.getElementById(id);
+            backdrop.classList.add('is-open');
+            activeModal.classList.add('is-open');
+            const first = activeModal.querySelector('input, textarea, button');
+            if (first) setTimeout(() => first.focus(), 100);
+        }
+        function closeModal(id) {
+            const m = id ? document.getElementById(id) : activeModal;
+            if (m) m.classList.remove('is-open');
+            backdrop.classList.remove('is-open');
+            activeModal = null;
+        }
+        backdrop.addEventListener('click', () => closeModal());
+
+        /* ═══════════════════════════════════════════════════════
+           DRAWERS
+           ═══════════════════════════════════════════════════════ */
+        let activeDrawer = null;
+        function openDrawer(id) {
+            closeDrawer(); // close any existing
+            activeDrawer = document.getElementById(id);
+            backdrop.classList.add('is-open');
+            activeDrawer.classList.add('is-open');
+        }
+        function closeDrawer(id) {
+            const d = id ? document.getElementById(id) : activeDrawer;
+            if (d) d.classList.remove('is-open');
+            if (!activeModal) backdrop.classList.remove('is-open');
+            activeDrawer = null;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           DROPDOWNS
+           ═══════════════════════════════════════════════════════ */
+        function toggleDropdown(btn) {
+            const wrap = btn.closest('.dropdown-wrap');
+            const menu = wrap.querySelector('.dropdown-menu');
+            const wasOpen = menu.classList.contains('is-open');
+            closeAllDropdowns();
+            if (!wasOpen) menu.classList.add('is-open');
+        }
+        function closeAllDropdowns() {
+            document.querySelectorAll('.dropdown-menu.is-open').forEach(m => m.classList.remove('is-open'));
+        }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.dropdown-wrap')) closeAllDropdowns();
+        });
+
+        /* ═══════════════════════════════════════════════════════
+           POPOVERS
+           ═══════════════════════════════════════════════════════ */
+        function showPopover(id) { document.getElementById(id).classList.add('is-open') }
+        function hidePopover(id) { document.getElementById(id).classList.remove('is-open') }
+        function togglePopover(id) { document.getElementById(id).classList.toggle('is-open') }
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.popover-wrap')) {
+                document.querySelectorAll('.popover.is-open').forEach(p => p.classList.remove('is-open'));
+            }
+        });
+
+        /* ═══════════════════════════════════════════════════════
+           COMMAND PALETTE
+           ═══════════════════════════════════════════════════════ */
+        const cmdBackdrop = document.getElementById('cmdBackdrop');
+        const cmdPalette = document.getElementById('cmdPalette');
+        const cmdInput = document.getElementById('cmdInput');
+        const cmdResults = document.getElementById('cmdResults');
+        let cmdIndex = 0;
+
+        const cmdData = [
+            { type: 'Recent', icon: 'clock', label: 'Table Mountain sunset post', hint: '2 hrs ago' },
+            { type: 'Recent', icon: 'clock', label: 'Joburg content calendar', hint: '1 day ago' },
+            { type: 'Pages', icon: 'layout', label: 'Dashboard', hint: '/dashboard' },
+            { type: 'Pages', icon: 'layout', label: 'Content Calendar', hint: '/calendar' },
+            { type: 'Pages', icon: 'layout', label: 'Analytics Overview', hint: '/analytics' },
+            { type: 'Pages', icon: 'layout', label: 'Brand Settings', hint: '/settings/brand' },
+            { type: 'Actions', icon: 'zap', label: 'Create New Post', hint: '⌘N' },
+            { type: 'Actions', icon: 'zap', label: 'Schedule Post', hint: '⌘⇧S' },
+            { type: 'Actions', icon: 'zap', label: 'Connect Platform', hint: '' },
+            { type: 'Actions', icon: 'zap', label: 'Export Analytics CSV', hint: '' },
+            { type: 'Posts', icon: 'file', label: 'Heritage Day braai special 🔥', hint: 'Draft' },
+            { type: 'Posts', icon: 'file', label: 'Soweto street food crawl 🍗', hint: 'Scheduled' },
+            { type: 'Posts', icon: 'file', label: 'Cape Town marathon recap 🏃', hint: 'Published' },
+            { type: 'Posts', icon: 'file', label: 'Durban beachfront vibes 🏖️', hint: 'Published' },
+            { type: 'Posts', icon: 'file', label: 'Kruger Park sunrise safari 🦁', hint: 'Published' },
+        ];
+
+        const icons = {
+            clock: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+            layout: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/><path d="M3 9h18M9 21V9"/></svg>',
+            zap: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+            file: '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>',
+        };
+
+        function fuzzyMatch(query, text) {
+            const q = query.toLowerCase();
+            const t = text.toLowerCase();
+            if (!q) return { match: true, html: text };
+            let result = '', qi = 0;
+            for (let i = 0; i < text.length; i++) {
+                if (qi < q.length && t[i] === q[qi]) {
+                    result += '<mark>' + text[i] + '</mark>';
+                    qi++;
+                } else {
+                    result += text[i];
+                }
+            }
+            return { match: qi === q.length, html: result };
+        }
+
+        function renderCmdResults(query) {
+            const filtered = [];
+            cmdData.forEach(item => {
+                const m = fuzzyMatch(query, item.label);
+                if (m.match) filtered.push({ ...item, html: m.html });
+            });
+
+            if (filtered.length === 0) {
+                cmdResults.innerHTML = '<div class="cmd-empty">No results for "' + query + '"</div>';
+                cmdIndex = 0;
+                return;
+            }
+
+            let html = '', lastType = '';
+            filtered.forEach((item, i) => {
+                if (item.type !== lastType) {
+                    html += '<div class="cmd-group-title">' + item.type + '</div>';
+                    lastType = item.type;
+                }
+                html += '<div class="cmd-item' + (i === 0 ? ' is-active' : '') + '" data-idx="' + i + '" onmouseenter="setCmdActive(' + i + ')" onclick="closeCmdPalette()">'
+                    + icons[item.icon]
+                    + '<span>' + item.html + '</span>'
+                    + (item.hint ? '<span class="cmd-item__right">' + item.hint + '</span>' : '')
+                    + '</div>';
+            });
+            cmdResults.innerHTML = html;
+            cmdIndex = 0;
+        }
+
+        function setCmdActive(idx) {
+            const items = cmdResults.querySelectorAll('.cmd-item');
+            items.forEach(el => el.classList.remove('is-active'));
+            if (items[idx]) { items[idx].classList.add('is-active'); cmdIndex = idx; }
+        }
+
+        function openCmdPalette() {
+            cmdBackdrop.classList.add('is-open');
+            cmdPalette.classList.add('is-open');
+            cmdInput.value = '';
+            renderCmdResults('');
+            setTimeout(() => cmdInput.focus(), 100);
+        }
+
+        function closeCmdPalette() {
+            cmdBackdrop.classList.remove('is-open');
+            cmdPalette.classList.remove('is-open');
+        }
+
+        cmdBackdrop.addEventListener('click', closeCmdPalette);
+        cmdInput.addEventListener('input', () => renderCmdResults(cmdInput.value));
+        cmdInput.addEventListener('keydown', e => {
+            const items = cmdResults.querySelectorAll('.cmd-item');
+            if (e.key === 'ArrowDown') { e.preventDefault(); setCmdActive(Math.min(cmdIndex + 1, items.length - 1)); items[cmdIndex]?.scrollIntoView({ block: 'nearest' }); }
+            if (e.key === 'ArrowUp') { e.preventDefault(); setCmdActive(Math.max(cmdIndex - 1, 0)); items[cmdIndex]?.scrollIntoView({ block: 'nearest' }); }
+            if (e.key === 'Enter') { closeCmdPalette(); }
+        });
+
+        /* ═══════════════════════════════════════════════════════
+           GLOBAL KEYBOARD
+           ═══════════════════════════════════════════════════════ */
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if (cmdPalette.classList.contains('is-open')) return closeCmdPalette();
+                if (activeModal) return closeModal();
+                if (activeDrawer) return closeDrawer();
+            }
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                if (cmdPalette.classList.contains('is-open')) closeCmdPalette();
+                else openCmdPalette();
+            }
+        });
+
+        /* ── Sidebar Active State (IntersectionObserver) ── */
+        (function () {
+            const links = document.querySelectorAll('.ds-sidebar__link');
+            const sections = [];
+            links.forEach(link => {
+                const id = link.getAttribute('href').replace('#', '');
+                const target = document.getElementById(id);
+                if (target) sections.push({ id, el: target, link });
+            });
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        links.forEach(l => l.classList.remove('is-active'));
+                        const match = sections.find(s => s.el === entry.target);
+                        if (match) match.link.classList.add('is-active');
+                    }
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            sections.forEach(s => observer.observe(s.el));
+        })();
+    </script>
+</body>
+
+</html>

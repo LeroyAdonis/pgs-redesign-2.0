@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purple Glow Social — Section 07: Layout &amp; Composition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           RESET
+           ═══════════════════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after { margin: 0; padding: 0; box-sizing: border-box }
+
+        /* ═══════════════════════════════════════════════════════
+           THEME TOKENS — DARK
+           ═══════════════════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --bg: #050507;
+            --bg-elevated: #0A0A0F;
+            --bg-subtle: #0E0E14;
+            --fg: #F0EDE8;
+            --fg-muted: #8A8680;
+            --fg-subtle: #5C5955;
+            --purple: #8B5CF6;
+            --purple-vivid: #A78BFA;
+            --purple-deep: #6D28D9;
+            --purple-surface: rgba(139, 92, 246, 0.12);
+            --success: #4ADE80;
+            --success-surface: rgba(74, 222, 128, 0.1);
+            --warning: #FBBF24;
+            --warning-surface: rgba(251, 191, 36, 0.1);
+            --error: #F87171;
+            --error-surface: rgba(248, 113, 113, 0.1);
+            --info: #60A5FA;
+            --info-surface: rgba(96, 165, 250, 0.1);
+            --border: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(139, 92, 246, 0.2);
+            --accent: #E8D5B5;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.25);
+            --toggle-icon: '☀';
+            --code-bg: rgba(255, 255, 255, 0.04);
+        }
+
+        [data-theme="light"] {
+            --bg: #F8F6F3;
+            --bg-elevated: #FFFFFF;
+            --bg-subtle: #F0EDE8;
+            --fg: #1A1A1E;
+            --fg-muted: #6B6966;
+            --fg-subtle: #9E9B97;
+            --purple: #7C3AED;
+            --purple-vivid: #8B5CF6;
+            --purple-deep: #5B21B6;
+            --purple-surface: rgba(124, 58, 237, 0.08);
+            --success: #22C55E;
+            --success-surface: rgba(34, 197, 94, 0.08);
+            --warning: #EAB308;
+            --warning-surface: rgba(234, 179, 8, 0.08);
+            --error: #EF4444;
+            --error-surface: rgba(239, 68, 68, 0.08);
+            --info: #3B82F6;
+            --info-surface: rgba(59, 130, 246, 0.08);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(124, 58, 237, 0.15);
+            --accent: #C4A882;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --shadow-glow: 0 0 30px rgba(124, 58, 237, 0.15);
+            --toggle-icon: '☾';
+            --code-bg: rgba(0, 0, 0, 0.04);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           SHARED TOKENS
+           ═══════════════════════════════════════════════════════ */
+        :root {
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-body: 'Sora', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+            --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+            --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+            --radius-none: 0; --radius-sm: 4px; --radius-md: 8px;
+            --radius-lg: 12px; --radius-xl: 16px; --radius-full: 9999px;
+            --duration-fast: 150ms; --duration-base: 250ms;
+            --duration-slow: 500ms; --duration-dramatic: 1000ms;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+            --z-dropdown: 100; --z-sticky: 200; --z-modal: 400; --z-tooltip: 600;
+            --sidebar-w: 260px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           BASE
+           ═══════════════════════════════════════════════════════ */
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+            overflow-x: hidden;
+            font-size: 16px;
+            transition: background var(--duration-base) var(--ease-out-expo),
+                        color var(--duration-base) var(--ease-out-expo);
+        }
+        a { color: var(--purple); text-decoration: none }
+        a:hover { text-decoration: underline }
+        ::selection { background: var(--purple); color: #fff }
+
+        /* ═══════════════════════════════════════════════════════
+           LAYOUT SHELL
+           ═══════════════════════════════════════════════════════ */
+        .ds-shell { display: flex; min-height: 100vh }
+
+        .ds-sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-w);
+            background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            overflow-y: auto; z-index: var(--z-sticky);
+            display: flex; flex-direction: column;
+            transition: background var(--duration-base) var(--ease-out-expo),
+                        border-color var(--duration-base) var(--ease-out-expo);
+        }
+        .ds-sidebar__logo {
+            padding: var(--space-6) var(--space-6) var(--space-4);
+            font-family: var(--font-display);
+            font-size: 1.35rem; letter-spacing: -0.02em;
+            border-bottom: 1px solid var(--border);
+            color: var(--fg);
+        }
+        .ds-sidebar__logo span { color: var(--purple) }
+        .ds-sidebar__nav { padding: var(--space-4) 0; flex: 1 }
+        .ds-sidebar__section {
+            padding: var(--space-2) var(--space-6) var(--space-1);
+            font-family: var(--font-mono); font-size: 0.625rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-subtle);
+        }
+        .ds-sidebar__link {
+            display: block; padding: var(--space-2) var(--space-6);
+            font-size: 0.8125rem; color: var(--fg-muted);
+            transition: color var(--duration-fast), background var(--duration-fast);
+            text-decoration: none; border-left: 2px solid transparent;
+        }
+        .ds-sidebar__link:hover {
+            color: var(--fg); background: var(--purple-surface); text-decoration: none;
+        }
+        .ds-sidebar__link.is-active {
+            color: var(--purple); border-left-color: var(--purple);
+            background: var(--purple-surface);
+        }
+
+        .ds-main {
+            margin-left: var(--sidebar-w); flex: 1;
+            padding: var(--space-10) var(--space-12) var(--space-24);
+            max-width: 1100px;
+        }
+
+        .ds-theme-toggle {
+            position: fixed; top: var(--space-4); right: var(--space-6);
+            z-index: var(--z-tooltip); width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            font-size: 1.25rem; cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out-expo);
+        }
+        .ds-theme-toggle:hover { border-color: var(--purple); box-shadow: var(--shadow-glow) }
+
+        /* ═══════════════════════════════════════════════════════
+           SECTION HEADINGS
+           ═══════════════════════════════════════════════════════ */
+        .ds-section { margin-bottom: var(--space-24); scroll-margin-top: var(--space-10) }
+        .ds-section__id {
+            font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500;
+            color: var(--purple); letter-spacing: 0.08em; margin-bottom: var(--space-1);
+            text-transform: uppercase;
+        }
+        .ds-section__title {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 400;
+            letter-spacing: -0.02em; line-height: 1.15; margin-bottom: var(--space-2);
+        }
+        .ds-section__desc {
+            font-size: 0.9375rem; color: var(--fg-muted);
+            max-width: 640px; line-height: 1.7; margin-bottom: var(--space-10);
+        }
+        .ds-sub { margin-bottom: var(--space-16); scroll-margin-top: var(--space-10) }
+        .ds-sub__title {
+            font-family: var(--font-body); font-size: 1.125rem;
+            font-weight: 600; margin-bottom: var(--space-1);
+        }
+        .ds-sub__desc {
+            font-size: 0.8125rem; color: var(--fg-muted);
+            margin-bottom: var(--space-6);
+        }
+        .ds-demo-label {
+            font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-2);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           7a — APP SHELL MOCKUP
+           ═══════════════════════════════════════════════════════ */
+        .app-shell-frame {
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            overflow: hidden; background: var(--bg);
+            position: relative; height: 420px;
+        }
+        .app-shell-frame__sidebar {
+            position: absolute; top: 0; left: 0; bottom: 0;
+            width: 180px; background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            transition: width var(--duration-base) var(--ease-out-expo);
+            z-index: 2; display: flex; flex-direction: column;
+        }
+        .app-shell-frame__sidebar.is-collapsed { width: 52px }
+        .app-shell-frame__sidebar.is-collapsed .asf-nav-label,
+        .app-shell-frame__sidebar.is-collapsed .asf-logo-text { display: none }
+        .app-shell-frame__sidebar.is-collapsed .asf-nav-item { justify-content: center; padding-left: 0; padding-right: 0 }
+
+        .asf-logo {
+            padding: 12px 14px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px; font-size: 0.75rem;
+            font-family: var(--font-display); color: var(--fg);
+        }
+        .asf-logo-dot {
+            width: 22px; height: 22px; border-radius: 6px;
+            background: var(--purple); flex-shrink: 0;
+        }
+        .asf-nav { padding: 8px 0; flex: 1; overflow: hidden }
+        .asf-nav-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 14px; font-size: 0.6875rem; color: var(--fg-muted);
+            cursor: default; transition: background var(--duration-fast);
+        }
+        .asf-nav-item:hover { background: var(--purple-surface) }
+        .asf-nav-item.is-active { color: var(--purple); background: var(--purple-surface) }
+        .asf-nav-icon {
+            width: 18px; height: 18px; border-radius: 4px;
+            background: var(--border); flex-shrink: 0;
+        }
+        .asf-nav-item.is-active .asf-nav-icon { background: var(--purple-surface); border: 1px solid var(--purple) }
+
+        .app-shell-frame__header {
+            position: absolute; top: 0; right: 0; height: 44px;
+            left: 180px; background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 16px;
+            gap: 10px; z-index: 1;
+            transition: left var(--duration-base) var(--ease-out-expo);
+        }
+        .app-shell-frame__sidebar.is-collapsed ~ .app-shell-frame__header { left: 52px }
+        .asf-breadcrumb { font-size: 0.6875rem; color: var(--fg-muted); flex: 1 }
+        .asf-breadcrumb em { color: var(--fg); font-style: normal }
+        .asf-avatar {
+            width: 24px; height: 24px; border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--purple), var(--purple-vivid));
+        }
+
+        .app-shell-frame__content {
+            position: absolute; top: 44px; bottom: 0; right: 0;
+            left: 180px; padding: 16px; overflow-y: auto;
+            transition: left var(--duration-base) var(--ease-out-expo);
+        }
+        .app-shell-frame__sidebar.is-collapsed ~ .app-shell-frame__content { left: 52px }
+        .asf-content-block {
+            background: var(--bg-subtle); border: 1px dashed var(--border);
+            border-radius: var(--radius-md); padding: 14px;
+            font-size: 0.6875rem; color: var(--fg-subtle);
+            margin-bottom: 10px;
+        }
+        .asf-content-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+        }
+        .asf-content-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.625rem; color: var(--fg-subtle);
+        }
+
+        /* Annotation arrows */
+        .annotation {
+            position: absolute; font-family: var(--font-mono); font-size: 0.5625rem;
+            color: var(--warning); display: flex; align-items: center; gap: 4px;
+            pointer-events: none; z-index: 5;
+        }
+        .annotation::before {
+            content: ''; display: block; width: 14px; height: 1px;
+            background: var(--warning);
+        }
+        .annotation--vert::before {
+            width: 1px; height: 14px;
+        }
+
+        .collapse-btn {
+            margin: auto 14px 12px; padding: 5px 8px; font-size: 0.5625rem;
+            font-family: var(--font-mono); background: var(--purple-surface);
+            color: var(--purple); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); cursor: pointer;
+            transition: all var(--duration-fast);
+            text-align: center;
+        }
+        .collapse-btn:hover { border-color: var(--purple) }
+
+        /* ═══════════════════════════════════════════════════════
+           7b — DASHBOARD GRID
+           ═══════════════════════════════════════════════════════ */
+        .grid-12-demo {
+            display: grid; grid-template-columns: repeat(12, 1fr);
+            gap: 4px; margin-bottom: var(--space-4);
+        }
+        .grid-12-demo__col {
+            height: 32px; background: var(--purple-surface);
+            border: 1px solid var(--purple); border-radius: 2px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.5rem; color: var(--purple);
+        }
+
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: var(--space-3); margin-bottom: var(--space-6);
+        }
+        .kpi-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: var(--space-4);
+            transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+        }
+        .kpi-card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-glow) }
+        .kpi-card__label {
+            font-size: 0.6875rem; color: var(--fg-muted);
+            margin-bottom: var(--space-1);
+        }
+        .kpi-card__value {
+            font-family: var(--font-display); font-size: 1.75rem;
+            letter-spacing: -0.02em; line-height: 1.1;
+        }
+        .kpi-card__delta {
+            font-family: var(--font-mono); font-size: 0.625rem;
+            margin-top: var(--space-1);
+        }
+        .kpi-card__delta--up { color: var(--success) }
+        .kpi-card__delta--down { color: var(--error) }
+
+        .split-layout {
+            display: grid; grid-template-columns: 2fr 1fr;
+            gap: var(--space-4); margin-bottom: var(--space-6);
+        }
+        .split-panel {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: var(--space-4);
+            min-height: 200px;
+        }
+        .split-panel__title {
+            font-size: 0.8125rem; font-weight: 600; margin-bottom: var(--space-3);
+        }
+        .chart-placeholder {
+            height: 140px; background: var(--bg-subtle);
+            border: 1px dashed var(--border); border-radius: var(--radius-sm);
+            display: flex; align-items: flex-end; padding: 0 8px 8px; gap: 4px;
+        }
+        .chart-bar {
+            flex: 1; background: var(--purple); border-radius: 2px 2px 0 0;
+            opacity: 0.7; transition: opacity var(--duration-fast);
+        }
+        .chart-bar:hover { opacity: 1 }
+
+        .feed-item {
+            display: flex; align-items: flex-start; gap: var(--space-2);
+            padding: var(--space-2) 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .feed-item:last-child { border-bottom: none }
+        .feed-dot {
+            width: 8px; height: 8px; border-radius: var(--radius-full);
+            margin-top: 5px; flex-shrink: 0;
+        }
+        .feed-text { font-size: 0.75rem; color: var(--fg-muted); line-height: 1.5 }
+        .feed-time { font-size: 0.625rem; color: var(--fg-subtle); font-family: var(--font-mono) }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-auto-rows: 100px; gap: var(--space-3);
+        }
+        .bento-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: var(--space-3);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+        }
+        .bento-card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md) }
+        .bento-card--tall { grid-row: span 2 }
+        .bento-card--wide { grid-column: span 2 }
+        .bento-card__label {
+            font-family: var(--font-mono); font-size: 0.5625rem;
+            color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .bento-card__value {
+            font-family: var(--font-display); font-size: 1.25rem;
+            margin-top: 4px;
+        }
+
+        .gap-demo { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6) }
+        .gap-demo__box {
+            display: grid; gap: var(--space-2); padding: 10px;
+            background: var(--bg-subtle); border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+        .gap-demo__cell {
+            width: 28px; height: 28px; background: var(--purple-surface);
+            border: 1px solid var(--purple); border-radius: 3px;
+        }
+        .gap-demo__label {
+            font-family: var(--font-mono); font-size: 0.5625rem;
+            color: var(--fg-subtle); text-align: center; margin-top: 4px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           7c — CONTENT CONTAINERS
+           ═══════════════════════════════════════════════════════ */
+        .container-demo-wrap {
+            background: var(--bg-subtle); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: var(--space-6) var(--space-3);
+            margin-bottom: var(--space-4); position: relative; overflow: hidden;
+        }
+        .container-demo {
+            border: 2px dashed var(--purple); border-radius: var(--radius-sm);
+            padding: var(--space-3) var(--space-4); position: relative;
+            margin: 0 auto; transition: max-width var(--duration-base) var(--ease-out-expo);
+        }
+        .container-demo__label {
+            position: absolute; top: -1px; left: var(--space-3);
+            background: var(--purple); color: #fff; font-family: var(--font-mono);
+            font-size: 0.5625rem; padding: 2px 8px; border-radius: 0 0 4px 4px;
+        }
+        .container-demo__width {
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            color: var(--fg-muted); text-align: center; padding: var(--space-2) 0;
+        }
+        .container-demo__prose {
+            font-size: 0.8125rem; color: var(--fg-muted); line-height: 1.7;
+            max-width: 100%;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           7d — DIVIDERS & SPACING
+           ═══════════════════════════════════════════════════════ */
+        .divider-demo { margin-bottom: var(--space-6) }
+        .hr-thin {
+            border: none; height: 1px; background: var(--border);
+            margin: var(--space-4) 0;
+        }
+        .hr-label {
+            display: flex; align-items: center; gap: var(--space-3);
+            color: var(--fg-subtle); font-size: 0.75rem; margin: var(--space-4) 0;
+        }
+        .hr-label::before,
+        .hr-label::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .hr-icon {
+            display: flex; align-items: center; gap: var(--space-3);
+            color: var(--fg-subtle); font-size: 0.75rem; margin: var(--space-4) 0;
+        }
+        .hr-icon::before,
+        .hr-icon::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .hr-icon svg { opacity: 0.5 }
+
+        .vdiv-demo {
+            display: flex; align-items: center; gap: var(--space-4);
+            margin: var(--space-4) 0; flex-wrap: wrap;
+        }
+        .vdiv {
+            width: 1px; height: 24px; background: var(--border); flex-shrink: 0;
+        }
+        .vdiv-item { font-size: 0.8125rem; color: var(--fg-muted) }
+
+        .spacing-scale { margin-bottom: var(--space-6) }
+        .spacing-row {
+            display: flex; align-items: center; gap: var(--space-4);
+            margin-bottom: var(--space-2);
+        }
+        .spacing-label {
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            color: var(--fg-muted); flex: 0 0 120px;
+        }
+        .spacing-bar {
+            height: 20px; background: var(--purple-surface);
+            border-left: 3px solid var(--purple);
+            transition: width var(--duration-base) var(--ease-out-expo);
+        }
+        .spacing-value {
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            color: var(--fg-subtle); flex: 0 0 44px; text-align: right;
+        }
+
+        .pad-demo {
+            display: inline-flex; flex-direction: column; gap: var(--space-2);
+            margin-bottom: var(--space-6);
+        }
+        .pad-box {
+            background: var(--purple-surface); border: 1px dashed var(--purple);
+            border-radius: var(--radius-sm); display: inline-flex;
+            align-items: center; justify-content: center;
+        }
+        .pad-inner {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: 2px; font-family: var(--font-mono);
+            font-size: 0.5625rem; color: var(--fg-muted);
+            padding: var(--space-2) var(--space-3);
+        }
+        .pad-label {
+            font-family: var(--font-mono); font-size: 0.5625rem;
+            color: var(--fg-subtle); text-align: center;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           7e — RESPONSIVE BEHAVIOR
+           ═══════════════════════════════════════════════════════ */
+        .bp-indicator {
+            display: flex; gap: var(--space-2); margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+        }
+        .bp-pill {
+            padding: var(--space-1) var(--space-3);
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            border: 1px solid var(--border); border-radius: var(--radius-full);
+            color: var(--fg-subtle); transition: all var(--duration-fast);
+        }
+        .bp-pill.is-active {
+            border-color: var(--success); color: var(--success);
+            background: var(--success-surface);
+        }
+
+        .bp-table {
+            width: 100%; border-collapse: collapse; margin-bottom: var(--space-6);
+        }
+        .bp-table th {
+            text-align: left; padding: var(--space-2) var(--space-3);
+            font-family: var(--font-mono); font-size: 0.625rem;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--fg-subtle); border-bottom: 1px solid var(--border);
+        }
+        .bp-table td {
+            padding: var(--space-2) var(--space-3);
+            font-size: 0.8125rem; border-bottom: 1px solid var(--border);
+        }
+        .bp-table td:first-child { font-family: var(--font-mono); font-size: 0.75rem; color: var(--purple) }
+        .bp-table td:nth-child(2) { font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-muted) }
+
+        .responsive-demo {
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            overflow: hidden; margin-bottom: var(--space-6); position: relative;
+        }
+        .responsive-demo__bar {
+            background: var(--bg-elevated); border-bottom: 1px solid var(--border);
+            padding: var(--space-2) var(--space-3);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .responsive-demo__label {
+            font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle);
+        }
+        .responsive-demo__controls {
+            display: flex; gap: var(--space-1);
+        }
+        .responsive-demo__btn {
+            padding: 3px 10px; font-family: var(--font-mono); font-size: 0.5625rem;
+            background: var(--bg-subtle); border: 1px solid var(--border);
+            color: var(--fg-muted); cursor: pointer; border-radius: var(--radius-sm);
+            transition: all var(--duration-fast);
+        }
+        .responsive-demo__btn:hover { border-color: var(--purple); color: var(--purple) }
+        .responsive-demo__btn.is-active {
+            background: var(--purple-surface); border-color: var(--purple); color: var(--purple);
+        }
+        .responsive-demo__viewport {
+            padding: var(--space-4); background: var(--bg);
+            transition: padding var(--duration-base);
+            overflow: hidden;
+        }
+        .responsive-demo__inner {
+            display: grid; gap: var(--space-3);
+            transition: grid-template-columns var(--duration-base) var(--ease-out-expo);
+        }
+        .responsive-demo__card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: var(--space-3);
+            min-height: 80px;
+        }
+        .responsive-demo__card-title {
+            font-size: 0.75rem; font-weight: 600; margin-bottom: 4px;
+        }
+        .responsive-demo__card-text {
+            font-size: 0.6875rem; color: var(--fg-muted); line-height: 1.5;
+        }
+
+        .mobile-first-demo {
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .mf-step {
+            padding: var(--space-3) var(--space-4);
+            display: flex; align-items: center; gap: var(--space-4);
+            border-bottom: 1px solid var(--border);
+            transition: background var(--duration-fast);
+        }
+        .mf-step:last-child { border-bottom: none }
+        .mf-step:hover { background: var(--purple-surface) }
+        .mf-step__bp {
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            color: var(--purple); flex: 0 0 50px;
+        }
+        .mf-step__code {
+            font-family: var(--font-mono); font-size: 0.6875rem;
+            color: var(--fg-muted); background: var(--code-bg);
+            padding: 2px 8px; border-radius: var(--radius-sm); flex: 1;
+        }
+        .mf-step__visual {
+            display: flex; gap: 3px; flex: 0 0 120px;
+        }
+        .mf-step__block {
+            height: 20px; background: var(--purple-surface);
+            border: 1px solid var(--purple); border-radius: 2px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           UTILITIES
+           ═══════════════════════════════════════════════════════ */
+        .ds-mt-4 { margin-top: var(--space-4) }
+        .ds-mt-6 { margin-top: var(--space-6) }
+        .ds-mt-8 { margin-top: var(--space-8) }
+    </style>
+</head>
+
+<body>
+    <div class="ds-shell">
+        <!-- ── Sidebar ── -->
+        <aside class="ds-sidebar">
+            <div class="ds-sidebar__logo">Purple <span>Glow</span> Social</div>
+            <nav class="ds-sidebar__nav">
+                <div class="ds-sidebar__section">Section 07</div>
+                <a class="ds-sidebar__link" href="#layout">Layout &amp; Composition</a>
+                <a class="ds-sidebar__link" href="#app-shell">App Shell</a>
+                <a class="ds-sidebar__link" href="#dashboard-grid">Dashboard Grid</a>
+                <a class="ds-sidebar__link" href="#containers">Content Containers</a>
+                <a class="ds-sidebar__link" href="#dividers">Dividers &amp; Spacing</a>
+                <a class="ds-sidebar__link" href="#responsive">Responsive Behavior</a>
+            </nav>
+        </aside>
+
+        <!-- ── Theme Toggle ── -->
+        <button class="ds-theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+
+        <!-- ── Main ── -->
+        <main class="ds-main">
+            <section class="ds-section" id="layout">
+                <div class="ds-section__id">07 — Layout</div>
+                <h1 class="ds-section__title">Layout &amp; Composition</h1>
+                <p class="ds-section__desc">
+                    Structural patterns that govern how content is arranged across
+                    the Purple Glow Social platform — from the app shell to responsive grids,
+                    container widths, and spacing utilities. Built for Mzansi's diverse devices.
+                </p>
+
+                <!-- ━━━ 7a App Shell ━━━ -->
+                <section class="ds-sub" id="app-shell">
+                    <h2 class="ds-sub__title">App Shell</h2>
+                    <p class="ds-sub__desc">
+                        The primary application structure: collapsible sidebar, top header bar,
+                        and scrollable content area. Click "Collapse" to see the responsive sidebar behavior.
+                    </p>
+
+                    <div class="app-shell-frame" id="appShellFrame">
+                        <div class="app-shell-frame__sidebar" id="appShellSidebar">
+                            <div class="asf-logo">
+                                <div class="asf-logo-dot"></div>
+                                <span class="asf-logo-text">PGS</span>
+                            </div>
+                            <div class="asf-nav">
+                                <div class="asf-nav-item is-active">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Dashboard</span>
+                                </div>
+                                <div class="asf-nav-item">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Compose</span>
+                                </div>
+                                <div class="asf-nav-item">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Calendar</span>
+                                </div>
+                                <div class="asf-nav-item">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Analytics</span>
+                                </div>
+                                <div class="asf-nav-item">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Accounts</span>
+                                </div>
+                                <div class="asf-nav-item">
+                                    <div class="asf-nav-icon"></div>
+                                    <span class="asf-nav-label">Settings</span>
+                                </div>
+                            </div>
+                            <button class="collapse-btn" id="collapseBtn" onclick="toggleShellSidebar()">
+                                ◀ Collapse
+                            </button>
+                        </div>
+                        <div class="app-shell-frame__header">
+                            <div class="asf-breadcrumb">Dashboard / <em>Overview — Cape Town</em></div>
+                            <div class="asf-avatar"></div>
+                        </div>
+                        <div class="app-shell-frame__content">
+                            <div class="asf-content-block">
+                                Scrollable content area — metrics, feeds, and charts render here.
+                            </div>
+                            <div class="asf-content-grid">
+                                <div class="asf-content-card">Card 1</div>
+                                <div class="asf-content-card">Card 2</div>
+                                <div class="asf-content-card">Card 3</div>
+                            </div>
+                            <div class="asf-content-block" style="margin-top:10px">
+                                Activity feed — recent posts, mentions, and engagement from Joburg &amp; Durban accounts.
+                            </div>
+                        </div>
+                        <!-- Annotations -->
+                        <div class="annotation" style="top:20px;left:184px">sidebar: 180px</div>
+                        <div class="annotation" style="top:6px;left:50%;transform:translateX(-50%)">header: 44px</div>
+                        <div class="annotation" style="bottom:12px;right:16px">content area</div>
+                    </div>
+                </section>
+
+                <!-- ━━━ 7b Dashboard Grid ━━━ -->
+                <section class="ds-sub" id="dashboard-grid">
+                    <h2 class="ds-sub__title">Dashboard Grid</h2>
+                    <p class="ds-sub__desc">
+                        A flexible 12-column system with auto-responsive cards,
+                        KPI rows, split layouts, and bento-style composition.
+                    </p>
+
+                    <div class="ds-demo-label">12-Column Grid</div>
+                    <div class="grid-12-demo" id="grid12">
+                        <!-- JS-generated columns -->
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-6">KPI Metric Cards</div>
+                    <div class="kpi-row">
+                        <div class="kpi-card">
+                            <div class="kpi-card__label">Total Reach</div>
+                            <div class="kpi-card__value">124.7K</div>
+                            <div class="kpi-card__delta kpi-card__delta--up">↑ 12.3% vs last week</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__label">Engagement Rate</div>
+                            <div class="kpi-card__value">4.8%</div>
+                            <div class="kpi-card__delta kpi-card__delta--up">↑ 0.6% lekker growth</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__label">Posts Scheduled</div>
+                            <div class="kpi-card__value">38</div>
+                            <div class="kpi-card__delta kpi-card__delta--down">↓ 4 fewer than target</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-card__label">New Followers</div>
+                            <div class="kpi-card__value">2,041</div>
+                            <div class="kpi-card__delta kpi-card__delta--up">↑ Mzansi loves it</div>
+                        </div>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-4">Split Layout — 2/3 + 1/3</div>
+                    <div class="split-layout">
+                        <div class="split-panel">
+                            <div class="split-panel__title">Engagement Over Time</div>
+                            <div class="chart-placeholder" id="chartBars">
+                                <!-- JS bars -->
+                            </div>
+                        </div>
+                        <div class="split-panel">
+                            <div class="split-panel__title">Recent Activity</div>
+                            <div class="feed-item">
+                                <div class="feed-dot" style="background:var(--success)"></div>
+                                <div>
+                                    <div class="feed-text">New follower from Joburg joined #LocalIsLekker campaign</div>
+                                    <div class="feed-time">2 min ago</div>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-dot" style="background:var(--info)"></div>
+                                <div>
+                                    <div class="feed-text">Scheduled post "Table Mountain sunrise" published to IG</div>
+                                    <div class="feed-time">14 min ago</div>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-dot" style="background:var(--warning)"></div>
+                                <div>
+                                    <div class="feed-text">Cape Town account nearing daily post limit</div>
+                                    <div class="feed-time">28 min ago</div>
+                                </div>
+                            </div>
+                            <div class="feed-item">
+                                <div class="feed-dot" style="background:var(--purple)"></div>
+                                <div>
+                                    <div class="feed-text">Durban Mzansi Vibes post hit 1K likes 🔥</div>
+                                    <div class="feed-time">43 min ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-4">Bento Grid</div>
+                    <div class="bento-grid">
+                        <div class="bento-card bento-card--tall">
+                            <div class="bento-card__label">Top Post</div>
+                            <div class="bento-card__value">Braai Day 🔥</div>
+                        </div>
+                        <div class="bento-card">
+                            <div class="bento-card__label">Impressions</div>
+                            <div class="bento-card__value">89.2K</div>
+                        </div>
+                        <div class="bento-card">
+                            <div class="bento-card__label">Clicks</div>
+                            <div class="bento-card__value">3,412</div>
+                        </div>
+                        <div class="bento-card bento-card--wide">
+                            <div class="bento-card__label">Trending Hashtag</div>
+                            <div class="bento-card__value">#MzansiMagic</div>
+                        </div>
+                        <div class="bento-card">
+                            <div class="bento-card__label">Shares</div>
+                            <div class="bento-card__value">741</div>
+                        </div>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-8">Gap Utilities</div>
+                    <div class="gap-demo" id="gapDemo">
+                        <!-- JS-generated -->
+                    </div>
+                </section>
+
+                <!-- ━━━ 7c Content Containers ━━━ -->
+                <section class="ds-sub" id="containers">
+                    <h2 class="ds-sub__title">Content Containers</h2>
+                    <p class="ds-sub__desc">
+                        Max-width containers that control content measure for readability,
+                        app layouts, dashboards, and full-bleed sections.
+                    </p>
+
+                    <div class="container-demo-wrap">
+                        <div class="container-demo" style="max-width:640px">
+                            <div class="container-demo__label">Prose — 640px</div>
+                            <div class="container-demo__width">max-width: 640px</div>
+                            <p class="container-demo__prose">
+                                Ideal for blog posts, long-form content, and campaign descriptions.
+                                Keeps line lengths between 55–75 characters for comfortable reading.
+                                Perfect for your Mzansi brand stories.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="container-demo-wrap">
+                        <div class="container-demo" style="max-width:100%">
+                            <div class="container-demo__label">Standard — 1100px</div>
+                            <div class="container-demo__width">max-width: 1100px (shown full-width in context)</div>
+                            <p class="container-demo__prose">
+                                The default app content container used for post composers, settings panels,
+                                and account management views.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="container-demo-wrap">
+                        <div class="container-demo" style="max-width:100%">
+                            <div class="container-demo__label">Wide — 1400px</div>
+                            <div class="container-demo__width">max-width: 1400px (shown full-width in context)</div>
+                            <p class="container-demo__prose">
+                                For dashboards and analytics views that need room for complex data visualisations
+                                and side-by-side panels.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="container-demo-wrap" style="padding:0">
+                        <div class="container-demo" style="max-width:100%;border-style:solid;border-radius:0">
+                            <div class="container-demo__label">Full Bleed — 100%</div>
+                            <div class="container-demo__width">Edge to edge — no max-width constraint</div>
+                            <p class="container-demo__prose">
+                                Hero banners, media galleries, and immersive visual sections
+                                that break free from container limits.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ━━━ 7d Dividers & Spacing ━━━ -->
+                <section class="ds-sub" id="dividers">
+                    <h2 class="ds-sub__title">Dividers &amp; Spacing</h2>
+                    <p class="ds-sub__desc">
+                        Horizontal and vertical dividers, the complete spacing scale, and
+                        margin/padding utility previews.
+                    </p>
+
+                    <div class="ds-demo-label">Horizontal Dividers</div>
+                    <div class="divider-demo">
+                        <p style="font-size:0.8125rem;color:var(--fg-muted)">Content above the thin divider</p>
+                        <hr class="hr-thin" />
+                        <p style="font-size:0.8125rem;color:var(--fg-muted)">Content below the thin divider</p>
+
+                        <div class="hr-label">or</div>
+
+                        <p style="font-size:0.8125rem;color:var(--fg-muted)">Content between labelled dividers</p>
+
+                        <div class="hr-icon">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 16 16">
+                                <circle cx="8" cy="8" r="6" /><path d="M8 5v6M5 8h6" />
+                            </svg>
+                        </div>
+
+                        <p style="font-size:0.8125rem;color:var(--fg-muted)">Content after icon divider</p>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-6">Vertical Dividers</div>
+                    <div class="vdiv-demo">
+                        <span class="vdiv-item">Joburg</span>
+                        <div class="vdiv"></div>
+                        <span class="vdiv-item">Cape Town</span>
+                        <div class="vdiv"></div>
+                        <span class="vdiv-item">Durban</span>
+                        <div class="vdiv"></div>
+                        <span class="vdiv-item">Pretoria</span>
+                        <div class="vdiv"></div>
+                        <span class="vdiv-item">Soweto</span>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-8">Spacing Scale</div>
+                    <div class="spacing-scale" id="spacingScale">
+                        <!-- JS-generated -->
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-8">Padding Utility Preview</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:var(--space-4);align-items:flex-start">
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:4px"><div class="pad-inner">space-1</div></div>
+                            <div class="pad-label">4px</div>
+                        </div>
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:8px"><div class="pad-inner">space-2</div></div>
+                            <div class="pad-label">8px</div>
+                        </div>
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:12px"><div class="pad-inner">space-3</div></div>
+                            <div class="pad-label">12px</div>
+                        </div>
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:16px"><div class="pad-inner">space-4</div></div>
+                            <div class="pad-label">16px</div>
+                        </div>
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:24px"><div class="pad-inner">space-6</div></div>
+                            <div class="pad-label">24px</div>
+                        </div>
+                        <div class="pad-demo">
+                            <div class="pad-box" style="padding:32px"><div class="pad-inner">space-8</div></div>
+                            <div class="pad-label">32px</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ━━━ 7e Responsive Behavior ━━━ -->
+                <section class="ds-sub" id="responsive">
+                    <h2 class="ds-sub__title">Responsive Behavior</h2>
+                    <p class="ds-sub__desc">
+                        Breakpoint indicators, media query references, and interactive
+                        layout demos showing stack-to-side-by-side transitions.
+                    </p>
+
+                    <div class="ds-demo-label">Current Viewport</div>
+                    <div class="bp-indicator" id="bpIndicator">
+                        <div class="bp-pill" data-min="0" data-label="xs">xs &lt;480</div>
+                        <div class="bp-pill" data-min="480" data-label="sm">sm ≥480</div>
+                        <div class="bp-pill" data-min="768" data-label="md">md ≥768</div>
+                        <div class="bp-pill" data-min="1024" data-label="lg">lg ≥1024</div>
+                        <div class="bp-pill" data-min="1280" data-label="xl">xl ≥1280</div>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-6">Breakpoint Reference</div>
+                    <table class="bp-table">
+                        <thead>
+                            <tr><th>Token</th><th>Min-width</th><th>Usage</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>xs</td><td>0 px</td><td>Mobile phones — single column, stacked layout</td></tr>
+                            <tr><td>sm</td><td>480 px</td><td>Large phones / small tablets — wider cards</td></tr>
+                            <tr><td>md</td><td>768 px</td><td>Tablets — 2-column grids, side panels appear</td></tr>
+                            <tr><td>lg</td><td>1024 px</td><td>Laptops — sidebar visible, 3-column grids</td></tr>
+                            <tr><td>xl</td><td>1280 px</td><td>Desktops — full dashboard, 4-column grids</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="ds-demo-label ds-mt-6">Stack ↔ Side-by-Side Demo</div>
+                    <div class="responsive-demo">
+                        <div class="responsive-demo__bar">
+                            <div class="responsive-demo__label" id="responsiveLabel">Desktop — 4 columns</div>
+                            <div class="responsive-demo__controls">
+                                <button class="responsive-demo__btn is-active" onclick="setResponsiveView('xl',this)">xl</button>
+                                <button class="responsive-demo__btn" onclick="setResponsiveView('lg',this)">lg</button>
+                                <button class="responsive-demo__btn" onclick="setResponsiveView('md',this)">md</button>
+                                <button class="responsive-demo__btn" onclick="setResponsiveView('sm',this)">sm</button>
+                                <button class="responsive-demo__btn" onclick="setResponsiveView('xs',this)">xs</button>
+                            </div>
+                        </div>
+                        <div class="responsive-demo__viewport">
+                            <div class="responsive-demo__inner" id="responsiveGrid" style="grid-template-columns:repeat(4,1fr)">
+                                <div class="responsive-demo__card">
+                                    <div class="responsive-demo__card-title">Joburg Reach</div>
+                                    <div class="responsive-demo__card-text">45.2K impressions this week across all platforms.</div>
+                                </div>
+                                <div class="responsive-demo__card">
+                                    <div class="responsive-demo__card-title">Cape Town Engagement</div>
+                                    <div class="responsive-demo__card-text">5.1% avg engagement — above national benchmark.</div>
+                                </div>
+                                <div class="responsive-demo__card">
+                                    <div class="responsive-demo__card-title">Durban Followers</div>
+                                    <div class="responsive-demo__card-text">+812 new followers from #MzansiVibes campaign.</div>
+                                </div>
+                                <div class="responsive-demo__card">
+                                    <div class="responsive-demo__card-title">Pretoria Clicks</div>
+                                    <div class="responsive-demo__card-text">1,204 link clicks driving traffic to landing page.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ds-demo-label ds-mt-6">Mobile-First Progression</div>
+                    <div class="mobile-first-demo">
+                        <div class="mf-step">
+                            <div class="mf-step__bp">base</div>
+                            <div class="mf-step__code">grid-template-columns: 1fr</div>
+                            <div class="mf-step__visual">
+                                <div class="mf-step__block" style="flex:1"></div>
+                            </div>
+                        </div>
+                        <div class="mf-step">
+                            <div class="mf-step__bp">sm</div>
+                            <div class="mf-step__code">grid-template-columns: repeat(2, 1fr)</div>
+                            <div class="mf-step__visual">
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                            </div>
+                        </div>
+                        <div class="mf-step">
+                            <div class="mf-step__bp">md</div>
+                            <div class="mf-step__code">grid-template-columns: repeat(3, 1fr)</div>
+                            <div class="mf-step__visual">
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                            </div>
+                        </div>
+                        <div class="mf-step">
+                            <div class="mf-step__bp">lg</div>
+                            <div class="mf-step__code">grid-template-columns: repeat(4, 1fr)</div>
+                            <div class="mf-step__visual">
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                                <div class="mf-step__block" style="flex:1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* ── Theme Toggle ── */
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+        }
+        (function() {
+            const btn = document.querySelector('.ds-theme-toggle');
+            function setIcon() {
+                btn.textContent = getComputedStyle(document.documentElement).getPropertyValue('--toggle-icon').replace(/'/g, '').trim();
+            }
+            new MutationObserver(setIcon).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+            setIcon();
+        })();
+
+        /* ── App Shell Sidebar Collapse ── */
+        function toggleShellSidebar() {
+            const sb = document.getElementById('appShellSidebar');
+            const btn = document.getElementById('collapseBtn');
+            sb.classList.toggle('is-collapsed');
+            btn.textContent = sb.classList.contains('is-collapsed') ? '▶ Expand' : '◀ Collapse';
+        }
+
+        /* ── 12-Column Grid ── */
+        (function() {
+            const g = document.getElementById('grid12');
+            for (let i = 1; i <= 12; i++) {
+                const d = document.createElement('div');
+                d.className = 'grid-12-demo__col';
+                d.textContent = i;
+                g.appendChild(d);
+            }
+        })();
+
+        /* ── Chart Bars ── */
+        (function() {
+            const c = document.getElementById('chartBars');
+            const heights = [45, 62, 38, 71, 55, 80, 68, 42, 73, 60, 85, 50];
+            heights.forEach(h => {
+                const b = document.createElement('div');
+                b.className = 'chart-bar';
+                b.style.height = h + '%';
+                c.appendChild(b);
+            });
+        })();
+
+        /* ── Gap Utilities ── */
+        (function() {
+            const wrap = document.getElementById('gapDemo');
+            const gaps = [
+                { token: '--space-1', val: '4px' },
+                { token: '--space-2', val: '8px' },
+                { token: '--space-3', val: '12px' },
+                { token: '--space-4', val: '16px' },
+                { token: '--space-6', val: '24px' },
+            ];
+            gaps.forEach(g => {
+                const box = document.createElement('div');
+                box.innerHTML = `
+                    <div class="gap-demo__box" style="grid-template-columns:repeat(3,1fr);gap:${g.val}">
+                        <div class="gap-demo__cell"></div><div class="gap-demo__cell"></div><div class="gap-demo__cell"></div>
+                        <div class="gap-demo__cell"></div><div class="gap-demo__cell"></div><div class="gap-demo__cell"></div>
+                    </div>
+                    <div class="gap-demo__label">${g.token}<br>${g.val}</div>`;
+                box.style.textAlign = 'center';
+                wrap.appendChild(box);
+            });
+        })();
+
+        /* ── Spacing Scale ── */
+        (function() {
+            const el = document.getElementById('spacingScale');
+            const tokens = [
+                { name: '--space-1', val: 4 }, { name: '--space-2', val: 8 },
+                { name: '--space-3', val: 12 }, { name: '--space-4', val: 16 },
+                { name: '--space-5', val: 20 }, { name: '--space-6', val: 24 },
+                { name: '--space-8', val: 32 }, { name: '--space-10', val: 40 },
+                { name: '--space-12', val: 48 }, { name: '--space-16', val: 64 },
+                { name: '--space-20', val: 80 }, { name: '--space-24', val: 96 },
+            ];
+            tokens.forEach(t => {
+                el.innerHTML += `
+                    <div class="spacing-row">
+                        <div class="spacing-label">${t.name}</div>
+                        <div class="spacing-bar" style="width:${t.val}px"></div>
+                        <div class="spacing-value">${t.val}px</div>
+                    </div>`;
+            });
+        })();
+
+        /* ── Breakpoint Indicator ── */
+        function updateBpIndicator() {
+            const vw = window.innerWidth;
+            document.querySelectorAll('.bp-pill').forEach(pill => {
+                const min = parseInt(pill.dataset.min);
+                pill.classList.toggle('is-active', vw >= min);
+            });
+        }
+        window.addEventListener('resize', updateBpIndicator);
+        updateBpIndicator();
+
+        /* ── Responsive Grid Demo ── */
+        function setResponsiveView(bp, btn) {
+            const grid = document.getElementById('responsiveGrid');
+            const label = document.getElementById('responsiveLabel');
+            document.querySelectorAll('.responsive-demo__btn').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            const map = {
+                xl: { cols: 'repeat(4,1fr)', text: 'Desktop — 4 columns' },
+                lg: { cols: 'repeat(3,1fr)', text: 'Laptop — 3 columns' },
+                md: { cols: 'repeat(2,1fr)', text: 'Tablet — 2 columns' },
+                sm: { cols: '1fr', text: 'Phone — 1 column' },
+                xs: { cols: '1fr', text: 'Small phone — stacked' },
+            };
+            grid.style.gridTemplateColumns = map[bp].cols;
+            label.textContent = map[bp].text;
+        }
+
+        /* ── Sidebar Active State (IntersectionObserver) ── */
+        (function() {
+            const links = document.querySelectorAll('.ds-sidebar__link');
+            const sections = [];
+            links.forEach(link => {
+                const id = link.getAttribute('href').replace('#', '');
+                const target = document.getElementById(id);
+                if (target) sections.push({ id, el: target, link });
+            });
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        links.forEach(l => l.classList.remove('is-active'));
+                        const match = sections.find(s => s.el === entry.target);
+                        if (match) match.link.classList.add('is-active');
+                    }
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            sections.forEach(s => observer.observe(s.el));
+        })();
+    </script>
+</body>
+
+</html>
