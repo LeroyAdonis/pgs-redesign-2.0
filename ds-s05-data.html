@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purple Glow Social — Section 05: Data Display</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Sora:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ═══════════════════════════════════════════════════════
+   RESET
+   ═══════════════════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after { margin: 0; padding: 0; box-sizing: border-box }
+
+        /* ═══════════════════════════════════════════════════════
+   THEME TOKENS — DARK
+   ═══════════════════════════════════════════════════════ */
+        [data-theme="dark"] {
+            --bg: #050507; --bg-elevated: #0A0A0F; --bg-subtle: #0E0E14;
+            --fg: #F0EDE8; --fg-muted: #8A8680; --fg-subtle: #5C5955;
+            --purple: #8B5CF6; --purple-vivid: #A78BFA; --purple-deep: #6D28D9;
+            --purple-surface: rgba(139,92,246,0.12);
+            --success: #4ADE80; --success-surface: rgba(74,222,128,0.1);
+            --warning: #FBBF24; --warning-surface: rgba(251,191,36,0.1);
+            --error: #F87171; --error-surface: rgba(248,113,113,0.1);
+            --info: #60A5FA; --info-surface: rgba(96,165,250,0.1);
+            --instagram: #E4405F; --facebook: #1877F2; --twitter: #FFFFFF; --linkedin: #0A66C2;
+            --border: rgba(255,255,255,0.05); --border-hover: rgba(139,92,246,0.2);
+            --accent: #E8D5B5;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.6);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+            --shadow-glow: 0 0 30px rgba(139,92,246,0.25);
+        }
+        [data-theme="light"] {
+            --bg: #F8F6F3; --bg-elevated: #FFFFFF; --bg-subtle: #F0EDE8;
+            --fg: #1A1A1E; --fg-muted: #6B6966; --fg-subtle: #9E9B97;
+            --purple: #7C3AED; --purple-vivid: #8B5CF6; --purple-deep: #5B21B6;
+            --purple-surface: rgba(124,58,237,0.08);
+            --success: #22C55E; --success-surface: rgba(34,197,94,0.08);
+            --warning: #EAB308; --warning-surface: rgba(234,179,8,0.08);
+            --error: #EF4444; --error-surface: rgba(239,68,68,0.08);
+            --info: #3B82F6; --info-surface: rgba(59,130,246,0.08);
+            --instagram: #E4405F; --facebook: #1877F2; --twitter: #000000; --linkedin: #0A66C2;
+            --border: rgba(0,0,0,0.08); --border-hover: rgba(124,58,237,0.15);
+            --accent: #C4A882;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --shadow-glow: 0 0 30px rgba(124,58,237,0.15);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+   SHARED TOKENS
+   ═══════════════════════════════════════════════════════ */
+        :root {
+            --font-display: 'Instrument Serif', Georgia, serif;
+            --font-body: 'Sora', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+            --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+            --space-12: 48px; --space-16: 64px; --space-20: 80px; --space-24: 96px;
+            --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-full: 9999px;
+            --duration-fast: 150ms; --duration-base: 250ms; --duration-slow: 500ms; --duration-dramatic: 1000ms;
+            --ease-out-expo: cubic-bezier(0.16,1,0.3,1);
+            --ease-out-quint: cubic-bezier(0.22,1,0.36,1);
+            --z-dropdown: 100; --z-sticky: 200; --z-tooltip: 600;
+            --sidebar-w: 260px;
+        }
+
+        /* ═══════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════ */
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }
+        body { font-family: var(--font-body); background: var(--bg); color: var(--fg); line-height: 1.6; overflow-x: hidden; font-size: 16px; transition: background var(--duration-base) var(--ease-out-expo), color var(--duration-base) var(--ease-out-expo) }
+        a { color: var(--purple); text-decoration: none }
+        a:hover { text-decoration: underline }
+        ::selection { background: var(--purple); color: #fff }
+
+        /* ═══════════════════════════════════════════════════════
+   LAYOUT SHELL
+   ═══════════════════════════════════════════════════════ */
+        .ds-shell { display: flex; min-height: 100vh }
+        .ds-sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--bg-elevated); border-right: 1px solid var(--border); overflow-y: auto; z-index: var(--z-sticky); display: flex; flex-direction: column; transition: background var(--duration-base) var(--ease-out-expo), border-color var(--duration-base) var(--ease-out-expo) }
+        .ds-sidebar__logo { padding: var(--space-6) var(--space-6) var(--space-4); font-family: var(--font-display); font-size: 1.35rem; letter-spacing: -0.02em; border-bottom: 1px solid var(--border); color: var(--fg) }
+        .ds-sidebar__logo span { color: var(--purple) }
+        .ds-sidebar__nav { padding: var(--space-4) 0; flex: 1 }
+        .ds-sidebar__section { padding: var(--space-2) var(--space-6) var(--space-1); font-family: var(--font-mono); font-size: 0.625rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-subtle) }
+        .ds-sidebar__link { display: block; padding: var(--space-2) var(--space-6); font-size: 0.8125rem; color: var(--fg-muted); transition: color var(--duration-fast), background var(--duration-fast); text-decoration: none; border-left: 2px solid transparent }
+        .ds-sidebar__link:hover { color: var(--fg); background: var(--purple-surface); text-decoration: none }
+        .ds-sidebar__link.is-active { color: var(--purple); border-left-color: var(--purple); background: var(--purple-surface) }
+        .ds-main { margin-left: var(--sidebar-w); flex: 1; padding: var(--space-10) var(--space-12) var(--space-24); max-width: 1100px }
+        .ds-theme-toggle { position: fixed; top: var(--space-4); right: var(--space-6); z-index: var(--z-tooltip); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--bg-elevated); border: 1px solid var(--border); font-size: 1.25rem; cursor: pointer; transition: all var(--duration-fast) var(--ease-out-expo); border-radius: 0 }
+        .ds-theme-toggle:hover { border-color: var(--purple); box-shadow: var(--shadow-glow) }
+
+        /* ═══════════════════════════════════════════════════════
+   SECTION HEADINGS
+   ═══════════════════════════════════════════════════════ */
+        .ds-section { margin-bottom: var(--space-24); scroll-margin-top: var(--space-10) }
+        .ds-section__id { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; color: var(--purple); letter-spacing: 0.08em; margin-bottom: var(--space-1); text-transform: uppercase }
+        .ds-section__title { font-family: var(--font-display); font-size: clamp(1.75rem,3vw,2.5rem); font-weight: 400; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: var(--space-2) }
+        .ds-section__desc { font-size: 0.9375rem; color: var(--fg-muted); max-width: 640px; line-height: 1.7; margin-bottom: var(--space-10) }
+        .ds-sub { margin-bottom: var(--space-16); scroll-margin-top: var(--space-10) }
+        .ds-sub__title { font-family: var(--font-body); font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-1) }
+        .ds-sub__desc { font-size: 0.8125rem; color: var(--fg-muted); margin-bottom: var(--space-6) }
+        .ds-demo-label { font-family: var(--font-mono); font-size: 0.625rem; color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-2) }
+        .ds-demo-row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-start; margin-bottom: var(--space-6) }
+
+        /* ═══════════════════════════════════════════════════════
+   5a — CARDS
+   ═══════════════════════════════════════════════════════ */
+        .ds-card-grid { display: grid; gap: var(--space-4) }
+        .ds-card-grid--3 { grid-template-columns: repeat(3, 1fr) }
+        .ds-card-grid--2 { grid-template-columns: repeat(2, 1fr) }
+
+        .ds-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo), border-color var(--duration-base) var(--ease-out-expo); cursor: default }
+        .ds-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-glow); border-color: var(--border-hover) }
+
+        /* Post Card */
+        .ds-card-post__thumb { height: 140px; background: var(--purple-surface); position: relative; overflow: hidden }
+        .ds-card-post__thumb-img { width: 100%; height: 100%; object-fit: cover; display: block }
+        .ds-card-post__thumb-gradient { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(109,40,217,0.5)); mix-blend-mode: multiply }
+        .ds-card-post__platform { position: absolute; top: var(--space-2); right: var(--space-2); width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; backdrop-filter: blur(8px); background: rgba(0,0,0,0.4) }
+        .ds-card-post__body { padding: var(--space-4) }
+        .ds-card-post__title { font-size: 0.875rem; font-weight: 600; margin-bottom: var(--space-1); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+        .ds-card-post__time { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--fg-subtle); margin-bottom: var(--space-3) }
+        .ds-card-post__stats { display: flex; gap: var(--space-4); font-size: 0.75rem; color: var(--fg-muted) }
+        .ds-card-post__stat { display: flex; align-items: center; gap: var(--space-1) }
+
+        /* Metric Card */
+        .ds-card-metric { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2) }
+        .ds-card-metric__label { font-size: 0.75rem; color: var(--fg-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em }
+        .ds-card-metric__row { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-3) }
+        .ds-card-metric__value { font-family: var(--font-display); font-size: 2rem; line-height: 1; letter-spacing: -0.03em }
+        .ds-card-metric__trend { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; padding: 2px 6px; border-radius: var(--radius-sm) }
+        .ds-card-metric__trend--up { color: var(--success); background: var(--success-surface) }
+        .ds-card-metric__trend--down { color: var(--error); background: var(--error-surface) }
+        .ds-card-metric__sparkline { height: 32px; margin-top: var(--space-1) }
+        .ds-card-metric__sparkline svg { width: 100%; height: 100% }
+
+        /* Profile Card */
+        .ds-card-profile { padding: var(--space-5); text-align: center }
+        .ds-card-profile__avatar { width: 64px; height: 64px; border-radius: var(--radius-full); margin: 0 auto var(--space-3); background: var(--purple-surface); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 1.5rem; color: var(--purple); border: 2px solid var(--purple); overflow: hidden }
+        .ds-card-profile__avatar img { width: 100%; height: 100%; object-fit: cover }
+        .ds-card-profile__name { font-size: 0.9375rem; font-weight: 600; margin-bottom: 2px }
+        .ds-card-profile__handle { font-family: var(--font-mono); font-size: 0.75rem; color: var(--purple-vivid); margin-bottom: var(--space-2) }
+        .ds-card-profile__bio { font-size: 0.75rem; color: var(--fg-muted); line-height: 1.5; margin-bottom: var(--space-3); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden }
+        .ds-card-profile__followers { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--fg-subtle); margin-bottom: var(--space-4) }
+        .ds-card-profile__followers strong { color: var(--fg); font-weight: 600 }
+        .ds-card-profile__actions { display: flex; gap: var(--space-2); justify-content: center }
+
+        /* Compact / Large modifiers */
+        .ds-card--compact .ds-card-post__thumb { height: 90px }
+        .ds-card--compact .ds-card-post__body { padding: var(--space-3) }
+        .ds-card--compact .ds-card-post__title { font-size: 0.8125rem }
+        .ds-card--large .ds-card-post__thumb { height: 200px }
+
+        /* Shared button */
+        .ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); font-family: var(--font-body); font-weight: 500; border: none; cursor: pointer; transition: all var(--duration-fast) var(--ease-out-expo); white-space: nowrap; font-size: 0.75rem; height: 32px; padding: 0 var(--space-4); border-radius: var(--radius-sm) }
+        .ds-btn--primary { background: var(--purple); color: #fff }
+        .ds-btn--primary:hover { background: var(--purple-vivid) }
+        .ds-btn--ghost { background: transparent; color: var(--fg-muted); border: 1px solid var(--border) }
+        .ds-btn--ghost:hover { color: var(--fg); border-color: var(--purple); background: var(--purple-surface) }
+
+        /* ═══════════════════════════════════════════════════════
+   5b — TABLES
+   ═══════════════════════════════════════════════════════ */
+        .ds-table-wrap { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-elevated) }
+        .ds-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem }
+        .ds-table th { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-muted); text-align: left; padding: var(--space-3) var(--space-4); background: var(--bg-subtle); border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; transition: color var(--duration-fast); white-space: nowrap }
+        .ds-table th:hover { color: var(--purple) }
+        .ds-table th .sort-arrow { display: inline-block; margin-left: 4px; font-size: 0.5rem; opacity: 0.3; transition: opacity var(--duration-fast) }
+        .ds-table th.sorted .sort-arrow { opacity: 1; color: var(--purple) }
+        .ds-table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); vertical-align: middle }
+        .ds-table tr:last-child td { border-bottom: none }
+        .ds-table tbody tr { transition: background var(--duration-fast) }
+        .ds-table tbody tr:hover { background: var(--purple-surface) }
+        .ds-table tbody tr.is-selected { background: rgba(139,92,246,0.08) }
+
+        .ds-table__check { width: 16px; height: 16px; border: 1.5px solid var(--fg-subtle); border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--duration-fast); flex-shrink: 0; font-size: 0.6rem; color: transparent }
+        .ds-table__check.is-checked { background: var(--purple); border-color: var(--purple); color: #fff }
+
+        .ds-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-full); white-space: nowrap }
+        .ds-badge--published { color: var(--success); background: var(--success-surface) }
+        .ds-badge--scheduled { color: var(--info); background: var(--info-surface) }
+        .ds-badge--draft { color: var(--fg-muted); background: var(--bg-subtle) }
+        .ds-badge--failed { color: var(--error); background: var(--error-surface) }
+        .ds-badge--dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor }
+
+        .ds-table__actions { position: relative }
+        .ds-table__actions-btn { background: none; border: 1px solid var(--border); color: var(--fg-muted); cursor: pointer; padding: 4px 8px; border-radius: var(--radius-sm); font-size: 0.75rem; transition: all var(--duration-fast) }
+        .ds-table__actions-btn:hover { color: var(--purple); border-color: var(--purple) }
+
+        .ds-pagination { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--fg-muted) }
+        .ds-pagination__pages { display: flex; gap: 2px }
+        .ds-pagination__page { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; background: none; color: var(--fg-muted); font-family: var(--font-mono); font-size: 0.75rem; transition: all var(--duration-fast) }
+        .ds-pagination__page:hover { border-color: var(--border); color: var(--fg) }
+        .ds-pagination__page.is-active { background: var(--purple); color: #fff; border-color: var(--purple) }
+
+        /* ═══════════════════════════════════════════════════════
+   5c — STATS / KPI
+   ═══════════════════════════════════════════════════════ */
+        .ds-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4) }
+        .ds-kpi { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-5); transition: border-color var(--duration-base), box-shadow var(--duration-base); position: relative; overflow: hidden }
+        .ds-kpi:hover { border-color: var(--border-hover); box-shadow: var(--shadow-glow) }
+        .ds-kpi::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--purple), var(--purple-vivid)); opacity: 0; transition: opacity var(--duration-base) }
+        .ds-kpi:hover::after { opacity: 1 }
+        .ds-kpi__icon { width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: var(--space-3); background: var(--purple-surface); color: var(--purple) }
+        .ds-kpi__label { font-size: 0.75rem; color: var(--fg-muted); font-weight: 500; margin-bottom: var(--space-2) }
+        .ds-kpi__value { font-family: var(--font-display); font-size: 2.25rem; line-height: 1; letter-spacing: -0.03em; margin-bottom: var(--space-2) }
+        .ds-kpi__trend { font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500 }
+        .ds-kpi__trend--up { color: var(--success) }
+        .ds-kpi__trend--down { color: var(--error) }
+
+        /* ═══════════════════════════════════════════════════════
+   5d — AVATARS
+   ═══════════════════════════════════════════════════════ */
+        .ds-avatar { position: relative; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-full); background: var(--purple-surface); color: var(--purple); font-weight: 600; overflow: visible; flex-shrink: 0; border: 2px solid var(--bg-elevated) }
+        .ds-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-full) }
+        .ds-avatar--xs { width: 24px; height: 24px; font-size: 0.5rem }
+        .ds-avatar--sm { width: 32px; height: 32px; font-size: 0.625rem }
+        .ds-avatar--md { width: 40px; height: 40px; font-size: 0.8125rem }
+        .ds-avatar--lg { width: 56px; height: 56px; font-size: 1.125rem }
+        .ds-avatar--xl { width: 80px; height: 80px; font-size: 1.5rem }
+        .ds-avatar__status { position: absolute; bottom: -1px; right: -1px; border-radius: 50%; border: 2px solid var(--bg-elevated); z-index: 1 }
+        .ds-avatar--xs .ds-avatar__status { width: 8px; height: 8px }
+        .ds-avatar--sm .ds-avatar__status { width: 10px; height: 10px }
+        .ds-avatar--md .ds-avatar__status { width: 12px; height: 12px }
+        .ds-avatar--lg .ds-avatar__status { width: 14px; height: 14px }
+        .ds-avatar--xl .ds-avatar__status { width: 16px; height: 16px }
+        .ds-avatar__status--online { background: var(--success) }
+        .ds-avatar__status--offline { background: var(--fg-subtle) }
+        .ds-avatar__platform { position: absolute; top: -2px; right: -4px; width: 18px; height: 18px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; color: #fff; z-index: 1; border: 1.5px solid var(--bg-elevated) }
+        .ds-avatar-stack { display: flex }
+        .ds-avatar-stack .ds-avatar { margin-left: -10px; transition: transform var(--duration-fast) }
+        .ds-avatar-stack .ds-avatar:first-child { margin-left: 0 }
+        .ds-avatar-stack .ds-avatar:hover { transform: translateY(-2px); z-index: 2 }
+        .ds-avatar-stack__overflow { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--bg-subtle); border: 2px solid var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--fg-muted); margin-left: -10px }
+
+        /* ═══════════════════════════════════════════════════════
+   5e — LISTS
+   ═══════════════════════════════════════════════════════ */
+        .ds-list { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--bg-elevated) }
+        .ds-list-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); transition: background var(--duration-fast); cursor: default }
+        .ds-list-item:last-child { border-bottom: none }
+        .ds-list-item:hover { background: var(--purple-surface) }
+        .ds-list-item__icon { width: 36px; height: 36px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; background: var(--purple-surface); color: var(--purple); font-size: 0.875rem; flex-shrink: 0 }
+        .ds-list-item__body { flex: 1; min-width: 0 }
+        .ds-list-item__title { font-size: 0.8125rem; font-weight: 500; margin-bottom: 1px }
+        .ds-list-item__desc { font-size: 0.75rem; color: var(--fg-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+        .ds-list-item__chevron { color: var(--fg-subtle); font-size: 0.75rem; flex-shrink: 0; transition: transform var(--duration-fast) }
+        .ds-list-item:hover .ds-list-item__chevron { transform: translateX(2px); color: var(--purple) }
+        .ds-list-item__time { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--fg-subtle); flex-shrink: 0; white-space: nowrap }
+
+        /* Feed item */
+        .ds-feed-item { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); transition: background var(--duration-fast) }
+        .ds-feed-item:last-child { border-bottom: none }
+        .ds-feed-item:hover { background: var(--purple-surface) }
+        .ds-feed-item__body { flex: 1; min-width: 0 }
+        .ds-feed-item__text { font-size: 0.8125rem; line-height: 1.5; margin-bottom: 2px }
+        .ds-feed-item__text strong { font-weight: 600 }
+        .ds-feed-item__meta { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--fg-subtle) }
+
+        /* Selectable list */
+        .ds-list-item--selectable { cursor: pointer }
+        .ds-list-item--selectable.is-selected { background: var(--purple-surface) }
+        .ds-list-item__check { width: 18px; height: 18px; border-radius: var(--radius-full); border: 1.5px solid var(--fg-subtle); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: transparent; flex-shrink: 0; transition: all var(--duration-fast) }
+        .ds-list-item--selectable.is-selected .ds-list-item__check { background: var(--purple); border-color: var(--purple); color: #fff }
+
+        /* ═══════════════════════════════════════════════════════
+   5f — TOOLTIPS
+   ═══════════════════════════════════════════════════════ */
+        .ds-tooltip-demo { display: flex; gap: var(--space-8); flex-wrap: wrap; justify-content: center; padding: var(--space-10) 0 }
+        .ds-tooltip-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 var(--space-5); background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.8125rem; color: var(--fg-muted); cursor: default; transition: border-color var(--duration-fast) }
+        .ds-tooltip-trigger:hover { border-color: var(--purple) }
+        .ds-tooltip { position: absolute; z-index: var(--z-tooltip); background: var(--fg); color: var(--bg); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 500; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity var(--duration-fast), transform var(--duration-fast); line-height: 1.3 }
+        .ds-tooltip::after { content: ''; position: absolute; width: 8px; height: 8px; background: var(--fg); transform: rotate(45deg) }
+
+        /* Positions */
+        .ds-tooltip--top { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(4px) }
+        .ds-tooltip--top::after { bottom: -4px; left: 50%; margin-left: -4px }
+        .ds-tooltip--bottom { top: calc(100% + 10px); left: 50%; transform: translateX(-50%) translateY(-4px) }
+        .ds-tooltip--bottom::after { top: -4px; left: 50%; margin-left: -4px }
+        .ds-tooltip--left { right: calc(100% + 10px); top: 50%; transform: translateY(-50%) translateX(4px) }
+        .ds-tooltip--left::after { right: -4px; top: 50%; margin-top: -4px }
+        .ds-tooltip--right { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) translateX(-4px) }
+        .ds-tooltip--right::after { left: -4px; top: 50%; margin-top: -4px }
+
+        .ds-tooltip-trigger:hover .ds-tooltip { opacity: 1 }
+        .ds-tooltip-trigger:hover .ds-tooltip--top { transform: translateX(-50%) translateY(0) }
+        .ds-tooltip-trigger:hover .ds-tooltip--bottom { transform: translateX(-50%) translateY(0) }
+        .ds-tooltip-trigger:hover .ds-tooltip--left { transform: translateY(-50%) translateX(0) }
+        .ds-tooltip-trigger:hover .ds-tooltip--right { transform: translateY(-50%) translateX(0) }
+
+        /* Rich tooltip */
+        .ds-tooltip--rich { white-space: normal; width: 220px; padding: var(--space-3); text-align: left }
+        .ds-tooltip--rich .ds-tooltip__title { font-weight: 600; margin-bottom: 2px; font-size: 0.75rem }
+        .ds-tooltip--rich .ds-tooltip__desc { font-weight: 400; font-size: 0.6875rem; opacity: 0.8; line-height: 1.4 }
+
+        /* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+        @media(max-width:1024px) {
+            .ds-sidebar { display: none }
+            .ds-main { margin-left: 0; padding: var(--space-6) var(--space-6) var(--space-16) }
+            .ds-card-grid--3 { grid-template-columns: 1fr }
+            .ds-kpi-grid { grid-template-columns: repeat(2, 1fr) }
+        }
+        @media(max-width:640px) {
+            .ds-kpi-grid { grid-template-columns: 1fr }
+            .ds-card-grid--2 { grid-template-columns: 1fr }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px }
+        ::-webkit-scrollbar-track { background: var(--bg) }
+        ::-webkit-scrollbar-thumb { background: var(--fg-subtle); border-radius: 3px }
+        ::-webkit-scrollbar-thumb:hover { background: var(--fg-muted) }
+
+        /* ═══════════════════════════════════════════════════════
+   NOISE TEXTURE OVERLAY
+   ═══════════════════════════════════════════════════════ */
+        body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.015; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px }
+
+        /* ═══════════════════════════════════════════════════════
+   COUNT-UP ANIMATION
+   ═══════════════════════════════════════════════════════ */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: translateY(0) } }
+        .ds-kpi { animation: fadeInUp 0.6s var(--ease-out-expo) both }
+        .ds-kpi:nth-child(2) { animation-delay: 0.08s }
+        .ds-kpi:nth-child(3) { animation-delay: 0.16s }
+        .ds-kpi:nth-child(4) { animation-delay: 0.24s }
+    </style>
+</head>
+
+<body>
+    <!-- ═══ THEME TOGGLE ═══ -->
+    <button class="ds-theme-toggle" id="themeToggle" aria-label="Toggle theme">☀</button>
+
+    <!-- ═══ SHELL ═══ -->
+    <div class="ds-shell">
+
+        <!-- ═══ SIDEBAR ═══ -->
+        <aside class="ds-sidebar">
+            <div class="ds-sidebar__logo"><span>Purple Glow</span> Design System</div>
+            <nav class="ds-sidebar__nav">
+                <div class="ds-sidebar__section">5 — Data Display</div>
+                <a href="#cards" class="ds-sidebar__link">Cards</a>
+                <a href="#tables" class="ds-sidebar__link">Tables</a>
+                <a href="#kpi" class="ds-sidebar__link">Stats / KPI</a>
+                <a href="#avatars" class="ds-sidebar__link">Avatars</a>
+                <a href="#lists" class="ds-sidebar__link">Lists</a>
+                <a href="#tooltips" class="ds-sidebar__link">Tooltips</a>
+            </nav>
+        </aside>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <main class="ds-main">
+
+            <!-- ═══════════════════════════════════════════════════
+     SECTION 5: DATA DISPLAY
+     ═══════════════════════════════════════════════════ -->
+            <section class="ds-section" id="data-display">
+                <div class="ds-section__id">Section 05</div>
+                <h1 class="ds-section__title">Data Display</h1>
+                <p class="ds-section__desc">Components for presenting content, metrics, and structured data throughout Purple Glow Social — from post previews and analytics dashboards to activity feeds and user profiles. SA-themed sample data throughout.</p>
+            </section>
+
+            <!-- ── 5a Cards ── -->
+            <section class="ds-sub" id="cards">
+                <h2 class="ds-sub__title">Cards</h2>
+                <p class="ds-sub__desc">Post previews, metric summaries, and profile cards with hover lift + purple glow. Shown in compact, default, and large sizes.</p>
+
+                <div class="ds-demo-label">Post Preview Cards</div>
+                <div class="ds-card-grid ds-card-grid--3" style="margin-bottom:var(--space-6)">
+                    <div class="ds-card ds-card--compact">
+                        <div class="ds-card-post__thumb" style="background:linear-gradient(135deg,#1a0533,#2d1054)">
+                            <div class="ds-card-post__platform" style="background:var(--instagram)">📷</div>
+                        </div>
+                        <div class="ds-card-post__body">
+                            <div class="ds-card-post__title">Table Mountain sunset vibes 🌅 #CapeTown</div>
+                            <div class="ds-card-post__time">Tomorrow · 18:00 SAST</div>
+                            <div class="ds-card-post__stats">
+                                <span class="ds-card-post__stat">♡ 2.4K</span>
+                                <span class="ds-card-post__stat">💬 182</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ds-card">
+                        <div class="ds-card-post__thumb" style="background:linear-gradient(135deg,#0a1628,#1a0533)">
+                            <div class="ds-card-post__platform" style="background:var(--facebook)">f</div>
+                        </div>
+                        <div class="ds-card-post__body">
+                            <div class="ds-card-post__title">Mzansi brands are winning big in 2025 — here's what we learned from Joburg entrepreneurs</div>
+                            <div class="ds-card-post__time">Wed 12 Mar · 09:00 SAST</div>
+                            <div class="ds-card-post__stats">
+                                <span class="ds-card-post__stat">♡ 891</span>
+                                <span class="ds-card-post__stat">💬 67</span>
+                                <span class="ds-card-post__stat">↗ 234</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ds-card ds-card--large">
+                        <div class="ds-card-post__thumb" style="background:linear-gradient(135deg,#0f172a,#1e1b4b)">
+                            <div class="ds-card-post__platform" style="background:var(--linkedin)">in</div>
+                        </div>
+                        <div class="ds-card-post__body">
+                            <div class="ds-card-post__title">How to scale your social presence across Africa</div>
+                            <div class="ds-card-post__time">Fri 14 Mar · 11:30 SAST</div>
+                            <div class="ds-card-post__stats">
+                                <span class="ds-card-post__stat">♡ 1.2K</span>
+                                <span class="ds-card-post__stat">💬 98</span>
+                                <span class="ds-card-post__stat">↗ 412</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label">Metric Cards</div>
+                <div class="ds-card-grid ds-card-grid--3" style="margin-bottom:var(--space-6)">
+                    <div class="ds-card ds-card-metric">
+                        <div class="ds-card-metric__label">Total Reach</div>
+                        <div class="ds-card-metric__row">
+                            <div class="ds-card-metric__value">48.2K</div>
+                            <div class="ds-card-metric__trend ds-card-metric__trend--up">+18.3% ↑</div>
+                        </div>
+                        <div class="ds-card-metric__sparkline">
+                            <svg viewBox="0 0 120 32" fill="none"><polyline points="0,28 15,24 30,26 45,18 60,20 75,12 90,14 105,6 120,8" stroke="var(--purple)" stroke-width="2" fill="none"/><polyline points="0,28 15,24 30,26 45,18 60,20 75,12 90,14 105,6 120,8 120,32 0,32" fill="var(--purple-surface)"/></svg>
+                        </div>
+                    </div>
+                    <div class="ds-card ds-card-metric">
+                        <div class="ds-card-metric__label">Engagement Rate</div>
+                        <div class="ds-card-metric__row">
+                            <div class="ds-card-metric__value">5.7%</div>
+                            <div class="ds-card-metric__trend ds-card-metric__trend--up">+2.1% ↑</div>
+                        </div>
+                        <div class="ds-card-metric__sparkline">
+                            <svg viewBox="0 0 120 32" fill="none"><polyline points="0,22 15,20 30,24 45,16 60,18 75,10 90,12 105,8 120,4" stroke="var(--success)" stroke-width="2" fill="none"/><polyline points="0,22 15,20 30,24 45,16 60,18 75,10 90,12 105,8 120,4 120,32 0,32" fill="var(--success-surface)"/></svg>
+                        </div>
+                    </div>
+                    <div class="ds-card ds-card-metric">
+                        <div class="ds-card-metric__label">Bounce Rate</div>
+                        <div class="ds-card-metric__row">
+                            <div class="ds-card-metric__value">32.1%</div>
+                            <div class="ds-card-metric__trend ds-card-metric__trend--down">−4.6% ↓</div>
+                        </div>
+                        <div class="ds-card-metric__sparkline">
+                            <svg viewBox="0 0 120 32" fill="none"><polyline points="0,8 15,10 30,6 45,14 60,12 75,18 90,16 105,22 120,20" stroke="var(--error)" stroke-width="2" fill="none"/><polyline points="0,8 15,10 30,6 45,14 60,12 75,18 90,16 105,22 120,20 120,32 0,32" fill="var(--error-surface)"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label">Profile Cards</div>
+                <div class="ds-card-grid ds-card-grid--3">
+                    <div class="ds-card ds-card-profile">
+                        <div class="ds-card-profile__avatar">TM</div>
+                        <div class="ds-card-profile__name">Thabo Molefe</div>
+                        <div class="ds-card-profile__handle">@thabo_jozi</div>
+                        <div class="ds-card-profile__bio">Digital strategist from Joburg. Building Mzansi's next big brand 🇿🇦</div>
+                        <div class="ds-card-profile__followers"><strong>12.4K</strong> followers · <strong>342</strong> posts</div>
+                        <div class="ds-card-profile__actions">
+                            <button class="ds-btn ds-btn--primary">Follow</button>
+                            <button class="ds-btn ds-btn--ghost">Message</button>
+                        </div>
+                    </div>
+                    <div class="ds-card ds-card-profile">
+                        <div class="ds-card-profile__avatar">NZ</div>
+                        <div class="ds-card-profile__name">Naledi Zulu</div>
+                        <div class="ds-card-profile__handle">@naledi_ct</div>
+                        <div class="ds-card-profile__bio">Cape Town content creator. Travel · Food · Local is Lekker ✨</div>
+                        <div class="ds-card-profile__followers"><strong>28.9K</strong> followers · <strong>1.1K</strong> posts</div>
+                        <div class="ds-card-profile__actions">
+                            <button class="ds-btn ds-btn--primary">Follow</button>
+                            <button class="ds-btn ds-btn--ghost">Message</button>
+                        </div>
+                    </div>
+                    <div class="ds-card ds-card-profile">
+                        <div class="ds-card-profile__avatar">SM</div>
+                        <div class="ds-card-profile__name">Sipho Mthembu</div>
+                        <div class="ds-card-profile__handle">@sipho_dbn</div>
+                        <div class="ds-card-profile__bio">Durban photographer. Catching the light along the Golden Mile 📸</div>
+                        <div class="ds-card-profile__followers"><strong>8.2K</strong> followers · <strong>567</strong> posts</div>
+                        <div class="ds-card-profile__actions">
+                            <button class="ds-btn ds-btn--primary">Follow</button>
+                            <button class="ds-btn ds-btn--ghost">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── 5b Tables ── -->
+            <section class="ds-sub" id="tables">
+                <h2 class="ds-sub__title">Tables</h2>
+                <p class="ds-sub__desc">Sortable data table with row selection, status badges, and pagination. Click column headers to sort.</p>
+
+                <div class="ds-table-wrap">
+                    <table class="ds-table" id="postsTable">
+                        <thead>
+                            <tr>
+                                <th style="width:40px"><span class="ds-table__check" id="selectAll" onclick="toggleAllRows()">✓</span></th>
+                                <th data-col="platform" onclick="sortTable(1)">Platform <span class="sort-arrow">▲</span></th>
+                                <th data-col="content" onclick="sortTable(2)">Content <span class="sort-arrow">▲</span></th>
+                                <th data-col="date" onclick="sortTable(3)">Date <span class="sort-arrow">▲</span></th>
+                                <th data-col="status" onclick="sortTable(4)">Status <span class="sort-arrow">▲</span></th>
+                                <th data-col="engagement" onclick="sortTable(5)">Engagement <span class="sort-arrow">▲</span></th>
+                                <th style="width:60px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- JS-generated -->
+                        </tbody>
+                    </table>
+                    <div class="ds-pagination">
+                        <span>Showing 1–6 of 24 posts</span>
+                        <div class="ds-pagination__pages">
+                            <button class="ds-pagination__page is-active">1</button>
+                            <button class="ds-pagination__page">2</button>
+                            <button class="ds-pagination__page">3</button>
+                            <button class="ds-pagination__page">4</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── 5c Stats / KPI ── -->
+            <section class="ds-sub" id="kpi">
+                <h2 class="ds-sub__title">Stats / KPI Widgets</h2>
+                <p class="ds-sub__desc">Key performance indicator cards with animated count-up, trend indicators, and staggered entrance.</p>
+
+                <div class="ds-kpi-grid" id="kpiGrid">
+                    <!-- JS count-up fills these -->
+                </div>
+            </section>
+
+            <!-- ── 5d Avatars ── -->
+            <section class="ds-sub" id="avatars">
+                <h2 class="ds-sub__title">Avatars</h2>
+                <p class="ds-sub__desc">Circle avatars with status indicators, initials fallback, platform overlays, and stacking.</p>
+
+                <div class="ds-demo-label">Sizes — xs · sm · md · lg · xl</div>
+                <div class="ds-demo-row" style="align-items:center;margin-bottom:var(--space-8)">
+                    <div class="ds-avatar ds-avatar--xs"><span class="ds-avatar__status ds-avatar__status--online"></span>T</div>
+                    <div class="ds-avatar ds-avatar--sm"><span class="ds-avatar__status ds-avatar__status--online"></span>NZ</div>
+                    <div class="ds-avatar ds-avatar--md"><span class="ds-avatar__status ds-avatar__status--offline"></span>SM</div>
+                    <div class="ds-avatar ds-avatar--lg"><span class="ds-avatar__status ds-avatar__status--online"></span>TM</div>
+                    <div class="ds-avatar ds-avatar--xl"><span class="ds-avatar__status ds-avatar__status--offline"></span>LN</div>
+                </div>
+
+                <div class="ds-demo-label">With Platform Overlay</div>
+                <div class="ds-demo-row" style="align-items:center;margin-bottom:var(--space-8)">
+                    <div class="ds-avatar ds-avatar--md">TM<span class="ds-avatar__platform" style="background:var(--instagram)">📷</span></div>
+                    <div class="ds-avatar ds-avatar--md">NZ<span class="ds-avatar__platform" style="background:var(--facebook)">f</span></div>
+                    <div class="ds-avatar ds-avatar--md">SM<span class="ds-avatar__platform" style="background:var(--linkedin)">in</span></div>
+                    <div class="ds-avatar ds-avatar--md">AB<span class="ds-avatar__platform" style="background:#000">𝕏</span></div>
+                </div>
+
+                <div class="ds-demo-label">Avatar Stack</div>
+                <div class="ds-demo-row" style="align-items:center">
+                    <div class="ds-avatar-stack">
+                        <div class="ds-avatar ds-avatar--md" style="background:#6D28D9;color:#fff">TM</div>
+                        <div class="ds-avatar ds-avatar--md" style="background:#E4405F;color:#fff">NZ</div>
+                        <div class="ds-avatar ds-avatar--md" style="background:#1877F2;color:#fff">SM</div>
+                        <div class="ds-avatar ds-avatar--md" style="background:#0A66C2;color:#fff">LN</div>
+                        <div class="ds-avatar-stack__overflow">+3</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── 5e Lists ── -->
+            <section class="ds-sub" id="lists">
+                <h2 class="ds-sub__title">Lists</h2>
+                <p class="ds-sub__desc">Action lists, activity feeds, and selectable lists for navigation and settings.</p>
+
+                <div class="ds-demo-label">Action List</div>
+                <div class="ds-list" style="margin-bottom:var(--space-6)">
+                    <div class="ds-list-item">
+                        <div class="ds-list-item__icon">📊</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Analytics Dashboard</div>
+                            <div class="ds-list-item__desc">View post performance across all Mzansi campaigns</div>
+                        </div>
+                        <div class="ds-list-item__chevron">›</div>
+                    </div>
+                    <div class="ds-list-item">
+                        <div class="ds-list-item__icon">📅</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Content Calendar</div>
+                            <div class="ds-list-item__desc">Schedule and manage upcoming posts for all platforms</div>
+                        </div>
+                        <div class="ds-list-item__chevron">›</div>
+                    </div>
+                    <div class="ds-list-item">
+                        <div class="ds-list-item__icon">👥</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Team Members</div>
+                            <div class="ds-list-item__desc">Manage collaborators and permissions for your workspace</div>
+                        </div>
+                        <div class="ds-list-item__chevron">›</div>
+                    </div>
+                    <div class="ds-list-item">
+                        <div class="ds-list-item__icon">⚙️</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Account Settings</div>
+                            <div class="ds-list-item__desc">Billing, API keys, and connected social accounts</div>
+                        </div>
+                        <div class="ds-list-item__chevron">›</div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label">Activity Feed</div>
+                <div class="ds-list" style="margin-bottom:var(--space-6)">
+                    <div class="ds-feed-item">
+                        <div class="ds-avatar ds-avatar--sm" style="background:var(--instagram);color:#fff;font-size:0.5rem">📷</div>
+                        <div class="ds-feed-item__body">
+                            <div class="ds-feed-item__text"><strong>Naledi Zulu</strong> published "Table Mountain sunrise" to Instagram</div>
+                            <div class="ds-feed-item__meta">2 min ago · Cape Town</div>
+                        </div>
+                    </div>
+                    <div class="ds-feed-item">
+                        <div class="ds-avatar ds-avatar--sm" style="background:var(--success);color:#fff;font-size:0.6rem">✓</div>
+                        <div class="ds-feed-item__body">
+                            <div class="ds-feed-item__text"><strong>Engagement milestone:</strong> "Joburg Food Guide" reached 5K likes 🎉</div>
+                            <div class="ds-feed-item__meta">18 min ago · Auto-notification</div>
+                        </div>
+                    </div>
+                    <div class="ds-feed-item">
+                        <div class="ds-avatar ds-avatar--sm" style="background:var(--facebook);color:#fff;font-size:0.5rem">f</div>
+                        <div class="ds-feed-item__body">
+                            <div class="ds-feed-item__text"><strong>Thabo Molefe</strong> scheduled "Mzansi Monday Motivation" for Facebook</div>
+                            <div class="ds-feed-item__meta">1 hour ago · Johannesburg</div>
+                        </div>
+                    </div>
+                    <div class="ds-feed-item">
+                        <div class="ds-avatar ds-avatar--sm" style="background:var(--warning);color:#000;font-size:0.6rem">⚠</div>
+                        <div class="ds-feed-item__body">
+                            <div class="ds-feed-item__text"><strong>API rate limit</strong> approaching on LinkedIn — 87% of daily quota used</div>
+                            <div class="ds-feed-item__meta">2 hours ago · System alert</div>
+                        </div>
+                    </div>
+                    <div class="ds-feed-item">
+                        <div class="ds-avatar ds-avatar--sm" style="background:#0A66C2;color:#fff;font-size:0.5rem">in</div>
+                        <div class="ds-feed-item__body">
+                            <div class="ds-feed-item__text"><strong>Sipho Mthembu</strong> shared "Durban's Golden Mile" on LinkedIn</div>
+                            <div class="ds-feed-item__meta">3 hours ago · Durban</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label">Selectable List</div>
+                <div class="ds-list">
+                    <div class="ds-list-item ds-list-item--selectable is-selected" onclick="this.classList.toggle('is-selected')">
+                        <div class="ds-list-item__check">✓</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Instagram — @mzansi_eats</div>
+                            <div class="ds-list-item__desc">Connected · 14.2K followers</div>
+                        </div>
+                    </div>
+                    <div class="ds-list-item ds-list-item--selectable" onclick="this.classList.toggle('is-selected')">
+                        <div class="ds-list-item__check">✓</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">Facebook — Mzansi Eats Page</div>
+                            <div class="ds-list-item__desc">Connected · 8.7K followers</div>
+                        </div>
+                    </div>
+                    <div class="ds-list-item ds-list-item--selectable is-selected" onclick="this.classList.toggle('is-selected')">
+                        <div class="ds-list-item__check">✓</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">LinkedIn — Mzansi Eats Brand</div>
+                            <div class="ds-list-item__desc">Connected · 3.1K followers</div>
+                        </div>
+                    </div>
+                    <div class="ds-list-item ds-list-item--selectable" onclick="this.classList.toggle('is-selected')">
+                        <div class="ds-list-item__check">✓</div>
+                        <div class="ds-list-item__body">
+                            <div class="ds-list-item__title">X (Twitter) — @mzansi_eats</div>
+                            <div class="ds-list-item__desc">Not connected</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── 5f Tooltips ── -->
+            <section class="ds-sub" id="tooltips">
+                <h2 class="ds-sub__title">Tooltips</h2>
+                <p class="ds-sub__desc">Hover-triggered tooltips in four directions. Simple text and rich variants with title + description.</p>
+
+                <div class="ds-demo-label">Directional Tooltips</div>
+                <div class="ds-tooltip-demo">
+                    <div class="ds-tooltip-trigger">
+                        Hover — Top
+                        <div class="ds-tooltip ds-tooltip--top">Schedule post</div>
+                    </div>
+                    <div class="ds-tooltip-trigger">
+                        Hover — Right
+                        <div class="ds-tooltip ds-tooltip--right">Edit draft</div>
+                    </div>
+                    <div class="ds-tooltip-trigger">
+                        Hover — Bottom
+                        <div class="ds-tooltip ds-tooltip--bottom">View analytics</div>
+                    </div>
+                    <div class="ds-tooltip-trigger">
+                        Hover — Left
+                        <div class="ds-tooltip ds-tooltip--left">Delete post</div>
+                    </div>
+                </div>
+
+                <div class="ds-demo-label">Rich Tooltip</div>
+                <div class="ds-tooltip-demo">
+                    <div class="ds-tooltip-trigger">
+                        Hover — Rich Info
+                        <div class="ds-tooltip ds-tooltip--top ds-tooltip--rich">
+                            <div class="ds-tooltip__title">Best Time to Post</div>
+                            <div class="ds-tooltip__desc">Based on your Mzansi audience, the optimal posting window is 18:00–20:00 SAST on weekdays.</div>
+                        </div>
+                    </div>
+                    <div class="ds-tooltip-trigger">
+                        Hover — Feature Hint
+                        <div class="ds-tooltip ds-tooltip--bottom ds-tooltip--rich">
+                            <div class="ds-tooltip__title">AI Caption Generator</div>
+                            <div class="ds-tooltip__desc">Uses SA slang and local expressions to craft authentic, engaging captions for your brand voice.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════
+   THEME TOGGLE
+   ═══════════════════════════════════════════════════════ */
+        (function () {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+            const stored = localStorage.getItem('ds-theme');
+            if (stored) html.dataset.theme = stored;
+            function update() { btn.textContent = html.dataset.theme === 'dark' ? '☀' : '☾' }
+            update();
+            btn.addEventListener('click', () => {
+                html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('ds-theme', html.dataset.theme);
+                update();
+            });
+        })();
+
+        /* ═══════════════════════════════════════════════════════
+   TABLE — RENDER + SORT + SELECT
+   ═══════════════════════════════════════════════════════ */
+        const TABLE_DATA = [
+            { platform: 'Instagram', content: 'Table Mountain sunset vibes 🌅 #CapeTown', date: '2025-03-10', status: 'published', engagement: 2412 },
+            { platform: 'Facebook', content: 'Mzansi brands winning big in 2025 — Joburg edition', date: '2025-03-12', status: 'scheduled', engagement: 891 },
+            { platform: 'LinkedIn', content: 'How to scale your social presence across Africa', date: '2025-03-14', status: 'draft', engagement: 0 },
+            { platform: 'X (Twitter)', content: 'Lekker Monday motivation from Soweto 🇿🇦', date: '2025-03-11', status: 'published', engagement: 1834 },
+            { platform: 'Instagram', content: 'Durban beachfront golden hour — #KZN vibes', date: '2025-03-09', status: 'published', engagement: 3201 },
+            { platform: 'Facebook', content: 'SA Heritage Day braai recipes your audience will love', date: '2025-03-15', status: 'failed', engagement: 0 },
+        ];
+
+        let sortCol = -1, sortAsc = true;
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = data.map((r, i) => `
+                <tr data-idx="${i}">
+                    <td><span class="ds-table__check" onclick="toggleRow(this)">✓</span></td>
+                    <td>${r.platform}</td>
+                    <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.content}</td>
+                    <td style="font-family:var(--font-mono);font-size:0.75rem;white-space:nowrap">${r.date}</td>
+                    <td><span class="ds-badge ds-badge--dot ds-badge--${r.status}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></td>
+                    <td style="font-family:var(--font-mono);font-size:0.8125rem">${r.engagement > 0 ? r.engagement.toLocaleString() : '—'}</td>
+                    <td><button class="ds-table__actions-btn" onclick="this.textContent=this.textContent==='⋯'?'✕':'⋯'">⋯</button></td>
+                </tr>`).join('');
+        }
+
+        function sortTable(col) {
+            const ths = document.querySelectorAll('#postsTable thead th');
+            if (sortCol === col) { sortAsc = !sortAsc } else { sortCol = col; sortAsc = true }
+            ths.forEach(th => th.classList.remove('sorted'));
+            ths[col].classList.add('sorted');
+            ths[col].querySelector('.sort-arrow').textContent = sortAsc ? '▲' : '▼';
+
+            const keys = ['', 'platform', 'content', 'date', 'status', 'engagement'];
+            const key = keys[col];
+            const sorted = [...TABLE_DATA].sort((a, b) => {
+                let va = a[key], vb = b[key];
+                if (typeof va === 'number') return sortAsc ? va - vb : vb - va;
+                return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+            });
+            renderTable(sorted);
+        }
+
+        function toggleRow(el) {
+            el.classList.toggle('is-checked');
+            el.closest('tr').classList.toggle('is-selected');
+            updateSelectAll();
+        }
+
+        function toggleAllRows() {
+            const all = document.getElementById('selectAll');
+            const checks = document.querySelectorAll('#tableBody .ds-table__check');
+            const allChecked = [...checks].every(c => c.classList.contains('is-checked'));
+            checks.forEach(c => {
+                c.classList.toggle('is-checked', !allChecked);
+                c.closest('tr').classList.toggle('is-selected', !allChecked);
+            });
+            all.classList.toggle('is-checked', !allChecked);
+        }
+
+        function updateSelectAll() {
+            const checks = document.querySelectorAll('#tableBody .ds-table__check');
+            const all = document.getElementById('selectAll');
+            const allChecked = [...checks].every(c => c.classList.contains('is-checked'));
+            all.classList.toggle('is-checked', allChecked);
+        }
+
+        renderTable(TABLE_DATA);
+
+        /* Pagination click handler */
+        document.querySelectorAll('.ds-pagination__page').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.ds-pagination__page').forEach(b => b.classList.remove('is-active'));
+                btn.classList.add('is-active');
+            });
+        });
+
+        /* ═══════════════════════════════════════════════════════
+   KPI CARDS — RENDER + COUNT-UP
+   ═══════════════════════════════════════════════════════ */
+        const KPI_DATA = [
+            { icon: '📝', label: 'Total Posts', value: 1247, display: '1,247', trend: '+12.3%', dir: 'up' },
+            { icon: '🔥', label: 'Engagement Rate', value: 5.7, display: '5.7%', trend: '+2.1%', dir: 'up' },
+            { icon: '👥', label: 'Followers Gained', value: 3842, display: '3,842', trend: '+8.7%', dir: 'up' },
+            { icon: '⏰', label: 'Best Time', value: 18, display: '18:00', trend: 'SAST weekdays', dir: 'up' },
+        ];
+
+        (function () {
+            const grid = document.getElementById('kpiGrid');
+            grid.innerHTML = KPI_DATA.map(k => `
+                <div class="ds-kpi">
+                    <div class="ds-kpi__icon">${k.icon}</div>
+                    <div class="ds-kpi__label">${k.label}</div>
+                    <div class="ds-kpi__value" data-target="${k.value}" data-display="${k.display}">0</div>
+                    <div class="ds-kpi__trend ds-kpi__trend--${k.dir}">${k.trend} ${k.dir === 'up' ? '↑' : '↓'}</div>
+                </div>`).join('');
+
+            /* Count-up with IntersectionObserver */
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const els = entry.target.querySelectorAll('.ds-kpi__value');
+                    els.forEach(el => {
+                        if (el.dataset.animated) return;
+                        el.dataset.animated = '1';
+                        const final = el.dataset.display;
+                        const target = parseFloat(el.dataset.target);
+                        const isFloat = final.includes('.') && !final.includes(':');
+                        const isTime = final.includes(':');
+                        const duration = 1200;
+                        const start = performance.now();
+                        function tick(now) {
+                            const p = Math.min((now - start) / duration, 1);
+                            const ease = 1 - Math.pow(1 - p, 4);
+                            const current = target * ease;
+                            if (isTime) {
+                                el.textContent = Math.round(current) + ':00';
+                            } else if (isFloat) {
+                                el.textContent = current.toFixed(1) + '%';
+                            } else {
+                                el.textContent = Math.round(current).toLocaleString();
+                            }
+                            if (p < 1) requestAnimationFrame(tick);
+                            else el.textContent = final;
+                        }
+                        requestAnimationFrame(tick);
+                    });
+                    observer.unobserve(entry.target);
+                });
+            }, { threshold: 0.3 });
+            observer.observe(grid);
+        })();
+
+        /* ═══════════════════════════════════════════════════════
+   SIDEBAR ACTIVE STATE (IntersectionObserver)
+   ═══════════════════════════════════════════════════════ */
+        (function () {
+            const links = document.querySelectorAll('.ds-sidebar__link');
+            const sections = [];
+            links.forEach(link => {
+                const id = link.getAttribute('href').replace('#', '');
+                const target = document.getElementById(id);
+                if (target) sections.push({ id, el: target, link });
+            });
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        links.forEach(l => l.classList.remove('is-active'));
+                        const match = sections.find(s => s.el === entry.target);
+                        if (match) match.link.classList.add('is-active');
+                    }
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            sections.forEach(s => observer.observe(s.el));
+        })();
+    </script>
+</body>
+
+</html>
