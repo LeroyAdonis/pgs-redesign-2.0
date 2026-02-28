@@ -40,9 +40,19 @@ export const auth = betterAuth({
     },
   }),
 
-  /** Email + password sign-up/sign-in */
+  /** Email + password sign-up/sign-in with password reset support */
   emailAndPassword: {
     enabled: true,
+    /**
+     * Sends the password reset email.
+     *
+     * In production, replace this with your email provider (e.g. Resend, SendGrid).
+     * The `url` contains the token and redirects to /reset-password.
+     */
+    sendResetPassword: async ({ user, url }) => {
+      // TODO: Replace with production email provider
+      console.log(`[auth] Password reset requested for ${user.email}: ${url}`);
+    },
   },
 
   /**

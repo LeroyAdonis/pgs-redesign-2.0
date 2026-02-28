@@ -123,7 +123,7 @@ export function LoginForm({ labels }: LoginFormProps) {
               {labels.password}
             </label>
             <a
-              href="#"
+              href="forgot-password"
               className="text-sm text-brand hover:text-brand/80"
             >
               {labels.forgotPassword}

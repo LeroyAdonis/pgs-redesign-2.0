@@ -32,6 +32,7 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "overview": "Overview",
     "accounts": "Accounts",
     "generate": "Content Studio",
     "posts": "Posts",
@@ -40,7 +41,12 @@
     "brand": "Brand",
     "billing": "Billing",
     "settings": "Settings",
-    "team": "Team"
+    "team": "Team",
+    "sectionMain": "Main",
+    "sectionInsights": "Insights",
+    "sectionManage": "Manage",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
   },
   "auth": {
     "signIn": "Sign in",
@@ -51,6 +57,20 @@
     "email": "Email address",
     "password": "Password",
     "forgotPassword": "Forgot your password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordDescription": "Enter your email and we'll send you a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetLinkSent": "Check your email for a reset link",
+    "resetLinkSentDescription": "If an account exists with that email, we've sent a password reset link.",
+    "backToLogin": "Back to sign in",
+    "resetPasswordTitle": "Set new password",
+    "resetPasswordDescription": "Enter your new password below.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "resetPassword": "Reset password",
+    "passwordResetSuccess": "Your password has been reset successfully.",
+    "passwordsMustMatch": "Passwords must match",
+    "invalidResetToken": "Invalid or expired reset link. Please request a new one.",
     "continueWithGoogle": "Continue with Google",
     "continueWithGithub": "Continue with GitHub",
     "noAccount": "Don't have an account?",
@@ -60,9 +80,13 @@
     "title": "Dashboard",
     "welcome": "Welcome back",
     "credits": "Credits remaining",
+    "creditsCount": "{count} credits",
     "postsScheduled": "Posts scheduled",
     "accountsConnected": "Accounts connected",
-    "recentActivity": "Recent activity"
+    "recentActivity": "Recent activity",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "userMenu": "User menu"
   },
   "errors": {
     "notFound": "Page not found",
@@ -82,5 +106,92 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Purple Glow Social",
+      "subtitle": "Let's set up your account in a few quick steps. You'll be creating amazing content for Mzansi in no time!",
+      "getStarted": "Let's get started"
+    },
+    "selectTier": {
+      "title": "Choose your plan",
+      "subtitle": "Start free and upgrade anytime as your business grows.",
+      "free": "Free",
+      "popular": "Popular",
+      "tiers": {
+        "seedling": {
+          "name": "Seedling",
+          "description": "Perfect for getting started. 10 AI posts per month, 1 social account."
+        },
+        "hustler": {
+          "name": "Hustler",
+          "description": "For side-hustlers ready to grow. 50 AI posts, 3 social accounts, brand analysis."
+        },
+        "grower": {
+          "name": "Grower",
+          "description": "For growing businesses. 200 AI posts, 10 accounts, full analytics, team access."
+        },
+        "mogul": {
+          "name": "Mogul",
+          "description": "For serious brands. Unlimited posts, unlimited accounts, priority support, white-label."
+        }
+      }
+    },
+    "linkAccount": {
+      "title": "Link your first account",
+      "subtitle": "Connect your social media accounts to start posting. You can always add more later.",
+      "connect": "Connect",
+      "comingSoon": "Coming soon"
+    },
+    "brandScan": {
+      "title": "Analyse your brand",
+      "subtitle": "Our AI will scan your existing content to learn your unique brand voice and style.",
+      "scanning": "Scanning your brand...",
+      "features": {
+        "tone": "Tone & voice fingerprint analysis",
+        "hashtags": "Hashtag strategy optimisation",
+        "timing": "Best posting times for SA audiences",
+        "audience": "Audience engagement patterns"
+      }
+    },
+    "generatePost": {
+      "title": "Generate your first post",
+      "subtitle": "See the power of AI-generated content tailored to your brand and South African audience.",
+      "prompt": "Your prompt",
+      "generate": "Generate with AI",
+      "mockPost": "\"Eish, what a lekker day to announce our new product! 🇿🇦 Stay tuned Mzansi — big things are coming! #LocalIsLekker #Mzansi\""
+    },
+    "schedule": {
+      "title": "Schedule your content",
+      "subtitle": "Plan your posts at the best times for your SA audience. We'll handle the rest.",
+      "bestTimes": "Suggested times (SAST)",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "timeSlots": {
+        "morning": "08:00 SAST",
+        "lunch": "12:30 SAST",
+        "evening": "18:00 SAST"
+      }
+    },
+    "done": {
+      "title": "You're all set!",
+      "subtitle": "Your account is ready. Head to your dashboard to start creating amazing content for Mzansi.",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "skip": "Skip"
+    },
+    "progress": {
+      "stepOf": "Step {current} of {total}"
+    }
   }
 }
