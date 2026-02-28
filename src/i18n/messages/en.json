@@ -98,14 +98,171 @@
     "goHome": "Go to homepage"
   },
   "landing": {
-    "hero": "AI-powered social media management for South African businesses.",
-    "techStack": "Next.js 16 + React 19 + Tailwind v4",
-    "foundation": "Foundation",
-    "foundationDesc": "TypeScript strict mode, App Router, Turbopack",
-    "designSystem": "Design System",
-    "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
-    "southAfrican": "South African",
-    "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+    "navbar": {
+      "features": "Features",
+      "process": "Process",
+      "stories": "Stories",
+      "membership": "Membership",
+      "login": "Log In",
+      "getStarted": "Get Started",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "hero": {
+      "label": "Made on the Scene",
+      "titleLine1": "LIQUID",
+      "titleLine2": "INTELLIGENCE",
+      "description": "The definitive AI social manager for the modern creator class. Liquid Intelligence that adapts, creates, and scales your digital presence with editorial precision.",
+      "startCreating": "Start Creating",
+      "watchDemo": "Watch demo",
+      "poweredBy": "Powered by",
+      "poweredByLink": "PurpleGlow v2.0",
+      "statsDescription": "Powering the next generation of creator-first social management tools in South Africa.",
+      "statsLanguages": "11+",
+      "statsLanguagesLabel": "Languages",
+      "statsOnline": "24/7",
+      "statsOnlineLabel": "Online",
+      "badgeLabel": "Generated with Magic +",
+      "badgePersona": "The Curator"
+    },
+    "marquee": {
+      "liquidIntelligence": "Liquid Intelligence",
+      "automatedCreativity": "Automated Creativity",
+      "editorialStandards": "Editorial Standards",
+      "masterCreators": "Master Creators"
+    },
+    "features": {
+      "label": "Curated Tools for Growth",
+      "titleThe": "The",
+      "titleEdition": "Edition",
+      "engine": {
+        "label": "Our Branding",
+        "title": "Conversational Engine",
+        "description": "An AI that speaks your language, literally. Crafted to understand context, slang, and sentiment, generating responses that feel authentically human."
+      },
+      "multilingual": {
+        "label": "Our Building",
+        "title": "Multilingual Core",
+        "description": "Seamless translation across 11 official languages, break barriers and reach every corner of the audience spectrum."
+      },
+      "scheduling": {
+        "label": "Our Operating",
+        "title": "Smart Scheduling",
+        "description": "Predictive algorithms determine the perfect moment for impact. Stop guessing, start dominating the timeline."
+      }
+    },
+    "process": {
+      "label": "Our Features Only",
+      "titlePrefix": "From Chaos to",
+      "titleHighlight": "Order",
+      "connect": {
+        "title": "Connect",
+        "description": "Link your social profiles securely. Our system analyzes your historical data to understand your unique voice."
+      },
+      "generate": {
+        "title": "Generate",
+        "description": "Send a topic or let the AI suggest trends. Watch as high-fidelity copy and images are crafted in seconds."
+      },
+      "publish": {
+        "title": "Publish",
+        "description": "Preview, refine, and schedule. The system handles the distribution while you focus on the bigger picture."
+      }
+    },
+    "testimonials": {
+      "titlePrefix": "Voice of the",
+      "titleHighlight": "Industry",
+      "thabo": {
+        "quote": "Finally, a tool that understands the nuance of South African digital culture. It's not just automation, it's cultural intelligence.",
+        "name": "Thabo M.",
+        "role": "Digital Strategist, JHB"
+      },
+      "zanele": {
+        "quote": "The multilingual support is a game-changer. I can run campaigns in Zulu and English simultaneously without losing tone.",
+        "name": "Zanele K.",
+        "role": "Content Creator, DBN"
+      },
+      "pieter": {
+        "quote": "It doubled my output while halving my time. The ROI on the Creator plan is unbeatable for any serious agency.",
+        "name": "Pieter S.",
+        "role": "Agency Owner, CPT"
+      }
+    },
+    "pricing": {
+      "title": "Membership",
+      "titleHighlight": "Tiers",
+      "monthly": "Monthly",
+      "annually": "Annually",
+      "selectPlan": "Select Plan",
+      "joinNow": "Join Now",
+      "contactSales": "Contact Sales",
+      "preferred": "PREFERRED",
+      "period": "/mo",
+      "periodAnnual": "/yr",
+      "hustle": {
+        "name": "The Hustle",
+        "price": "0",
+        "priceAnnual": "0",
+        "feature1": "3 AI Posts",
+        "feature2": "1 Profile",
+        "feature3": "Basic Analytics"
+      },
+      "creator": {
+        "name": "The Creator",
+        "price": "299",
+        "priceAnnual": "2,990",
+        "feature1": "Unlimited Text",
+        "feature2": "50 Image Credits",
+        "feature3": "5 Social Profiles",
+        "feature4": "Translation Engine"
+      },
+      "mogul": {
+        "name": "The Mogul",
+        "price": "999",
+        "priceAnnual": "9,990",
+        "feature1": "Everything in Creator",
+        "feature2": "200 Image/Video Credits",
+        "feature3": "Unlimited Profiles",
+        "feature4": "Team Seats (5)"
+      }
+    },
+    "credits": {
+      "label": "Powered by Purple",
+      "title": "Need more ammunition?",
+      "description": "Top up your creative credits instantly without elevating your membership.",
+      "buyStill": "Buy Still Credits",
+      "buyVideo": "Buy Video Pack",
+      "checkoutLabel": "Checkout",
+      "buyCredits": "Buy Credits",
+      "smallAmount": "100 Credits",
+      "smallPrice": "R150.00",
+      "largeAmount": "500 Credits",
+      "largePrice": "R650.00"
+    },
+    "contact": {
+      "titlePrefix": "Make",
+      "titleHighlight": "Contact",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "sendMessage": "Send Message"
+    },
+    "footer": {
+      "brandDescription": "Liquid Intelligence for modern creators. Content strategy, automation, and multi-platform publishing.",
+      "sitemap": "Sitemap",
+      "mediaWorks": "Media/Works",
+      "login": "Login",
+      "featuresCol": "Features",
+      "aiContent": "AI Content",
+      "scheduling": "Scheduling",
+      "analytics": "Analytics",
+      "legal": "Legal/EAF",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "fairPractices": "Fair Practices",
+      "social": "Social",
+      "copyright": "© 2024 Purple Glow Technologies. All Rights Reserved.",
+      "basedIn": "Based in Cape Town"
+    }
   },
   "onboarding": {
     "welcome": {
