@@ -1,13 +1,19 @@
 /**
- * Dashboard overview page (placeholder)
+ * Dashboard overview page
  *
- * This is the main landing page for authenticated users.
- * The full dashboard overview with stats, charts, and activity
- * will be implemented in a future task.
+ * Main landing page for authenticated users. Displays a 2×2 grid
+ * of dashboard widgets: Credits Summary, Quick Stats, Recent Posts,
+ * and Upcoming Scheduled posts.
+ *
+ * Layout: 2-column on desktop (lg), single-column on mobile.
  */
 
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { CreditsSummary } from "@/components/dashboard/widgets/CreditsSummary";
+import { QuickStats } from "@/components/dashboard/widgets/QuickStats";
+import { RecentPosts } from "@/components/dashboard/widgets/RecentPosts";
+import { UpcomingPosts } from "@/components/dashboard/widgets/UpcomingPosts";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -28,9 +34,25 @@ function DashboardContent() {
   const t = useTranslations("dashboard");
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
-      <p className="mt-2 text-text-muted">{t("welcome")}</p>
+    <div className="mx-auto max-w-[1400px]" data-testid="dashboard-overview">
+      {/* Page heading */}
+      <div className="mb-6">
+        <h1 className="font-display text-2xl font-semibold text-text">
+          {t("title")}
+        </h1>
+        <p className="mt-1 text-sm text-text-muted">{t("welcome")}</p>
+      </div>
+
+      {/* Widget grid — 2×2 on desktop, stacked on mobile */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Top row */}
+        <CreditsSummary />
+        <QuickStats />
+
+        {/* Bottom row */}
+        <RecentPosts />
+        <UpcomingPosts />
+      </div>
     </div>
   );
 }
