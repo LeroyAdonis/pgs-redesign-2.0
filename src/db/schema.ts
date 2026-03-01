@@ -157,7 +157,6 @@ export const contentTypeEnum = pgEnum("content_type", [
   "image",
   "video",
 ]);
-
 // ============================================================
 // Helper: cuid2 primary key default
 // ============================================================
@@ -629,6 +628,7 @@ export const userRelations = relations(user, ({ many }) => ({
   organizationMemberships: many(organizationMember),
   posts: many(post),
   notifications: many(notification),
+  aiFeedbacks: many(aiFeedback),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -660,6 +660,7 @@ export const organizationRelations = relations(
       references: [subscription.orgId],
     }),
     notifications: many(notification),
+    aiFeedbacks: many(aiFeedback),
   }),
 );
 

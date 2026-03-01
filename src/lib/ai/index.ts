@@ -21,6 +21,7 @@ export type {
   GenerationResult,
   ContentRating,
   AIFeedback,
+  AIFeedbackData,
   FeedbackStats,
   GenerationState,
   PuterAvailability,

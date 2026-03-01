@@ -166,6 +166,17 @@ export interface AIFeedback {
   contentType: ContentType;
 }
 
+/** Client-side feedback payload (sent from UI to /api/ai/feedback) */
+export interface AIFeedbackData {
+  rating: ContentRating;
+  originalContent: string;
+  editedContent?: string;
+  aiModel: string;
+  aiPrompt: string;
+  platform: string;
+  contentType: ContentType;
+}
+
 /** Aggregated feedback statistics */
 export interface FeedbackStats {
   total: number;
