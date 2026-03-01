@@ -5,13 +5,31 @@
  * - Publishing scheduled posts when their time arrives
  * - Retrying failed publications (max 3 retries)
  * - Periodic cron to check for due posts
+ *
+ * Publishing flow:
+ *   1. Mark post as "publishing"
+ *   2. Look up social account + decrypt access token
+ *   3. Fetch post content and media
+ *   4. Call platform publisher adapter
+ *   5. Deduct credit on success
+ *   6. Update status (published / retry / failed)
  */
 
 import { inngest } from "./client";
 import { db } from "@/db";
-import { postSchedule, post } from "@/db/schema";
+import {
+  postSchedule,
+  post,
+  socialAccount,
+  postMedia,
+} from "@/db/schema";
 import { eq, and, lte, inArray } from "drizzle-orm";
 import { logger } from "@/lib/logger";
+import { decrypt } from "@/lib/crypto";
+import { getPublisher } from "@/lib/publishers/types";
+import { deductCredit } from "@/lib/credits/credit-service";
+import type { PublishResult } from "@/lib/publishers/types";
+import type { Platform } from "@/lib/social/types";
 
 // ── Event type declarations ─────────────────────────────────────
 
@@ -20,6 +38,7 @@ type PostPublishEvent = {
   data: {
     scheduleId: string;
     postId: string;
+    orgId: string;
   };
 };
 
@@ -28,6 +47,7 @@ type PostRetryEvent = {
   data: {
     scheduleId: string;
     postId: string;
+    orgId: string;
     attempt: number;
   };
 };
@@ -37,12 +57,15 @@ type ScheduleCheckEvent = {
   data: Record<string, never>;
 };
 
+// Suppress lint — ScheduleCheckEvent used for documentation only
+void (undefined as unknown as ScheduleCheckEvent);
+
 // ── post/publish ────────────────────────────────────────────────
 
 /**
  * Triggered when a scheduled post's time arrives.
- * Updates status to 'publishing', attempts to publish, then marks
- * as 'published' or 'failed'.
+ * Updates status to 'publishing', publishes via platform adapter,
+ * deducts credit on success, and handles retry/failure logic.
  */
 export const publishPost = inngest.createFunction(
   {
@@ -51,7 +74,8 @@ export const publishPost = inngest.createFunction(
   },
   { event: "post/publish" },
   async ({ event, step }) => {
-    const { scheduleId, postId } = event.data as PostPublishEvent["data"];
+    const { scheduleId, postId, orgId } =
+      event.data as PostPublishEvent["data"];
 
     // Step 1: Mark as publishing
     await step.run("mark-publishing", async () => {
@@ -63,32 +87,159 @@ export const publishPost = inngest.createFunction(
       logger.info("Post marked as publishing", { postId, scheduleId });
     });
 
-    // Step 2: Attempt to publish
-    // In production, this would call platform-specific APIs
-    // (Instagram Graph API, Twitter API, etc.)
-    const publishResult = await step.run("publish-to-platform", async () => {
-      try {
-        // TODO: Call platform publishing APIs via social account service
-        // For now, this is a placeholder that simulates successful publishing
-        logger.info("Publishing post to platform (placeholder)", {
-          postId,
-          scheduleId,
-        });
+    // Step 2: Publish to the platform via the publisher adapter
+    const publishResult = await step.run(
+      "publish-to-platform",
+      async (): Promise<PublishResult> => {
+        try {
+          // 2a: Look up the schedule → social account
+          const [schedule] = await db
+            .select({
+              socialAccountId: postSchedule.socialAccountId,
+            })
+            .from(postSchedule)
+            .where(eq(postSchedule.id, scheduleId))
+            .limit(1);
 
-        return { success: true } as const;
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown publishing error";
-        logger.error("Failed to publish post", {
-          postId,
-          scheduleId,
-          error: errorMessage,
-        });
-        return { success: false, error: errorMessage } as const;
-      }
-    });
+          if (!schedule) {
+            return {
+              success: false,
+              error: `Schedule ${scheduleId} not found`,
+              retryable: false,
+            };
+          }
 
-    // Step 3: Update status based on result
+          // 2b: Get the social account (platform + encrypted token)
+          const [account] = await db
+            .select({
+              platform: socialAccount.platform,
+              accessTokenEncrypted: socialAccount.accessTokenEncrypted,
+              isActive: socialAccount.isActive,
+            })
+            .from(socialAccount)
+            .where(eq(socialAccount.id, schedule.socialAccountId))
+            .limit(1);
+
+          if (!account) {
+            return {
+              success: false,
+              error: `Social account ${schedule.socialAccountId} not found`,
+              retryable: false,
+            };
+          }
+
+          if (!account.isActive) {
+            return {
+              success: false,
+              error: "Social account is disconnected",
+              retryable: false,
+            };
+          }
+
+          if (!account.accessTokenEncrypted) {
+            return {
+              success: false,
+              error: "No access token stored for social account",
+              retryable: false,
+            };
+          }
+
+          // 2c: Decrypt the access token
+          const accessToken = decrypt(account.accessTokenEncrypted);
+
+          // 2d: Get post content
+          const [postData] = await db
+            .select({ content: post.content })
+            .from(post)
+            .where(eq(post.id, postId))
+            .limit(1);
+
+          if (!postData) {
+            return {
+              success: false,
+              error: `Post ${postId} not found`,
+              retryable: false,
+            };
+          }
+
+          // 2e: Get post media attachments
+          const media = await db
+            .select({
+              url: postMedia.url,
+              mediaType: postMedia.mediaType,
+              altText: postMedia.altText,
+            })
+            .from(postMedia)
+            .where(eq(postMedia.postId, postId));
+
+          // 2f: Call the platform publisher
+          const platform = account.platform as Platform;
+          const publisher = getPublisher(platform);
+
+          const result = await publisher.publish({
+            postId,
+            content: postData.content,
+            platform,
+            accessToken,
+            media: media.map((m) => ({
+              url: m.url,
+              type: m.mediaType as "image" | "video" | "gif",
+              altText: m.altText ?? undefined,
+            })),
+          });
+
+          logger.info("Platform publish completed", {
+            postId,
+            scheduleId,
+            platform,
+            success: result.success,
+            platformPostId: result.platformPostId,
+          });
+
+          return result;
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Unknown publishing error";
+          logger.error("Failed to publish post", {
+            postId,
+            scheduleId,
+            error: errorMessage,
+          });
+          return {
+            success: false,
+            error: errorMessage,
+            retryable: true,
+          };
+        }
+      },
+    );
+
+    // Step 3: On success, deduct credits
+    if (publishResult.success) {
+      await step.run("deduct-credit", async () => {
+        try {
+          const result = await deductCredit(orgId, postId);
+          logger.info("Credit deducted for published post", {
+            postId,
+            orgId,
+            newBalance: result.newBalance,
+          });
+        } catch (error) {
+          // Credit deduction failure should NOT roll back a successful publish.
+          // Log it and let billing reconciliation handle it.
+          logger.error("Failed to deduct credit after publish", {
+            postId,
+            orgId,
+            error:
+              error instanceof Error ? error.message : "Unknown error",
+          });
+        }
+      });
+    }
+
+    // Step 4: Update status based on result
     await step.run("update-status", async () => {
       if (publishResult.success) {
         await db
@@ -101,7 +252,11 @@ export const publishPost = inngest.createFunction(
           .set({ status: "published" })
           .where(eq(post.id, postId));
 
-        logger.info("Post published successfully", { postId, scheduleId });
+        logger.info("Post published successfully", {
+          postId,
+          scheduleId,
+          platformPostId: publishResult.platformPostId,
+        });
       } else {
         const [schedule] = await db
           .select({ retryCount: postSchedule.retryCount })
@@ -120,13 +275,14 @@ export const publishPost = inngest.createFunction(
           })
           .where(eq(postSchedule.id, scheduleId));
 
-        if (retryCount < 3) {
+        if (retryCount < 3 && publishResult.retryable) {
           // Send retry event
           await inngest.send({
             name: "post/retry",
             data: {
               scheduleId,
               postId,
+              orgId,
               attempt: retryCount,
             },
           });
@@ -135,18 +291,21 @@ export const publishPost = inngest.createFunction(
             postId,
             scheduleId,
             attempt: retryCount,
+            error: publishResult.error,
           });
         } else {
-          // Max retries reached — mark as failed
+          // Max retries reached or non-retryable — mark as failed
           await db
             .update(post)
             .set({ status: "failed" })
             .where(eq(post.id, postId));
 
-          logger.error("Post publishing failed after max retries", {
+          logger.error("Post publishing failed permanently", {
             postId,
             scheduleId,
             retryCount,
+            retryable: publishResult.retryable,
+            error: publishResult.error,
           });
         }
       }
@@ -167,7 +326,7 @@ export const retryPost = inngest.createFunction(
   },
   { event: "post/retry" },
   async ({ event, step }) => {
-    const { scheduleId, postId, attempt } =
+    const { scheduleId, postId, orgId, attempt } =
       event.data as PostRetryEvent["data"];
 
     // Exponential backoff: 5min * 3^(attempt-1)
@@ -179,12 +338,13 @@ export const retryPost = inngest.createFunction(
     await step.run("retry-publish", async () => {
       await inngest.send({
         name: "post/publish",
-        data: { scheduleId, postId },
+        data: { scheduleId, postId, orgId },
       });
 
       logger.info("Retry publish triggered", {
         postId,
         scheduleId,
+        orgId,
         attempt,
         delayMinutes,
       });
@@ -205,7 +365,7 @@ export const checkScheduledPosts = inngest.createFunction(
   },
   { cron: "*/5 * * * *" },
   async ({ step }) => {
-    // Find all due schedules
+    // Find all due schedules (includes orgId from the post table)
     const dueSchedules = await step.run("find-due-posts", async () => {
       const now = new Date();
 
@@ -213,6 +373,7 @@ export const checkScheduledPosts = inngest.createFunction(
         .select({
           scheduleId: postSchedule.id,
           postId: postSchedule.postId,
+          orgId: post.orgId,
         })
         .from(postSchedule)
         .innerJoin(post, eq(postSchedule.postId, post.id))
@@ -237,6 +398,7 @@ export const checkScheduledPosts = inngest.createFunction(
           data: {
             scheduleId: s.scheduleId,
             postId: s.postId,
+            orgId: s.orgId,
           },
         }));
 
