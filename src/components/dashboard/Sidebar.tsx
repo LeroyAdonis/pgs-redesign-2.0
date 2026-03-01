@@ -126,21 +126,21 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { labelKey: "overview", href: "/dashboard", icon: <HomeIcon /> },
       { labelKey: "generate", href: "/dashboard/generate", icon: <SparklesIcon /> },
-      { labelKey: "posts", href: "/posts", icon: <EditIcon /> },
-      { labelKey: "calendar", href: "/calendar", icon: <CalendarIcon /> },
+      { labelKey: "posts", href: "/dashboard/posts", icon: <EditIcon /> },
+      { labelKey: "calendar", href: "/dashboard/calendar", icon: <CalendarIcon /> },
     ],
   },
   {
     labelKey: "sectionInsights",
     items: [
       { labelKey: "analytics", href: "/analytics", icon: <ChartIcon /> },
-      { labelKey: "brand", href: "/brand", icon: <PaletteIcon /> },
+      { labelKey: "brand", href: "/dashboard/brand", icon: <PaletteIcon /> },
     ],
   },
   {
     labelKey: "sectionManage",
     items: [
-      { labelKey: "accounts", href: "/accounts", icon: <UsersIcon /> },
+      { labelKey: "accounts", href: "/dashboard/accounts", icon: <UsersIcon /> },
       { labelKey: "team", href: "/team", icon: <PeopleIcon /> },
       { labelKey: "settings", href: "/settings", icon: <GearIcon /> },
       { labelKey: "billing", href: "/billing", icon: <CreditCardIcon /> },
