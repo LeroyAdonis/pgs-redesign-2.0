@@ -48,12 +48,10 @@ import { AccountsManager } from "../accounts-manager";
 
 // ─── Mocks ───────────────────────────────────────────────────
 
+// Stable reference — new object per render would re-trigger useEffect deps.
+const mockRouter = { replace: vi.fn(), push: vi.fn(), refresh: vi.fn() };
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    replace: vi.fn(),
-    push: vi.fn(),
-    refresh: vi.fn(),
-  }),
+  useRouter: () => mockRouter,
 }));
 
 // ─── Test Data ───────────────────────────────────────────────
