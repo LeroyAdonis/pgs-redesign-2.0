@@ -15,8 +15,8 @@ After completing each phase, update the status below:
 | Phase | Status | Completed By |
 |-------|--------|-------------|
 | Phase 1: Foundation | ✅ Complete | Copilot Fleet |
-| Phase 2: Core UI | ⬜ Not Started | — |
-| Phase 3: Social Linking | ⬜ Not Started | — |
+| Phase 2: Core UI | ✅ Complete | Copilot Fleet |
+| Phase 3: Social Linking | ✅ Complete | Copilot Fleet |
 | Phase 4: AI Engine | ⬜ Not Started | — |
 | Phase 5: Scheduling | ⬜ Not Started | — |
 | Phase 6: Posting Engine | ⬜ Not Started | — |
