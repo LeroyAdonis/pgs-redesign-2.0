@@ -88,11 +88,11 @@ describe("Sidebar", () => {
 
     const hrefs = links.map((link) => link.getAttribute("href"));
     expect(hrefs).toContain("/dashboard");
-    expect(hrefs).toContain("/posts");
-    expect(hrefs).toContain("/calendar");
+    expect(hrefs).toContain("/dashboard/posts");
+    expect(hrefs).toContain("/dashboard/calendar");
     expect(hrefs).toContain("/analytics");
-    expect(hrefs).toContain("/brand");
-    expect(hrefs).toContain("/accounts");
+    expect(hrefs).toContain("/dashboard/brand");
+    expect(hrefs).toContain("/dashboard/accounts");
     expect(hrefs).toContain("/team");
     expect(hrefs).toContain("/settings");
     expect(hrefs).toContain("/billing");

@@ -18,7 +18,7 @@ After completing each phase, update the status below:
 | Phase 2: Core UI | ✅ Complete | Copilot Fleet |
 | Phase 3: Social Linking | ✅ Complete | Copilot Fleet |
 | Phase 4: AI Engine | ✅ Complete | — |
-| Phase 5: Scheduling | ⬜ Not Started | — |
+| Phase 5: Scheduling | ✅ Complete | Copilot Fleet |
 | Phase 6: Posting Engine | ⬜ Not Started | — |
 | Phase 7: Payments | ⬜ Not Started | — |
 | Phase 8: Analytics | ⬜ Not Started | — |
