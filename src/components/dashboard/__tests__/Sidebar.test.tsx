@@ -95,7 +95,7 @@ describe("Sidebar", () => {
     expect(hrefs).toContain("/dashboard/accounts");
     expect(hrefs).toContain("/team");
     expect(hrefs).toContain("/settings");
-    expect(hrefs).toContain("/billing");
+    expect(hrefs).toContain("/dashboard/billing");
   });
 
   // ── Active state ──────────────────────────────────────────────

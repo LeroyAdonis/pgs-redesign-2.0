@@ -88,7 +88,7 @@ vi.mock("@/lib/crypto", () => ({
   encrypt: vi.fn((plain: string) => `encrypted_${plain}`),
 }));
 
-vi.mock("@/lib/publishers/types", () => ({
+vi.mock("@/lib/publishers", () => ({
   getPublisher: vi.fn(() => ({
     platform: "twitter",
     publish: mockPublish,
@@ -96,7 +96,7 @@ vi.mock("@/lib/publishers/types", () => ({
   })),
 }));
 
-vi.mock("@/lib/credits/credit-service", () => ({
+vi.mock("@/lib/credits", () => ({
   deductCredit: (...args: unknown[]) => mockDeductCredit(...args),
   hasEnoughCredits: vi.fn().mockResolvedValue(true),
 }));

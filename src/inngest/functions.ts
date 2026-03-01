@@ -26,8 +26,8 @@ import {
 import { eq, and, lte, inArray } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 import { decrypt } from "@/lib/crypto";
-import { getPublisher } from "@/lib/publishers/types";
-import { deductCredit } from "@/lib/credits/credit-service";
+import { getPublisher } from "@/lib/publishers";
+import { deductCredit } from "@/lib/credits";
 import type { PublishResult } from "@/lib/publishers/types";
 import type { Platform } from "@/lib/social/types";
 

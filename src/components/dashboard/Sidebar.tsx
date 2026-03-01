@@ -143,7 +143,7 @@ const NAV_SECTIONS: NavSection[] = [
       { labelKey: "accounts", href: "/dashboard/accounts", icon: <UsersIcon /> },
       { labelKey: "team", href: "/team", icon: <PeopleIcon /> },
       { labelKey: "settings", href: "/settings", icon: <GearIcon /> },
-      { labelKey: "billing", href: "/billing", icon: <CreditCardIcon /> },
+      { labelKey: "billing", href: "/dashboard/billing", icon: <CreditCardIcon /> },
     ],
   },
 ];

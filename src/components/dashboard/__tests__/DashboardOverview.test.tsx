@@ -71,7 +71,7 @@ describe("CreditsSummary", () => {
     render(<CreditsSummary />);
     const link = screen.getByText("buyMoreCredits");
     expect(link).toBeInTheDocument();
-    expect(link.closest("a")).toHaveAttribute("href", "/billing");
+    expect(link.closest("a")).toHaveAttribute("href", "/dashboard/billing");
   });
 
   it("shows the usage percentage text", () => {

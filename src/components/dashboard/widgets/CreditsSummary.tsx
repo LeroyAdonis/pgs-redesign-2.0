@@ -35,7 +35,7 @@ export function CreditsSummary({ className }: { className?: string }) {
           {t("creditsSummaryTitle")}
         </h2>
         <Link
-          href="/billing"
+          href="/dashboard/billing"
           className={cn(
             "text-xs font-medium text-brand",
             "transition-colors hover:text-brand-vivid",
