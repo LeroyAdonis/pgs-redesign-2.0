@@ -109,6 +109,15 @@ function CreditCardIcon() {
   );
 }
 
+function SparklesIcon() {
+  return (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M10 2l.6 2.4a3.5 3.5 0 0 0 2.5 2.5L15.5 7.5l-2.4.6a3.5 3.5 0 0 0-2.5 2.5L10 13l-.6-2.4a3.5 3.5 0 0 0-2.5-2.5L4.5 7.5l2.4-.6a3.5 3.5 0 0 0 2.5-2.5L10 2Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 12l.3 1.2a2 2 0 0 0 1.5 1.5L19 15l-1.2.3a2 2 0 0 0-1.5 1.5L16 18l-.3-1.2a2 2 0 0 0-1.5-1.5L13 15l1.2-.3a2 2 0 0 0 1.5-1.5L16 12Z" />
+    </svg>
+  );
+}
+
 /* ─── Navigation Structure ─── */
 
 const NAV_SECTIONS: NavSection[] = [
@@ -116,6 +125,7 @@ const NAV_SECTIONS: NavSection[] = [
     labelKey: "sectionMain",
     items: [
       { labelKey: "overview", href: "/dashboard", icon: <HomeIcon /> },
+      { labelKey: "generate", href: "/dashboard/generate", icon: <SparklesIcon /> },
       { labelKey: "posts", href: "/posts", icon: <EditIcon /> },
       { labelKey: "calendar", href: "/calendar", icon: <CalendarIcon /> },
     ],

@@ -146,6 +146,18 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "system",
 ]);
 
+export const contentTypeEnum = pgEnum("content_type", [
+  "text",
+  "image",
+  "video",
+]);
+
+export const contentRatingEnum = pgEnum("content_rating", [
+  "thumbs_up",
+  "thumbs_down",
+  "edited",
+]);
+
 // ============================================================
 // Helper: cuid2 primary key default
 // ============================================================
@@ -572,6 +584,39 @@ export const notification = pgTable(
   ],
 );
 
+// --- AI Feedback ---
+
+export const aiFeedback = pgTable(
+  "ai_feedback",
+  {
+    id: cuid2Id(),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    postId: text("post_id").references(() => post.id, {
+      onDelete: "set null",
+    }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    rating: contentRatingEnum("rating").notNull(),
+    originalContent: text("original_content").notNull(),
+    editedContent: text("edited_content"),
+    aiModel: text("ai_model").notNull(),
+    aiPrompt: text("ai_prompt").notNull(),
+    platform: platformEnum("platform").notNull(),
+    contentType: contentTypeEnum("content_type").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("ai_feedback_org_id_idx").on(table.orgId),
+    index("ai_feedback_user_id_idx").on(table.userId),
+    index("ai_feedback_post_id_idx").on(table.postId),
+  ],
+);
+
 // ============================================================
 // Drizzle relations
 // ============================================================
@@ -583,6 +628,7 @@ export const userRelations = relations(user, ({ many }) => ({
   organizationMemberships: many(organizationMember),
   posts: many(post),
   notifications: many(notification),
+  aiFeedbacks: many(aiFeedback),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -614,6 +660,7 @@ export const organizationRelations = relations(
       references: [subscription.orgId],
     }),
     notifications: many(notification),
+    aiFeedbacks: many(aiFeedback),
   }),
 );
 
@@ -730,5 +777,20 @@ export const notificationRelations = relations(notification, ({ one }) => ({
   organization: one(organization, {
     fields: [notification.orgId],
     references: [organization.id],
+  }),
+}));
+
+export const aiFeedbackRelations = relations(aiFeedback, ({ one }) => ({
+  organization: one(organization, {
+    fields: [aiFeedback.orgId],
+    references: [organization.id],
+  }),
+  post: one(post, {
+    fields: [aiFeedback.postId],
+    references: [post.id],
+  }),
+  user: one(user, {
+    fields: [aiFeedback.userId],
+    references: [user.id],
   }),
 }));
