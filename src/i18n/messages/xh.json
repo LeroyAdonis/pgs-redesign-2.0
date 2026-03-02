@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Iplani Yangoku",
+    "freePlan": "Iplani Yasimahla",
+    "nextBilling": "Umhla olandelayo wentlawulo",
+    "changePlan": "Tshintsha Iplani",
+    "cancelSubscription": "Rhoxisa Ubhaliso",
+    "cancelConfirm": "Uqinisekile ukuba ufuna ukurhoxisa ubhaliso lwakho?",
+    "cancelWarning": "Iplani yakho iza kuhlala isebenza ukuya ku-{date}",
+    "cancelSuccess": "Ubhaliso lurhoxisiwe ngempumelelo",
+    "upgradePrompt": "Ufikelele kumda wakho we-{limit} {feature} kwiplani ye-{tier}",
+    "upgradeCta": "Nyusela Iplani",
+    "topUp": "Ufuna Ama-Credits Angakumbi?",
+    "topUpDescription": "Thenga ama-credits ongezelelweyo xa uwafuna",
+    "buyCredits": "Thenga Ama-Credits",
+    "perMonth": "ngenyanga",
+    "perYear": "ngonyaka",
+    "mostPopular": "Ethandwa Kakhulu",
+    "currentPlanBadge": "Iplani Yangoku",
+    "getStarted": "Qala Ngoku",
+    "upgrade": "Nyusela",
+    "downgrade": "Thoba",
+    "savePercent": "Gcina {percent}%",
+    "monthly": "Ngenyanga",
+    "annually": "Ngonyaka",
+    "features": {
+      "socialAccounts": "Iiakhawunti Zonxibelelwano",
+      "aiPosts": "Izithuba ze-AI Ngenyanga",
+      "imageGen": "Ukwenziwa Kwemifanekiso",
+      "videoGen": "Ukwenziwa Kwevidiyo",
+      "teamSeats": "Izihlalo Zeqela",
+      "scheduling": "Ukucwangcisa",
+      "creditRollover": "Ukuqengqeleka Kwama-Credits",
+      "platforms": "Amaqonga",
+      "unlimited": "Akunamda"
+    },
+    "status": {
+      "active": "Iyasebenza",
+      "pastDue": "Idlulile",
+      "canceled": "Irhoxisiwe",
+      "trialing": "Ixesha Lokuvavanyo"
+    }
   }
 }
 

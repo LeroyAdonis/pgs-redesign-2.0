@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Iplani Yamanje",
+    "freePlan": "Iplani Yamahhala",
+    "nextBilling": "Usuku lokukhokha olulandelayo",
+    "changePlan": "Shintsha Iplani",
+    "cancelSubscription": "Khansela Ukubhalisa",
+    "cancelConfirm": "Uqinisekile ukuthi ufuna ukukhansela ukubhalisa kwakho?",
+    "cancelWarning": "Iplani yakho izosebenza kuze kube ngu-{date}",
+    "cancelSuccess": "Ukubhalisa kukhanselwe ngempumelelo",
+    "upgradePrompt": "Ufinyelele umkhawulo wakho we-{limit} {feature} kuPlani ye-{tier}",
+    "upgradeCta": "Thuthukisa Iplani",
+    "topUp": "Udinga Ama-Credits Engeziwe?",
+    "topUpDescription": "Thenga ama-credits engeziwe uma uwadinga",
+    "buyCredits": "Thenga Ama-Credits",
+    "perMonth": "ngenyanga",
+    "perYear": "ngonyaka",
+    "mostPopular": "Edumile Kakhulu",
+    "currentPlanBadge": "Iplani Yamanje",
+    "getStarted": "Qala Manje",
+    "upgrade": "Thuthukisa",
+    "downgrade": "Yehlisa",
+    "savePercent": "Onga {percent}%",
+    "monthly": "Ngenyanga",
+    "annually": "Ngonyaka",
+    "features": {
+      "socialAccounts": "Ama-Akhawunti Enkundla Yokuxhumana",
+      "aiPosts": "Izithangami ze-AI Ngenyanga",
+      "imageGen": "Ukwenza Izithombe",
+      "videoGen": "Ukwenza Amavidiyo",
+      "teamSeats": "Izihlalo Zeqembu",
+      "scheduling": "Ukuhlela",
+      "creditRollover": "Ukugqigqeleka Kwama-Credits",
+      "platforms": "Izinkundla",
+      "unlimited": "Akunamkhawulo"
+    },
+    "status": {
+      "active": "Kusebenza",
+      "pastDue": "Kudlulile",
+      "canceled": "Kukhanseliwe",
+      "trialing": "Isikhathi Sokuhlola"
+    }
   }
 }
 

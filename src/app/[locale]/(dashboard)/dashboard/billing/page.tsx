@@ -3,19 +3,26 @@
  *
  * Route: /[locale]/dashboard/billing
  *
- * Displays the organisation's credit balance with a circular gauge,
- * usage stats, a low-balance warning, and paginated transaction history.
- * Data is fetched server-side via the credit service.
+ * Displays the organisation's current plan, credit balance with a circular
+ * gauge, usage stats, a low-balance warning, top-up packages, pricing
+ * comparison cards, and paginated transaction history.
+ * Data is fetched server-side via the credit and subscription services.
  */
 
 import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { getBalance, getTransactionHistory } from "@/lib/credits";
+import { getCurrentSubscription } from "@/lib/payments/subscription-service";
+import { getTierConfig } from "@/lib/payments/tier-config";
 import { CreditBalance } from "@/components/dashboard/widgets/CreditBalance";
 import { TransactionHistory } from "@/components/dashboard/widgets/TransactionHistory";
+import { CurrentPlan } from "@/components/billing/CurrentPlan";
+import { TopUpWidget } from "@/components/billing/TopUpWidget";
+import { PricingSection } from "@/components/billing/PricingSection";
 
 type Props = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata() {
@@ -25,8 +32,8 @@ export async function generateMetadata() {
   };
 }
 
-export default async function BillingPage({ params }: Props) {
-  const { locale } = await params;
+export default async function BillingPage({ params, searchParams }: Props) {
+  const [{ locale }, sp] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
 
   const session = await requireServerSession();
@@ -37,13 +44,53 @@ export default async function BillingPage({ params }: Props) {
     session.user.id;
 
   // Fetch data in parallel
-  const [balance, transactions] = await Promise.all([
+  const [balance, transactions, subscription] = await Promise.all([
     getBalance(orgId),
     getTransactionHistory(orgId, { limit: 10 }),
+    getCurrentSubscription(orgId),
   ]);
+
+  const currentTier = subscription?.tier ?? "seedling";
+  const tierConfig = getTierConfig(currentTier);
+
+  // Checkout / top-up success flags from query params
+  const checkoutSuccess = sp.checkout === "success";
+  const topUpSuccess = sp.topup === "success";
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
+      {/* Success banners */}
+      {checkoutSuccess && (
+        <div
+          className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-5 py-3"
+          role="status"
+          data-testid="checkout-success-banner"
+        >
+          <span className="text-lg" aria-hidden="true">
+            🎉
+          </span>
+          <p className="text-sm font-medium text-emerald-400">
+            Your subscription has been activated! Welcome to the{" "}
+            {tierConfig.displayName} plan.
+          </p>
+        </div>
+      )}
+
+      {topUpSuccess && (
+        <div
+          className="flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-5 py-3"
+          role="status"
+          data-testid="topup-success-banner"
+        >
+          <span className="text-lg" aria-hidden="true">
+            ✨
+          </span>
+          <p className="text-sm font-medium text-emerald-400">
+            Credits have been added to your account successfully!
+          </p>
+        </div>
+      )}
+
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -57,7 +104,7 @@ export default async function BillingPage({ params }: Props) {
 
         {/* Top-up CTA */}
         <a
-          href="#"
+          href="#topup"
           className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-vivid"
           data-testid="top-up-button"
         >
@@ -79,11 +126,26 @@ export default async function BillingPage({ params }: Props) {
         </a>
       </div>
 
+      {/* Current plan */}
+      <CurrentPlan
+        subscription={subscription}
+        tierConfig={tierConfig}
+        locale={locale}
+      />
+
       {/* Credit balance widget */}
       <CreditBalance balance={balance} />
 
+      {/* Credit top-up packages */}
+      <div id="topup">
+        <TopUpWidget currentBalance={balance.balance} />
+      </div>
+
       {/* Transaction history */}
       <TransactionHistory transactions={transactions} orgId={orgId} />
+
+      {/* Pricing comparison */}
+      <PricingSection currentTier={currentTier} />
     </div>
   );
 }

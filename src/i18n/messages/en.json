@@ -409,5 +409,47 @@
     "progress": {
       "stepOf": "Step {current} of {total}"
     }
+  },
+  "billing": {
+    "currentPlan": "Current Plan",
+    "freePlan": "Free Plan",
+    "nextBilling": "Next billing date",
+    "changePlan": "Change Plan",
+    "cancelSubscription": "Cancel Subscription",
+    "cancelConfirm": "Are you sure you want to cancel your subscription?",
+    "cancelWarning": "Your plan will remain active until {date}",
+    "cancelSuccess": "Subscription cancelled successfully",
+    "upgradePrompt": "You've reached your {limit} {feature} limit on the {tier} plan",
+    "upgradeCta": "Upgrade Plan",
+    "topUp": "Need More Credits?",
+    "topUpDescription": "Purchase additional credits for burst needs",
+    "buyCredits": "Buy Credits",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "mostPopular": "Most Popular",
+    "currentPlanBadge": "Current Plan",
+    "getStarted": "Get Started",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "savePercent": "Save {percent}%",
+    "monthly": "Monthly",
+    "annually": "Annually",
+    "features": {
+      "socialAccounts": "Social Accounts",
+      "aiPosts": "AI Posts per Month",
+      "imageGen": "Image Generation",
+      "videoGen": "Video Generation",
+      "teamSeats": "Team Seats",
+      "scheduling": "Scheduling",
+      "creditRollover": "Credit Rollover",
+      "platforms": "Platforms",
+      "unlimited": "Unlimited"
+    },
+    "status": {
+      "active": "Active",
+      "pastDue": "Past Due",
+      "canceled": "Canceled",
+      "trialing": "Trial"
+    }
   }
 }

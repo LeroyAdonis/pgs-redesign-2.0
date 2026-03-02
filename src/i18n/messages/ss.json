@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Lisu Lanyalo",
+    "freePlan": "Lisu Lamahhala",
+    "nextBilling": "Lilanga lelilandzelako lekukhokha",
+    "changePlan": "Gucula Lisu",
+    "cancelSubscription": "Khansela Kubhaliswa",
+    "cancelConfirm": "Uchubekile kutsi ufuna kukhansela kubhaliswa kwakho?",
+    "cancelWarning": "Lisu lakho litawuchubeka lisebenta kuze kube ngu-{date}",
+    "cancelSuccess": "Kubhaliswa kukhansele ngekuphumelela",
+    "upgradePrompt": "Ufinyelelise umkhawulo wakho we-{limit} {feature} kulisu le-{tier}",
+    "upgradeCta": "Thuthukisa Lisu",
+    "topUp": "Udzinga Ema-Credits Langetiwe?",
+    "topUpDescription": "Tshenga ema-credits langetiwe nawuwadzinga",
+    "buyCredits": "Tshenga Ema-Credits",
+    "perMonth": "ngenyanga",
+    "perYear": "ngemnyaka",
+    "mostPopular": "Ledzumile Kakhulu",
+    "currentPlanBadge": "Lisu Lanyalo",
+    "getStarted": "Cala Nyalo",
+    "upgrade": "Thuthukisa",
+    "downgrade": "Yehlisa",
+    "savePercent": "Onga {percent}%",
+    "monthly": "Ngenyanga",
+    "annually": "Ngemnyaka",
+    "features": {
+      "socialAccounts": "Ema-Akhawunti Emphakatsini",
+      "aiPosts": "Tithangami te-AI Ngenyanga",
+      "imageGen": "Kwenta Titfombe",
+      "videoGen": "Kwenta Emavidiyo",
+      "teamSeats": "Tihlalo Telicembu",
+      "scheduling": "Kuhlela",
+      "creditRollover": "Kuphetfula Credits",
+      "platforms": "Tinkundla",
+      "unlimited": "Akunamkhawulo"
+    },
+    "status": {
+      "active": "Iyasebenta",
+      "pastDue": "Idlulile",
+      "canceled": "Ikhanseliwe",
+      "trialing": "Sikhatsi Sekuhlola"
+    }
   }
 }
 

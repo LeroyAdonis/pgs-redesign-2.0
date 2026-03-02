@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Huidige Plan",
+    "freePlan": "Gratis Plan",
+    "nextBilling": "Volgende faktureringsdatum",
+    "changePlan": "Verander Plan",
+    "cancelSubscription": "Kanselleer Intekening",
+    "cancelConfirm": "Is jy seker jy wil jou intekening kanselleer?",
+    "cancelWarning": "Jou plan sal aktief bly tot {date}",
+    "cancelSuccess": "Intekening suksesvol gekanselleer",
+    "upgradePrompt": "Jy het jou {limit} {feature} limiet op die {tier} plan bereik",
+    "upgradeCta": "Opgradeer Plan",
+    "topUp": "Meer Credits Nodig?",
+    "topUpDescription": "Koop addisionele credits vir ekstra behoeftes",
+    "buyCredits": "Koop Credits",
+    "perMonth": "per maand",
+    "perYear": "per jaar",
+    "mostPopular": "Gewildste",
+    "currentPlanBadge": "Huidige Plan",
+    "getStarted": "Begin Nou",
+    "upgrade": "Opgradeer",
+    "downgrade": "Afgradeer",
+    "savePercent": "Spaar {percent}%",
+    "monthly": "Maandeliks",
+    "annually": "Jaarliks",
+    "features": {
+      "socialAccounts": "Sosiale Rekeninge",
+      "aiPosts": "AI-plasings per Maand",
+      "imageGen": "Beeldgenerering",
+      "videoGen": "Videogenerering",
+      "teamSeats": "Spanplekke",
+      "scheduling": "Skedulering",
+      "creditRollover": "Krediet-oorskuiwing",
+      "platforms": "Platforms",
+      "unlimited": "Onbeperk"
+    },
+    "status": {
+      "active": "Aktief",
+      "pastDue": "Agterstallig",
+      "canceled": "Gekanselleer",
+      "trialing": "Proeftydperk"
+    }
   }
 }
 

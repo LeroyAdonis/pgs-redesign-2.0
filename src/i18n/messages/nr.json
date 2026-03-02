@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Iplani Yanje",
+    "freePlan": "Iplani Yamahhala",
+    "nextBilling": "Ilanga elilandelako lokukhokha",
+    "changePlan": "Tjhintjha Iplani",
+    "cancelSubscription": "Khansela Ukubhaliswa",
+    "cancelConfirm": "Uqinisekile bona ufuna ukukhansela ukubhaliswa kwakho?",
+    "cancelWarning": "Iplani yakho izokuragela phambili isebenza bekube ngu-{date}",
+    "cancelSuccess": "Ukubhaliswa kukhanselwe ngepumelelo",
+    "upgradePrompt": "Ufikelelise umkhawulo wakho we-{limit} {feature} kuPlani ye-{tier}",
+    "upgradeCta": "Thuthukisa Iplani",
+    "topUp": "Ufuna Ama-Credits Angeziweko?",
+    "topUpDescription": "Thenga ama-credits angeziweko nawuwatlhoga",
+    "buyCredits": "Thenga Ama-Credits",
+    "perMonth": "ngenyanga",
+    "perYear": "ngomnyaka",
+    "mostPopular": "Edzumileko Khulu",
+    "currentPlanBadge": "Iplani Yanje",
+    "getStarted": "Thoma Nje",
+    "upgrade": "Thuthukisa",
+    "downgrade": "Yehlisa",
+    "savePercent": "Boloka {percent}%",
+    "monthly": "Ngenyanga",
+    "annually": "Ngomnyaka",
+    "features": {
+      "socialAccounts": "Ama-Akhawunti Womphakathi",
+      "aiPosts": "Iinthangami ze-AI Ngenyanga",
+      "imageGen": "Ukwenza Iinthombe",
+      "videoGen": "Ukwenza Amavidiyo",
+      "teamSeats": "Iintulo Zeqembu",
+      "scheduling": "Ukuhlela",
+      "creditRollover": "Ukuphetfula Credits",
+      "platforms": "Iinkundla",
+      "unlimited": "Akunamkhawulo"
+    },
+    "status": {
+      "active": "Iyasebenza",
+      "pastDue": "Idlulile",
+      "canceled": "Ikhanseliwe",
+      "trialing": "Isikhathi Sokuhlola"
+    }
   }
 }
 

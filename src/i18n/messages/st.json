@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Morero wa Hona Jwale",
+    "freePlan": "Morero wa Mahala",
+    "nextBilling": "Letsatsi le tlang la tefo",
+    "changePlan": "Fetola Morero",
+    "cancelSubscription": "Hlakola Tefo",
+    "cancelConfirm": "Na o tiisitse hore o batla ho hlakola tefo ya hao?",
+    "cancelWarning": "Morero wa hao o tla tswela pele ho sebetsa ho fihlela ka {date}",
+    "cancelSuccess": "Tefo e hlakotswe ka katleho",
+    "upgradePrompt": "O fihleletse moedi wa hao wa {limit} {feature} morerong wa {tier}",
+    "upgradeCta": "Ntlafatsa Morero",
+    "topUp": "O Hloka Credits tse Ding?",
+    "topUpDescription": "Reka credits tse ding ha o di hloka",
+    "buyCredits": "Reka Credits",
+    "perMonth": "ka kgwedi",
+    "perYear": "ka selemo",
+    "mostPopular": "E Ratwang Haholo",
+    "currentPlanBadge": "Morero wa Hona Jwale",
+    "getStarted": "Qala Hona Jwale",
+    "upgrade": "Ntlafatsa",
+    "downgrade": "Theola",
+    "savePercent": "Boloka {percent}%",
+    "monthly": "Ka Kgwedi",
+    "annually": "Ka Selemo",
+    "features": {
+      "socialAccounts": "Di-Akhawonto tsa Sechaba",
+      "aiPosts": "Diposo tsa AI ka Kgwedi",
+      "imageGen": "Ho Etsa Ditshwantsho",
+      "videoGen": "Ho Etsa Dividio",
+      "teamSeats": "Ditulo tsa Sehlopha",
+      "scheduling": "Ho Hlophisa",
+      "creditRollover": "Ho Fetisa Credits",
+      "platforms": "Marangrang",
+      "unlimited": "Ha ho na Moedi"
+    },
+    "status": {
+      "active": "E a Sebetsa",
+      "pastDue": "E Fetilwe",
+      "canceled": "E Hlakotswe",
+      "trialing": "Nako ya Teko"
+    }
   }
 }
 

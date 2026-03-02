@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Pulane ya Zwino",
+    "freePlan": "Pulane ya Mahala",
+    "nextBilling": "Ḓuvha ḽi ḓaho ḽa mbadelo",
+    "changePlan": "Shanduka Pulane",
+    "cancelSubscription": "Khansela U Bvisela",
+    "cancelConfirm": "Ni na vhungomu uri ni ṱoḓa u khansela u bvisela haṋu?",
+    "cancelWarning": "Pulane yaṋu i ḓo bvela phanḓa i tshi shuma u swika nga {date}",
+    "cancelSuccess": "U bvisela ho khanselwa nga mvelaphanḓa",
+    "upgradePrompt": "No swika kha tshiṅwe tsha {limit} {feature} kha pulane ya {tier}",
+    "upgradeCta": "Khwinisa Pulane",
+    "topUp": "Ni Ṱoḓa Credits Dziṅwe?",
+    "topUpDescription": "Renga credits dziṅwe musi ni tshi dzi ṱoḓa",
+    "buyCredits": "Renga Credits",
+    "perMonth": "nga ṅwedzi",
+    "perYear": "nga ṅwaha",
+    "mostPopular": "I Funwaho Vhukuma",
+    "currentPlanBadge": "Pulane ya Zwino",
+    "getStarted": "Thoma Zwino",
+    "upgrade": "Khwinisa",
+    "downgrade": "Tsitsela Fhasi",
+    "savePercent": "Vhulungani {percent}%",
+    "monthly": "Nga Ṅwedzi",
+    "annually": "Nga Ṅwaha",
+    "features": {
+      "socialAccounts": "Akhaunthu dza Matshilisano",
+      "aiPosts": "Zwidzhendedzi zwa AI nga Ṅwedzi",
+      "imageGen": "U Ita Zwifanyiso",
+      "videoGen": "U Ita Vhidio",
+      "teamSeats": "Dzidulo dza Tshigwada",
+      "scheduling": "U Dzudzanya",
+      "creditRollover": "U Fhirisela Credits",
+      "platforms": "Mabulungelo",
+      "unlimited": "A Hu Na Tshiṅwe"
+    },
+    "status": {
+      "active": "I a Shuma",
+      "pastDue": "Yo Fhira",
+      "canceled": "Yo Khanselwa",
+      "trialing": "Tshifhinga Tsha U Linga"
+    }
   }
 }
 

@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Lenaneo la Jaanong",
+    "freePlan": "Lenaneo la Mahala",
+    "nextBilling": "Letsatsi le le latelang la tuelo",
+    "changePlan": "Fetola Lenaneo",
+    "cancelSubscription": "Khansela Tuelo",
+    "cancelConfirm": "A o tlhomamisitse gore o batla go khansela tuelo ya gago?",
+    "cancelWarning": "Lenaneo la gago le tla tswelela go bereka go fitlha ka {date}",
+    "cancelSuccess": "Tuelo e khanselitswe ka katlego",
+    "upgradePrompt": "O fitlhetse moedi wa gago wa {limit} {feature} mo lenaneong la {tier}",
+    "upgradeCta": "Tokafatsa Lenaneo",
+    "topUp": "O Batla Credits Tse Dingwe?",
+    "topUpDescription": "Reka credits tse dingwe fa o di tlhoka",
+    "buyCredits": "Reka Credits",
+    "perMonth": "ka kgwedi",
+    "perYear": "ka ngwaga",
+    "mostPopular": "E E Ratwang Thata",
+    "currentPlanBadge": "Lenaneo la Jaanong",
+    "getStarted": "Simolola Jaanong",
+    "upgrade": "Tokafatsa",
+    "downgrade": "Theosa",
+    "savePercent": "Boloka {percent}%",
+    "monthly": "Ka Kgwedi",
+    "annually": "Ka Ngwaga",
+    "features": {
+      "socialAccounts": "Di-Akhonto tsa Leago",
+      "aiPosts": "Diposo tsa AI ka Kgwedi",
+      "imageGen": "Go Dira Ditshwantsho",
+      "videoGen": "Go Dira Dibidio",
+      "teamSeats": "Ditilo tsa Setlhopha",
+      "scheduling": "Go Rulaganya",
+      "creditRollover": "Go Fetisa Credits",
+      "platforms": "Mafala",
+      "unlimited": "Ga go na Moedi"
+    },
+    "status": {
+      "active": "E a Bereka",
+      "pastDue": "E Fetilwe",
+      "canceled": "E Khanselitswe",
+      "trialing": "Nako ya Teko"
+    }
   }
 }
 

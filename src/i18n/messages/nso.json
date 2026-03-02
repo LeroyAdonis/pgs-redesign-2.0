@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Peakanyo ya Bjale",
+    "freePlan": "Peakanyo ya Mahala",
+    "nextBilling": "Letšatšikgwedi la go latelago la tefo",
+    "changePlan": "Fetoša Peakanyo",
+    "cancelSubscription": "Khansela Peakanyo",
+    "cancelConfirm": "Na o tloga o nyaka go khansela peakanyo ya gago?",
+    "cancelWarning": "Peakanyo ya gago e tla dula e šoma go fihlela ka {date}",
+    "cancelSuccess": "Peakanyo e khansetšwe ka katlego",
+    "upgradePrompt": "O fihleletše moedi wa gago wa {limit} {feature} go peakanyo ya {tier}",
+    "upgradeCta": "Hlatlosa Peakanyo",
+    "topUp": "O Nyaka Credits tše Dingwe?",
+    "topUpDescription": "Reka credits tše dingwe ge o di hloka",
+    "buyCredits": "Reka Credits",
+    "perMonth": "ka kgwedi",
+    "perYear": "ka ngwaga",
+    "mostPopular": "E Ratwago Kudu",
+    "currentPlanBadge": "Peakanyo ya Bjale",
+    "getStarted": "Thoma Bjale",
+    "upgrade": "Hlatlosa",
+    "downgrade": "Theošetša",
+    "savePercent": "Boloka {percent}%",
+    "monthly": "Ka Kgwedi",
+    "annually": "Ka Ngwaga",
+    "features": {
+      "socialAccounts": "Di-Akhawonto tša Leago",
+      "aiPosts": "Dithangami tša AI ka Kgwedi",
+      "imageGen": "Go Hlama Diswantšho",
+      "videoGen": "Go Hlama Dibidio",
+      "teamSeats": "Ditulo tša Sehlopha",
+      "scheduling": "Go Beakanya",
+      "creditRollover": "Go Phethišetša Credits",
+      "platforms": "Mafala",
+      "unlimited": "Ga go na Moedi"
+    },
+    "status": {
+      "active": "E a Šoma",
+      "pastDue": "E Fetilwe",
+      "canceled": "E Khansetšwe",
+      "trialing": "Nako ya Teko"
+    }
   }
 }
 

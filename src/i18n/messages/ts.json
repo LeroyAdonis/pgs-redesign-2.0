@@ -82,6 +82,48 @@
     "designSystemDesc": "Custom tokens, dark mode, purple glow theme",
     "southAfrican": "South African",
     "southAfricanDesc": "11 languages, SAST timezone, ZAR currency"
+  },
+  "billing": {
+    "currentPlan": "Pulani ya Sweswi",
+    "freePlan": "Pulani ya Mahala",
+    "nextBilling": "Siku ro landza ra ku hakela",
+    "changePlan": "Cinca Pulani",
+    "cancelSubscription": "Khansela Ku Hakela",
+    "cancelConfirm": "Xana u tiyisekile leswaku u lava ku khansela ku hakela ka wena?",
+    "cancelWarning": "Pulani ya wena yi ta ya emahlweni yi tirha ku fikela hi {date}",
+    "cancelSuccess": "Ku hakela ku khanseriwile hi ku humelela",
+    "upgradePrompt": "U fikelele nhlayiso ya wena ya {limit} {feature} eka pulani ya {tier}",
+    "upgradeCta": "Tlakusa Pulani",
+    "topUp": "U Lava Credits tin'wana?",
+    "topUpDescription": "Xava credits tin'wana loko u ti lava",
+    "buyCredits": "Xava Credits",
+    "perMonth": "hi n'hweti",
+    "perYear": "hi lembe",
+    "mostPopular": "Yi Rhandziwa Ngopfu",
+    "currentPlanBadge": "Pulani ya Sweswi",
+    "getStarted": "Sungula Sweswi",
+    "upgrade": "Tlakusa",
+    "downgrade": "Ehla",
+    "savePercent": "Hlayisa {percent}%",
+    "monthly": "Hi N'hweti",
+    "annually": "Hi Lembe",
+    "features": {
+      "socialAccounts": "Ti-Akhawunti ta Vanhu",
+      "aiPosts": "Swithangami swa AI hi N'hweti",
+      "imageGen": "Ku Endla Swifaniso",
+      "videoGen": "Ku Endla Tividio",
+      "teamSeats": "Switshamo swa Ntlawa",
+      "scheduling": "Ku Lungisa",
+      "creditRollover": "Ku Hundzisela Credits",
+      "platforms": "Swipfuneto",
+      "unlimited": "Ku Hava Nhlayiso"
+    },
+    "status": {
+      "active": "Yi a Tirha",
+      "pastDue": "Yi Hundurile",
+      "canceled": "Yi Khanseriwile",
+      "trialing": "Nkarhi wa Ku Ringeta"
+    }
   }
 }
 
