@@ -45,6 +45,16 @@ vi.mock("@/components/ui/language-selector", () => ({
   LanguageSelector: () => <div data-testid="language-selector">Lang</div>,
 }));
 
+/**
+ * Mock NotificationBell — renders a simple placeholder.
+ * The real component fetches data via network; we test it separately.
+ */
+vi.mock("@/components/notifications/NotificationBell", () => ({
+  NotificationBell: () => (
+    <button type="button" data-testid="notification-bell">Bell</button>
+  ),
+}));
+
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 
 const defaultProps = {
@@ -52,7 +62,6 @@ const defaultProps = {
   userEmail: "thabo@example.co.za",
   userImage: "https://example.com/thabo.jpg",
   credits: 42,
-  notificationCount: 5,
 };
 
 describe("DashboardHeader", () => {
@@ -84,33 +93,6 @@ describe("DashboardHeader", () => {
   it("renders the notification bell", () => {
     render(<DashboardHeader {...defaultProps} />);
     expect(screen.getByTestId("notification-bell")).toBeInTheDocument();
-  });
-
-  it("shows notification badge when count > 0", () => {
-    render(<DashboardHeader {...defaultProps} />);
-    expect(screen.getByText("5")).toBeInTheDocument();
-  });
-
-  it("hides notification badge when count is 0", () => {
-    render(
-      <DashboardHeader
-        {...defaultProps}
-        notificationCount={0}
-      />,
-    );
-    const bell = screen.getByTestId("notification-bell");
-    // Badge should not be present inside the bell
-    expect(bell.querySelector(".absolute")).not.toBeInTheDocument();
-  });
-
-  it("caps notification badge at 99+", () => {
-    render(
-      <DashboardHeader
-        {...defaultProps}
-        notificationCount={150}
-      />,
-    );
-    expect(screen.getByText("99+")).toBeInTheDocument();
   });
 
   // ── Language selector ─────────────────────────────────────────

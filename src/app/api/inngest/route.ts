@@ -23,16 +23,33 @@ import {
   refreshDailyMetrics,
   weeklyAnalyticsDigest,
 } from "@/inngest/analytics-functions";
+import {
+  notifyOnPostPublished,
+  notifyOnPostFailed,
+  notifyOnLowCredits,
+  checkExpiringTokens,
+  notifyOnSignup,
+  notifyOnSubscriptionChange,
+} from "@/inngest/notification-functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
+    // Post publishing pipeline
     publishPost,
     retryPost,
     checkScheduledPosts,
+    // Analytics pipeline
     fetchInitialMetrics,
     refreshRecentMetrics,
     refreshDailyMetrics,
     weeklyAnalyticsDigest,
+    // Notification handlers
+    notifyOnPostPublished,
+    notifyOnPostFailed,
+    notifyOnLowCredits,
+    checkExpiringTokens,
+    notifyOnSignup,
+    notifyOnSubscriptionChange,
   ],
 });

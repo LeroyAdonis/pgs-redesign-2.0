@@ -217,13 +217,14 @@ describe("publishPost", () => {
       step,
     });
 
-    // 5 steps: mark-publishing, publish-to-platform, deduct-credit, update-status, trigger-analytics
-    expect(step.run).toHaveBeenCalledTimes(5);
+    // 6 steps: mark-publishing, publish-to-platform, deduct-credit, update-status, trigger-analytics, send-notifications
+    expect(step.run).toHaveBeenCalledTimes(6);
     expect(step.run.mock.calls[0][0]).toBe("mark-publishing");
     expect(step.run.mock.calls[1][0]).toBe("publish-to-platform");
     expect(step.run.mock.calls[2][0]).toBe("deduct-credit");
     expect(step.run.mock.calls[3][0]).toBe("update-status");
     expect(step.run.mock.calls[4][0]).toBe("trigger-analytics");
+    expect(step.run.mock.calls[5][0]).toBe("send-notifications");
 
     // Publisher called with decrypted token
     expect(mockPublish).toHaveBeenCalledWith({
@@ -282,8 +283,8 @@ describe("publishPost", () => {
       },
     });
 
-    // 3 steps only: mark-publishing, publish-to-platform, update-status
-    expect(step.run).toHaveBeenCalledTimes(3);
+    // 4 steps: mark-publishing, publish-to-platform, update-status, send-notifications
+    expect(step.run).toHaveBeenCalledTimes(4);
   });
 
   it("marks post as failed after max retries", async () => {

@@ -511,11 +511,11 @@ describe("weeklyAnalyticsDigest", () => {
 
     await handler({ step });
 
-    // 3 steps: fetch-orgs, digest-org-1, log-digests
+    // 3 steps: fetch-orgs, digest-org-1, send-digest-notifications
     expect(step.run).toHaveBeenCalledTimes(3);
     expect(step.run.mock.calls[0][0]).toBe("fetch-orgs");
     expect(step.run.mock.calls[1][0]).toBe("digest-org-1");
-    expect(step.run.mock.calls[2][0]).toBe("log-digests");
+    expect(step.run.mock.calls[2][0]).toBe("send-digest-notifications");
 
     // Analytics fetched for this week and previous week
     expect(mockGetOrgAnalytics).toHaveBeenCalledTimes(2);

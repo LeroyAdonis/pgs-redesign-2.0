@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
 import { LanguageSelector } from "@/components/ui/language-selector";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 /* ─── Types ─── */
 
@@ -19,8 +19,6 @@ interface DashboardHeaderProps {
   userImage?: string;
   /** Credit balance to display */
   credits?: number;
-  /** Number of unread notifications */
-  notificationCount?: number;
   className?: string;
 }
 
@@ -31,7 +29,6 @@ function DashboardHeader({
   userEmail,
   userImage,
   credits = 0,
-  notificationCount = 0,
   className,
 }: DashboardHeaderProps) {
   const t = useTranslations("dashboard");
@@ -115,36 +112,7 @@ function DashboardHeader({
         </div>
 
         {/* Notification bell */}
-        <button
-          type="button"
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-brand-surface hover:text-text"
-          aria-label={t("notifications")}
-          data-testid="notification-bell"
-        >
-          <svg
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10 3a5 5 0 0 0-5 5c0 4-2 5-2 5h14s-2-1-2-5a5 5 0 0 0-5-5ZM8.5 15.5a2.12 2.12 0 0 0 3 0"
-            />
-          </svg>
-          {notificationCount > 0 && (
-            <Badge
-              variant="error"
-              size="sm"
-              className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center p-0 text-[0.5rem]"
-            >
-              {notificationCount > 99 ? "99+" : notificationCount}
-            </Badge>
-          )}
-        </button>
+        <NotificationBell />
 
         {/* Language selector */}
         <div className="hidden sm:block">

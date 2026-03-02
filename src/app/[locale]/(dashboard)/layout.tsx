@@ -39,7 +39,6 @@ export default async function DashboardLayout({ children, params }: Props) {
           userEmail={session.user.email}
           userImage={session.user.image ?? undefined}
           credits={42}
-          notificationCount={3}
         />
 
         <main className="flex-1 p-4 md:p-6">{children}</main>

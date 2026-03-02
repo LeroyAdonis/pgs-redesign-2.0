@@ -16,7 +16,12 @@
 
 import { inngest } from "./client";
 import { db } from "@/db";
-import { organization, postSchedule, socialAccount } from "@/db/schema";
+import {
+  organization,
+  organizationMember,
+  postSchedule,
+  socialAccount,
+} from "@/db/schema";
 import { eq, and, gte, lte, isNotNull } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 import { decrypt } from "@/lib/crypto";
@@ -27,6 +32,7 @@ import {
   getTopPosts,
   getPlatformComparison,
 } from "@/lib/analytics/analytics-service";
+import { notifyWeeklyDigest } from "@/lib/notifications/notification-triggers";
 import type { Platform } from "@/lib/social/types";
 
 // ── Event type declarations ─────────────────────────────────────
@@ -396,7 +402,6 @@ function determineTrend(
  * Each org's digest is compiled inside its own `step.run()` for
  * proper error isolation — one failing org does not block others.
  */
-// TODO: Send email digest when notification system is implemented (Phase 9)
 export const weeklyAnalyticsDigest = inngest.createFunction(
   {
     id: "analytics-weekly-digest",
@@ -508,9 +513,46 @@ export const weeklyAnalyticsDigest = inngest.createFunction(
       }
     }
 
-    // 3. Log compiled digests
-    // TODO: Send email digest when notification system is implemented (Phase 9)
-    await step.run("log-digests", async () => {
+    // 3. Send digest notifications to all members of each org
+    await step.run("send-digest-notifications", async () => {
+      for (const digest of digests) {
+        try {
+          // Find all members of this organisation
+          const members = await db
+            .select({ userId: organizationMember.userId })
+            .from(organizationMember)
+            .where(eq(organizationMember.orgId, digest.orgId));
+
+          for (const member of members) {
+            await notifyWeeklyDigest(member.userId, {
+              totalImpressions: digest.summary.totalImpressions,
+              topPostId: digest.topPosts[0]
+                ? undefined // topPosts has content not IDs; omit
+                : undefined,
+              trend:
+                digest.trend === "stable"
+                  ? "flat"
+                  : digest.trend,
+            });
+          }
+
+          logger.info("analytics/weekly-digest: notifications sent", {
+            orgId: digest.orgId,
+            memberCount: members.length,
+          });
+        } catch (error) {
+          logger.warn(
+            "analytics/weekly-digest: notification send failed",
+            {
+              orgId: digest.orgId,
+              error:
+                error instanceof Error ? error.message : "Unknown error",
+            },
+          );
+        }
+      }
+
+      // Log summary
       for (const digest of digests) {
         logger.info("analytics/weekly-digest: digest compiled", {
           orgId: digest.orgId,

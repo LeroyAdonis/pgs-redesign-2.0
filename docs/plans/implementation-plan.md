@@ -22,7 +22,7 @@ After completing each phase, update the status below:
 | Phase 6: Posting Engine | ✅ Complete | Copilot Fleet |
 | Phase 7: Payments | ⬜ Not Started | — |
 | Phase 8: Analytics | ✅ Complete | Copilot Fleet |
-| Phase 9: Notifications | ⬜ Not Started | — |
+| Phase 9: Notifications | ✅ Complete | Copilot Fleet |
 | Phase 10: Admin Dashboard | ⬜ Not Started | — |
 | Phase 11: Docs & Legal | ⬜ Not Started | — |
 | Phase 12: Chatbot | ⬜ Not Started | — |

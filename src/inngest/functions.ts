@@ -22,12 +22,14 @@ import {
   post,
   socialAccount,
   postMedia,
+  credit,
 } from "@/db/schema";
 import { eq, and, lte, inArray } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 import { decrypt } from "@/lib/crypto";
 import { getPublisher } from "@/lib/publishers";
 import { deductCredit } from "@/lib/credits";
+import { LOW_BALANCE_THRESHOLD } from "@/lib/credits";
 import type { PublishResult } from "@/lib/publishers/types";
 import type { Platform } from "@/lib/social/types";
 
@@ -216,7 +218,7 @@ export const publishPost = inngest.createFunction(
       },
     );
 
-    // Step 3: On success, deduct credits
+    // Step 3: On success, deduct credits and check for low balance
     if (publishResult.success) {
       await step.run("deduct-credit", async () => {
         try {
@@ -226,6 +228,47 @@ export const publishPost = inngest.createFunction(
             orgId,
             newBalance: result.newBalance,
           });
+
+          // Check if remaining balance is below the low-balance threshold
+          if (result.success) {
+            const [creditRow] = await db
+              .select({ monthlyAllocation: credit.monthlyAllocation })
+              .from(credit)
+              .where(eq(credit.orgId, orgId))
+              .limit(1);
+
+            if (creditRow && creditRow.monthlyAllocation > 0) {
+              const isLow =
+                result.newBalance <=
+                creditRow.monthlyAllocation * LOW_BALANCE_THRESHOLD;
+
+              if (isLow) {
+                // Look up post creator to notify them
+                const [postRecord] = await db
+                  .select({ createdById: post.createdById })
+                  .from(post)
+                  .where(eq(post.id, postId))
+                  .limit(1);
+
+                if (postRecord) {
+                  await inngest.send({
+                    name: "notification/low-credits",
+                    data: {
+                      userId: postRecord.createdById,
+                      remaining: result.newBalance,
+                      total: creditRow.monthlyAllocation,
+                    },
+                  });
+
+                  logger.info("Low credits event sent", {
+                    orgId,
+                    remaining: result.newBalance,
+                    total: creditRow.monthlyAllocation,
+                  });
+                }
+              }
+            }
+          }
         } catch (error) {
           // Credit deduction failure should NOT roll back a successful publish.
           // Log it and let billing reconciliation handle it.
@@ -328,6 +371,57 @@ export const publishPost = inngest.createFunction(
         });
       });
     }
+
+    // Step 6: Send notification events
+    await step.run("send-notifications", async () => {
+      // Look up the post creator and platform for notification context
+      const [postRecord] = await db
+        .select({
+          createdById: post.createdById,
+          platform: post.platform,
+        })
+        .from(post)
+        .where(eq(post.id, postId))
+        .limit(1);
+
+      if (!postRecord) return;
+
+      if (publishResult.success) {
+        await inngest.send({
+          name: "notification/post-published",
+          data: {
+            userId: postRecord.createdById,
+            postId,
+            platform: postRecord.platform,
+            platformUrl: publishResult.platformUrl,
+          },
+        });
+      } else {
+        // Only notify on final failure (non-retryable or max retries reached)
+        const [schedule] = await db
+          .select({ retryCount: postSchedule.retryCount })
+          .from(postSchedule)
+          .where(eq(postSchedule.id, scheduleId))
+          .limit(1);
+
+        const retryCount = schedule?.retryCount ?? 0;
+        const isFinalFailure =
+          !publishResult.retryable || retryCount >= 3;
+
+        if (isFinalFailure) {
+          await inngest.send({
+            name: "notification/post-failed",
+            data: {
+              userId: postRecord.createdById,
+              postId,
+              platform: postRecord.platform,
+              error: publishResult.error ?? "Unknown error",
+              retryable: false,
+            },
+          });
+        }
+      }
+    });
   },
 );
 
