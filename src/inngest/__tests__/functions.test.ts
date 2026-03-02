@@ -42,6 +42,8 @@ vi.mock("@/db/schema", () => ({
     orgId: "post.orgId",
     status: "post.status",
     content: "post.content",
+    createdById: "post.createdById",
+    platform: "post.platform",
   },
   postSchedule: {
     id: "postSchedule.id",
@@ -65,6 +67,10 @@ vi.mock("@/db/schema", () => ({
     url: "postMedia.url",
     mediaType: "postMedia.mediaType",
     altText: "postMedia.altText",
+  },
+  credit: {
+    orgId: "credit.orgId",
+    monthlyAllocation: "credit.monthlyAllocation",
   },
 }));
 
@@ -100,6 +106,8 @@ vi.mock("@/lib/publishers", () => ({
 vi.mock("@/lib/credits", () => ({
   deductCredit: (...args: unknown[]) => mockDeductCredit(...args),
   hasEnoughCredits: vi.fn().mockResolvedValue(true),
+  hasDeductionForPost: vi.fn().mockResolvedValue(false),
+  LOW_BALANCE_THRESHOLD: 0.1,
 }));
 
 // Mock inngest client — createFunction returns the raw handler for testing
@@ -196,6 +204,8 @@ describe("publishPost", () => {
       [{ platform: "twitter", accessTokenEncrypted: "enc_token_123", isActive: true }],
       [{ content: "Hello #Mzansi! 🇿🇦" }],
       [], // no media
+      [{ monthlyAllocation: 100 }], // credit row for low-balance check
+      [{ createdById: "user-1", platform: "twitter" }], // send-notifications post lookup
     ]);
 
     mockPublish.mockResolvedValue({
@@ -217,14 +227,15 @@ describe("publishPost", () => {
       step,
     });
 
-    // 6 steps: mark-publishing, publish-to-platform, deduct-credit, update-status, trigger-analytics, send-notifications
-    expect(step.run).toHaveBeenCalledTimes(6);
+    // 7 steps: mark-publishing, check-credits, publish-to-platform, deduct-credit, update-status, trigger-analytics, send-notifications
+    expect(step.run).toHaveBeenCalledTimes(7);
     expect(step.run.mock.calls[0][0]).toBe("mark-publishing");
-    expect(step.run.mock.calls[1][0]).toBe("publish-to-platform");
-    expect(step.run.mock.calls[2][0]).toBe("deduct-credit");
-    expect(step.run.mock.calls[3][0]).toBe("update-status");
-    expect(step.run.mock.calls[4][0]).toBe("trigger-analytics");
-    expect(step.run.mock.calls[5][0]).toBe("send-notifications");
+    expect(step.run.mock.calls[1][0]).toBe("check-credits");
+    expect(step.run.mock.calls[2][0]).toBe("publish-to-platform");
+    expect(step.run.mock.calls[3][0]).toBe("deduct-credit");
+    expect(step.run.mock.calls[4][0]).toBe("update-status");
+    expect(step.run.mock.calls[5][0]).toBe("trigger-analytics");
+    expect(step.run.mock.calls[6][0]).toBe("send-notifications");
 
     // Publisher called with decrypted token
     expect(mockPublish).toHaveBeenCalledWith({
@@ -283,8 +294,8 @@ describe("publishPost", () => {
       },
     });
 
-    // 4 steps: mark-publishing, publish-to-platform, update-status, send-notifications
-    expect(step.run).toHaveBeenCalledTimes(4);
+    // 5 steps: mark-publishing, check-credits, publish-to-platform, update-status, send-notifications
+    expect(step.run).toHaveBeenCalledTimes(5);
   });
 
   it("marks post as failed after max retries", async () => {

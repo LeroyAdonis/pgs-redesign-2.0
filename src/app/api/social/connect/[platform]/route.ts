@@ -5,6 +5,10 @@
  * Builds the authorization URL, stores CSRF/PKCE state in a cookie,
  * and redirects the user to the platform's consent page.
  *
+ * Enforces:
+ *  - Social account tier limit (before starting OAuth)
+ *  - Platform access for the org's tier
+ *
  * Query params:
  *   - orgId: Organization to link the account to (required)
  */
@@ -20,6 +24,11 @@ import {
   OAUTH_PROVIDERS,
   type Platform,
 } from "@/lib/social";
+import {
+  checkAccountLimit,
+  checkPlatformAccess,
+} from "@/lib/payments/tier-enforcement";
+import { TIER_CONFIGS } from "@/lib/payments/tier-config";
 
 const OAUTH_STATE_COOKIE = "pgs_oauth_state";
 const STATE_MAX_AGE_SECONDS = 600; // 10 minutes
@@ -28,6 +37,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ platform: string }> },
 ) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
   try {
     const session = await requireServerSession();
     const { platform } = await params;
@@ -52,6 +63,41 @@ export async function GET(
     // Verify org membership
     await requireOrgMembership(session.user.id, orgId);
 
+    // --- Tier enforcement: check social account limit ---
+    const accountCheck = await checkAccountLimit(orgId);
+    if (!accountCheck.allowed) {
+      const tierName = TIER_CONFIGS[accountCheck.tier].displayName;
+      const upgradeName = accountCheck.upgradeRequired
+        ? TIER_CONFIGS[accountCheck.upgradeRequired].displayName
+        : undefined;
+
+      logger.warn("Social account limit reached", {
+        orgId,
+        platform,
+        tier: accountCheck.tier,
+        current: accountCheck.current,
+        limit: accountCheck.limit,
+      });
+
+      return NextResponse.redirect(
+        `${baseUrl}/dashboard/accounts?error=account_limit&tier=${tierName}&current=${accountCheck.current}&limit=${accountCheck.limit}${upgradeName ? `&upgrade=${upgradeName}` : ""}`,
+      );
+    }
+
+    // --- Tier enforcement: check platform access ---
+    const platformCheck = await checkPlatformAccess(orgId, platform);
+    if (!platformCheck.allowed) {
+      logger.warn("Platform not available on tier", {
+        orgId,
+        platform,
+        tier: platformCheck.tier,
+      });
+
+      return NextResponse.redirect(
+        `${baseUrl}/dashboard/accounts?error=platform_unavailable&platform=${platform}&tier=${TIER_CONFIGS[platformCheck.tier].displayName}`,
+      );
+    }
+
     // Build authorization URL with state
     const { url, state } = buildAuthorizationUrl(platform, orgId);
 
@@ -74,7 +120,6 @@ export async function GET(
     });
 
     // Redirect to accounts page with error
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     return NextResponse.redirect(
       `${baseUrl}/dashboard/accounts?error=connect_failed`,
     );

@@ -94,7 +94,7 @@ describe("CurrentPlan", () => {
     );
 
     const badge = screen.getByTestId("status-badge");
-    expect(badge).toHaveTextContent("Active");
+    expect(badge).toHaveTextContent("status.active");
   });
 
   it("shows canceled status badge", () => {
@@ -107,7 +107,7 @@ describe("CurrentPlan", () => {
       />,
     );
 
-    expect(screen.getByTestId("status-badge")).toHaveTextContent("Canceled");
+    expect(screen.getByTestId("status-badge")).toHaveTextContent("status.canceled");
   });
 
   it("shows past_due status badge", () => {
@@ -120,7 +120,7 @@ describe("CurrentPlan", () => {
       />,
     );
 
-    expect(screen.getByTestId("status-badge")).toHaveTextContent("Past Due");
+    expect(screen.getByTestId("status-badge")).toHaveTextContent("status.pastDue");
   });
 
   it("shows trialing status badge", () => {
@@ -133,7 +133,7 @@ describe("CurrentPlan", () => {
       />,
     );
 
-    expect(screen.getByTestId("status-badge")).toHaveTextContent("Trialing");
+    expect(screen.getByTestId("status-badge")).toHaveTextContent("status.trialing");
   });
 
   it("displays price in ZAR format", () => {
@@ -231,7 +231,7 @@ describe("CurrentPlan", () => {
 
     const notice = screen.getByTestId("cancellation-notice");
     expect(notice).toBeInTheDocument();
-    expect(notice.textContent).toContain("will remain active until");
+    expect(notice.textContent).toContain("activeUntil");
   });
 
   it("does NOT show next billing date when canceledAt is set", () => {
@@ -277,9 +277,10 @@ describe("CurrentPlan", () => {
     );
 
     const limits = screen.getByTestId("plan-limits");
-    expect(limits.textContent).toContain("5");        // socialAccounts
-    expect(limits.textContent).toContain("50/mo");    // aiPostsPerMonth
-    expect(limits.textContent).toContain("2");        // teamSeats
+    expect(limits.textContent).toContain("5");          // socialAccounts
+    expect(limits.textContent).toContain("50");         // aiPostsPerMonth
+    expect(limits.textContent).toContain("moSuffix");   // /mo suffix key
+    expect(limits.textContent).toContain("2");          // teamSeats
   });
 
   it('shows "Unlimited" for mogul tier unlimited limits', () => {
@@ -294,7 +295,7 @@ describe("CurrentPlan", () => {
 
     const limits = screen.getByTestId("plan-limits");
     // Mogul has unlimited social accounts and team seats
-    const unlimitedCount = (limits.textContent ?? "").split("Unlimited").length - 1;
+    const unlimitedCount = (limits.textContent ?? "").split("features.unlimited").length - 1;
     expect(unlimitedCount).toBe(2);
   });
 
@@ -309,7 +310,7 @@ describe("CurrentPlan", () => {
 
     const link = screen.getByTestId("change-plan-button");
     expect(link).toHaveAttribute("href", "#pricing");
-    expect(link).toHaveTextContent("Change Plan");
+    expect(link).toHaveTextContent("changePlan");
   });
 });
 
@@ -338,7 +339,7 @@ describe("PricingCards", () => {
 
     expect(screen.getByTestId("current-plan-badge")).toBeInTheDocument();
     expect(screen.getByTestId("current-plan-badge")).toHaveTextContent(
-      "Current Plan",
+      "currentPlanBadge",
     );
   });
 
@@ -360,7 +361,7 @@ describe("PricingCards", () => {
 
     expect(screen.getByTestId("most-popular-badge")).toBeInTheDocument();
     expect(screen.getByTestId("most-popular-badge")).toHaveTextContent(
-      "Most Popular",
+      "mostPopular",
     );
   });
 
@@ -388,8 +389,7 @@ describe("PricingCards", () => {
 
     // Hustler: monthly R299 × 12 = R3588, annual R2990 → save ~17%
     const savingsBadge = screen.getByTestId("savings-badge-hustler");
-    expect(savingsBadge.textContent).toContain("Save");
-    expect(savingsBadge.textContent).toContain("%");
+    expect(savingsBadge.textContent).toContain("savePercent");
   });
 
   it("calls onSelectTier with correct tier and monthly interval", async () => {
@@ -420,27 +420,27 @@ describe("PricingCards", () => {
 
     const btn = screen.getByTestId("cta-hustler");
     expect(btn).toBeDisabled();
-    expect(btn).toHaveTextContent("Current Plan");
+    expect(btn).toHaveTextContent("currentPlanBadge");
   });
 
   it('shows "Upgrade" for tiers above current', () => {
     render(<PricingCards currentTier="hustler" onSelectTier={noop} />);
 
-    expect(screen.getByTestId("cta-grower")).toHaveTextContent("Upgrade");
-    expect(screen.getByTestId("cta-mogul")).toHaveTextContent("Upgrade");
+    expect(screen.getByTestId("cta-grower")).toHaveTextContent("upgrade");
+    expect(screen.getByTestId("cta-mogul")).toHaveTextContent("upgrade");
   });
 
   it('shows "Downgrade" for tiers below current', () => {
     render(<PricingCards currentTier="grower" onSelectTier={noop} />);
 
-    expect(screen.getByTestId("cta-seedling")).toHaveTextContent("Downgrade");
-    expect(screen.getByTestId("cta-hustler")).toHaveTextContent("Downgrade");
+    expect(screen.getByTestId("cta-seedling")).toHaveTextContent("downgrade");
+    expect(screen.getByTestId("cta-hustler")).toHaveTextContent("downgrade");
   });
 
   it('shows "Get Started" for seedling when no current tier', () => {
     render(<PricingCards onSelectTier={noop} />);
 
-    expect(screen.getByTestId("cta-seedling")).toHaveTextContent("Get Started");
+    expect(screen.getByTestId("cta-seedling")).toHaveTextContent("getStarted");
   });
 
   it("shows feature list items with availability indicators", () => {
@@ -449,11 +449,11 @@ describe("PricingCards", () => {
     // Seedling has 0 image generations → should show ✗
     const seedlingCard = screen.getByTestId("tier-card-seedling");
     expect(seedlingCard.textContent).toContain("✗");
-    expect(seedlingCard.textContent).toContain("0 image generations");
+    expect(seedlingCard.textContent).toContain("features.imageGenCount");
 
     // Mogul has WhatsApp Business → should show ✓
     const mogulCard = screen.getByTestId("tier-card-mogul");
-    expect(mogulCard.textContent).toContain("WhatsApp Business");
+    expect(mogulCard.textContent).toContain("features.whatsappBusiness");
   });
 });
 
@@ -559,7 +559,7 @@ describe("TopUpWidget", () => {
     for (const pkg of TOP_UP_PACKAGES) {
       const buyBtn = screen.getByTestId(`topup-buy-${pkg.creditAmount}`);
       expect(buyBtn).toBeInTheDocument();
-      expect(buyBtn).toHaveTextContent("Buy");
+      expect(buyBtn).toHaveTextContent("buy");
     }
   });
 });

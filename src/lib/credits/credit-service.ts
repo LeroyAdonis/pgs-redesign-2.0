@@ -15,6 +15,7 @@ import { db } from "@/db";
 import { credit, creditTransaction } from "@/db/schema";
 import { eq, and, gte, desc, sql } from "drizzle-orm";
 import { logger } from "@/lib/logger";
+import { inngest } from "@/inngest/client";
 import type {
   CreditBalance,
   CreditDeductionResult,
@@ -128,7 +129,58 @@ export async function deductCredit(
   });
 
   logger.info("Credit deducted", { orgId, amount, newBalance });
+
+  // Check if remaining balance has dropped to the low-balance threshold
+  const [creditRow] = await db
+    .select({ monthlyAllocation: credit.monthlyAllocation })
+    .from(credit)
+    .where(eq(credit.orgId, orgId))
+    .limit(1);
+
+  if (
+    creditRow &&
+    creditRow.monthlyAllocation > 0 &&
+    newBalance <= creditRow.monthlyAllocation * LOW_BALANCE_THRESHOLD
+  ) {
+    await inngest.send({
+      name: "billing/credits.low",
+      data: {
+        orgId,
+        userId: "", // Resolved by the Inngest handler via org owner lookup
+        remaining: newBalance,
+        total: creditRow.monthlyAllocation,
+      },
+    });
+
+    logger.info("Billing credits low event sent", {
+      orgId,
+      remaining: newBalance,
+      total: creditRow.monthlyAllocation,
+    });
+  }
+
   return { success: true, newBalance };
+}
+
+/**
+ * Check whether a credit deduction already exists for a given post.
+ *
+ * Used to prevent double-deduction on retries: if the first attempt
+ * succeeded but later steps failed, the retry should skip deduction.
+ */
+export async function hasDeductionForPost(postId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: creditTransaction.id })
+    .from(creditTransaction)
+    .where(
+      and(
+        eq(creditTransaction.postId, postId),
+        eq(creditTransaction.type, "deduction"),
+      ),
+    )
+    .limit(1);
+
+  return rows.length > 0;
 }
 
 /**

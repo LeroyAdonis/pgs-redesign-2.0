@@ -5,6 +5,9 @@
  * the platform, validates CSRF state, exchanges the code for tokens,
  * fetches the user profile, encrypts tokens, and stores in DB.
  *
+ * Enforces:
+ *  - Social account tier limit (belt-and-suspenders — also checked pre-OAuth)
+ *
  * Redirects to /dashboard/accounts on success or with an error param.
  */
 
@@ -21,6 +24,7 @@ import {
   type Platform,
   type OAuthState,
 } from "@/lib/social";
+import { checkAccountLimit } from "@/lib/payments/tier-enforcement";
 
 const OAUTH_STATE_COOKIE = "pgs_oauth_state";
 const STATE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
@@ -108,6 +112,23 @@ export async function GET(
 
     // Clear the state cookie
     cookieStore.delete(OAUTH_STATE_COOKIE);
+
+    // --- Tier enforcement: re-check account limit before saving ---
+    // Belt-and-suspenders: the connect route checks too, but a concurrent
+    // request could have consumed the last slot between OAuth start & callback.
+    const accountCheck = await checkAccountLimit(savedState.orgId);
+    if (!accountCheck.allowed) {
+      logger.warn("Social account limit reached at callback", {
+        orgId: savedState.orgId,
+        platform,
+        tier: accountCheck.tier,
+        current: accountCheck.current,
+        limit: accountCheck.limit,
+      });
+      return NextResponse.redirect(
+        `${accountsUrl}?error=account_limit&current=${accountCheck.current}&limit=${accountCheck.limit}`,
+      );
+    }
 
     // Exchange code for tokens
     const tokens = await exchangeCodeForTokens(

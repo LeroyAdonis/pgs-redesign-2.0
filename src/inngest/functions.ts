@@ -8,11 +8,12 @@
  *
  * Publishing flow:
  *   1. Mark post as "publishing"
- *   2. Look up social account + decrypt access token
- *   3. Fetch post content and media
- *   4. Call platform publisher adapter
- *   5. Deduct credit on success
- *   6. Update status (published / retry / failed)
+ *   2. Pre-publish credit check (block if insufficient)
+ *   3. Publish via platform adapter
+ *   4. Deduct credit on success (skip if already deducted for retries)
+ *   5. Update status (published / retry / failed)
+ *   6. Trigger analytics fetch
+ *   7. Send notifications
  */
 
 import { inngest } from "./client";
@@ -28,7 +29,11 @@ import { eq, and, lte, inArray } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 import { decrypt } from "@/lib/crypto";
 import { getPublisher } from "@/lib/publishers";
-import { deductCredit } from "@/lib/credits";
+import {
+  deductCredit,
+  hasEnoughCredits,
+  hasDeductionForPost,
+} from "@/lib/credits";
 import { LOW_BALANCE_THRESHOLD } from "@/lib/credits";
 import type { PublishResult } from "@/lib/publishers/types";
 import type { Platform } from "@/lib/social/types";
@@ -89,7 +94,58 @@ export const publishPost = inngest.createFunction(
       logger.info("Post marked as publishing", { postId, scheduleId });
     });
 
-    // Step 2: Publish to the platform via the publisher adapter
+    // Step 2: Pre-publish credit check
+    const hasCredits = await step.run("check-credits", async () => {
+      const enough = await hasEnoughCredits(orgId);
+      if (!enough) {
+        logger.warn("Insufficient credits — blocking publish", {
+          postId,
+          orgId,
+        });
+
+        await db
+          .update(post)
+          .set({ status: "failed" })
+          .where(eq(post.id, postId));
+
+        await db
+          .update(postSchedule)
+          .set({
+            failedAt: new Date(),
+            lastError: "Insufficient credits",
+          })
+          .where(eq(postSchedule.id, scheduleId));
+      }
+      return enough;
+    });
+
+    if (!hasCredits) {
+      // Notify the user about the credit failure
+      await step.run("notify-credit-failure", async () => {
+        const [postRecord] = await db
+          .select({ createdById: post.createdById, platform: post.platform })
+          .from(post)
+          .where(eq(post.id, postId))
+          .limit(1);
+
+        if (postRecord) {
+          await inngest.send({
+            name: "notification/post-failed",
+            data: {
+              userId: postRecord.createdById,
+              postId,
+              platform: postRecord.platform,
+              error: "Insufficient credits. Please upgrade your plan or purchase more credits.",
+              retryable: false,
+            },
+          });
+        }
+      });
+
+      return; // Do not proceed with publishing
+    }
+
+    // Step 3: Publish to the platform via the publisher adapter
     const publishResult = await step.run(
       "publish-to-platform",
       async (): Promise<PublishResult> => {
@@ -218,10 +274,20 @@ export const publishPost = inngest.createFunction(
       },
     );
 
-    // Step 3: On success, deduct credits and check for low balance
+    // Step 4: On success, deduct credits and check for low balance
     if (publishResult.success) {
       await step.run("deduct-credit", async () => {
         try {
+          // Guard against double-deduction on retries
+          const alreadyDeducted = await hasDeductionForPost(postId);
+          if (alreadyDeducted) {
+            logger.info("Credit already deducted for post — skipping", {
+              postId,
+              orgId,
+            });
+            return;
+          }
+
           const result = await deductCredit(orgId, postId);
           logger.info("Credit deducted for published post", {
             postId,
@@ -282,7 +348,7 @@ export const publishPost = inngest.createFunction(
       });
     }
 
-    // Step 4: Update status based on result
+    // Step 5: Update status based on result
     await step.run("update-status", async () => {
       if (publishResult.success) {
         await db
@@ -357,7 +423,7 @@ export const publishPost = inngest.createFunction(
       }
     });
 
-    // Step 5: Trigger analytics fetch after successful publish
+    // Step 6: Trigger analytics fetch after successful publish
     if (publishResult.success) {
       await step.run("trigger-analytics", async () => {
         await inngest.send({
@@ -372,7 +438,7 @@ export const publishPost = inngest.createFunction(
       });
     }
 
-    // Step 6: Send notification events
+    // Step 7: Send notification events
     await step.run("send-notifications", async () => {
       // Look up the post creator and platform for notification context
       const [postRecord] = await db

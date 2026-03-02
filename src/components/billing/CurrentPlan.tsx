@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn, formatZAR, formatDateSAST } from "@/lib/utils";
 import { Card } from "@/components/layout/Card";
 import type { SubscriptionInfo, SubscriptionStatus } from "@/lib/payments/types";
@@ -17,12 +18,19 @@ const TIER_ICONS: Record<Tier, string> = {
 
 const STATUS_STYLES: Record<
   SubscriptionStatus,
-  { bg: string; text: string; label: string }
+  { bg: string; text: string }
 > = {
-  active: { bg: "bg-emerald-500/10", text: "text-emerald-400", label: "Active" },
-  past_due: { bg: "bg-amber-500/10", text: "text-amber-400", label: "Past Due" },
-  canceled: { bg: "bg-red-500/10", text: "text-red-400", label: "Canceled" },
-  trialing: { bg: "bg-blue-500/10", text: "text-blue-400", label: "Trialing" },
+  active: { bg: "bg-emerald-500/10", text: "text-emerald-400" },
+  past_due: { bg: "bg-amber-500/10", text: "text-amber-400" },
+  canceled: { bg: "bg-red-500/10", text: "text-red-400" },
+  trialing: { bg: "bg-blue-500/10", text: "text-blue-400" },
+};
+
+const STATUS_KEYS: Record<SubscriptionStatus, string> = {
+  active: "status.active",
+  past_due: "status.pastDue",
+  canceled: "status.canceled",
+  trialing: "status.trialing",
 };
 
 /* ─── Props ─── */
@@ -42,6 +50,7 @@ interface CurrentPlanProps {
 export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
   const [canceling, setCanceling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const t = useTranslations("billing");
 
   const tier = subscription?.tier ?? "seedling";
   const icon = TIER_ICONS[tier];
@@ -54,9 +63,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
     tier !== "seedling";
 
   async function handleCancel() {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel your subscription? Your plan will remain active until the end of the current billing period.",
-    );
+    const confirmed = window.confirm(t("cancelConfirm"));
     if (!confirmed) return;
 
     setCanceling(true);
@@ -82,7 +89,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
     <Card as="section" padding="lg">
       <div data-testid="current-plan">
         <h2 className="mb-5 font-display text-lg font-semibold text-text">
-          Current Plan
+          {t("currentPlan")}
         </h2>
 
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
@@ -107,7 +114,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
                 )}
                 data-testid="status-badge"
               >
-                {statusStyle.label}
+                {t(STATUS_KEYS[status])}
               </span>
             </div>
 
@@ -119,13 +126,13 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
               >
                 {formatZAR(tierConfig.monthlyPriceZAR)}
               </span>
-              {tierConfig.monthlyPriceZAR > 0 ? " / month" : " — Free forever"}
+              {" "}{tierConfig.monthlyPriceZAR > 0 ? t("perMonth") : t("freeForever")}
             </div>
 
             {/* Next billing date */}
             {subscription?.currentPeriodEnd && !subscription.canceledAt && (
               <p className="text-sm text-text-muted" data-testid="next-billing-date">
-                Next billing date:{" "}
+                {t("nextBilling")}{" "}
                 <span className="font-medium text-text">
                   {formatDateSAST(new Date(subscription.currentPeriodEnd), {
                     day: "numeric",
@@ -142,7 +149,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
                 className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-400"
                 data-testid="cancellation-notice"
               >
-                Your plan will remain active until{" "}
+                {t("activeUntil")}{" "}
                 <span className="font-medium">
                   {formatDateSAST(new Date(subscription.currentPeriodEnd), {
                     day: "numeric",
@@ -156,24 +163,24 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
             {/* Key limits */}
             <div className="flex flex-wrap gap-4 text-sm" data-testid="plan-limits">
               <div className="rounded-lg border border-border bg-surface px-3 py-2">
-                <span className="text-text-muted">Social Accounts</span>{" "}
+                <span className="text-text-muted">{t("features.socialAccounts")}</span>{" "}
                 <span className="font-semibold text-text">
                   {tierConfig.limits.socialAccounts === -1
-                    ? "Unlimited"
+                    ? t("features.unlimited")
                     : tierConfig.limits.socialAccounts}
                 </span>
               </div>
               <div className="rounded-lg border border-border bg-surface px-3 py-2">
-                <span className="text-text-muted">AI Posts</span>{" "}
+                <span className="text-text-muted">{t("features.aiPosts")}</span>{" "}
                 <span className="font-semibold text-text">
-                  {tierConfig.limits.aiPostsPerMonth}/mo
+                  {tierConfig.limits.aiPostsPerMonth}{t("moSuffix")}
                 </span>
               </div>
               <div className="rounded-lg border border-border bg-surface px-3 py-2">
-                <span className="text-text-muted">Team Seats</span>{" "}
+                <span className="text-text-muted">{t("features.teamSeats")}</span>{" "}
                 <span className="font-semibold text-text">
                   {tierConfig.limits.teamSeats === -1
-                    ? "Unlimited"
+                    ? t("features.unlimited")
                     : tierConfig.limits.teamSeats}
                 </span>
               </div>
@@ -187,7 +194,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
               className="inline-flex items-center gap-2 rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-vivid"
               data-testid="change-plan-button"
             >
-              Change Plan
+              {t("changePlan")}
             </a>
 
             {isPaidActive && (
@@ -198,7 +205,7 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
                 className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 px-5 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="cancel-subscription-button"
               >
-                {canceling ? "Canceling\u2026" : "Cancel Subscription"}
+                {canceling ? t("canceling") : t("cancelSubscription")}
               </button>
             )}
 
@@ -216,12 +223,12 @@ export function CurrentPlan({ subscription, tierConfig }: CurrentPlanProps) {
             className="mt-4 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-text-muted"
             data-testid="free-plan-notice"
           >
-            {"You're on the free Seedling plan. "}
+            {t("freePlanNotice")}{" "}
             <a
               href="#pricing"
               className="font-medium text-brand hover:text-brand-vivid"
             >
-              Upgrade to unlock more features &rarr;
+              {t("upgradeToUnlock")}
             </a>
           </div>
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn, formatZAR } from "@/lib/utils";
 import { Card } from "@/components/layout/Card";
 import { TOP_UP_PACKAGES } from "@/lib/payments/tier-config";
@@ -22,6 +23,7 @@ interface TopUpWidgetProps {
 export function TopUpWidget({ currentBalance }: TopUpWidgetProps) {
   const [loadingPkg, setLoadingPkg] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("billing");
 
   async function handleBuy(creditAmount: number) {
     setLoadingPkg(creditAmount);
@@ -61,10 +63,10 @@ export function TopUpWidget({ currentBalance }: TopUpWidgetProps) {
       <div data-testid="topup-widget">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg font-semibold text-text">
-            Need More Credits?
+            {t("topUp")}
           </h2>
           <span className="text-sm text-text-muted">
-            Current balance:{" "}
+            {t("currentBalance")}{" "}
             <span className="font-mono font-semibold text-text">
               {currentBalance}
             </span>
@@ -85,7 +87,7 @@ export function TopUpWidget({ currentBalance }: TopUpWidgetProps) {
                 <span className="font-display text-2xl font-bold text-text">
                   {pkg.creditAmount}
                 </span>
-                <span className="mt-1 text-xs text-text-muted">credits</span>
+                <span className="mt-1 text-xs text-text-muted">{t("credits")}</span>
 
                 <span
                   className="mt-3 font-mono text-sm font-semibold text-text"
@@ -105,7 +107,7 @@ export function TopUpWidget({ currentBalance }: TopUpWidgetProps) {
                   )}
                   data-testid={`topup-buy-${pkg.creditAmount}`}
                 >
-                  {isLoading ? "Processing\u2026" : "Buy"}
+                  {isLoading ? t("processing") : t("buy")}
                 </button>
               </div>
             );

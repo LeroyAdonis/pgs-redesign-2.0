@@ -14,6 +14,8 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 vi.mock("@/db", () => ({
   db: {
     select: vi.fn(),
+    update: vi.fn(),
+    insert: vi.fn(),
   },
 }));
 
@@ -29,13 +31,19 @@ vi.mock("@/lib/logger", () => ({
 // Import after mocks
 import {
   checkTierLimit,
+  checkAccountLimit,
+  checkPostLimit,
+  checkImageGenLimit,
+  checkVideoGenLimit,
+  checkTeamSeatLimit,
   checkPlatformAccess,
   checkSchedulingMode,
+  checkFeatureAccess,
   getRequiredTierForLimit,
 } from "../tier-enforcement";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-let db: { select: Mock };
+let db: { select: Mock; update: Mock; insert: Mock };
 
 // ---------------------------------------------------------------------------
 // Helpers — Drizzle fluent chain mocks
@@ -280,5 +288,182 @@ describe("getRequiredTierForLimit", () => {
     // mogul aiPostsPerMonth = 500 (not unlimited)
     // 600 > 500, so no tier qualifies — fallback to mogul
     expect(getRequiredTierForLimit("ai_posts", 600)).toBe("mogul");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkAccountLimit — named convenience function with upgradeRequired
+// ---------------------------------------------------------------------------
+
+describe("checkAccountLimit", () => {
+  it("allows when below limit and returns no upgradeRequired", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 2 }])); // 2/5
+    const result = await checkAccountLimit(ORG_ID);
+    expect(result.allowed).toBe(true);
+    expect(result.upgradeRequired).toBeUndefined();
+  });
+
+  it("denies at limit and suggests grower for hustler at 5/5", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 5 }]));
+    const result = await checkAccountLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.current).toBe(5);
+    expect(result.limit).toBe(5);
+    expect(result.upgradeRequired).toBe("grower"); // need 6 → grower=15
+  });
+
+  it("denies seedling at 2/2 and suggests hustler", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 2 }]));
+    const result = await checkAccountLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("hustler"); // need 3 → hustler=5
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkPostLimit — AI posts per month with upgradeRequired
+// ---------------------------------------------------------------------------
+
+describe("checkPostLimit", () => {
+  it("allows grower within monthly post limit", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "grower" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 100 }])); // 100/200
+    const result = await checkPostLimit(ORG_ID);
+    expect(result.allowed).toBe(true);
+    expect(result.current).toBe(100);
+    expect(result.limit).toBe(200);
+    expect(result.upgradeRequired).toBeUndefined();
+  });
+
+  it("denies hustler at limit and suggests grower", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 50 }])); // 50/50
+    const result = await checkPostLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("grower"); // need 51 → grower=200
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkImageGenLimit — with upgradeRequired
+// ---------------------------------------------------------------------------
+
+describe("checkImageGenLimit", () => {
+  it("denies seedling (limit is 0) and suggests hustler", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 0 }]));
+    const result = await checkImageGenLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.limit).toBe(0);
+    expect(result.upgradeRequired).toBe("hustler"); // need 1 → hustler=10
+  });
+
+  it("allows hustler within limit", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 5 }])); // 5/10
+    const result = await checkImageGenLimit(ORG_ID);
+    expect(result.allowed).toBe(true);
+    expect(result.upgradeRequired).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkVideoGenLimit
+// ---------------------------------------------------------------------------
+
+describe("checkVideoGenLimit", () => {
+  it("denies seedling (limit is 0) and suggests hustler", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 0 }]));
+    const result = await checkVideoGenLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("hustler"); // need 1 → hustler=5
+  });
+
+  it("allows hustler within limit", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 3 }])); // 3/5
+    const result = await checkVideoGenLimit(ORG_ID);
+    expect(result.allowed).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkTeamSeatLimit
+// ---------------------------------------------------------------------------
+
+describe("checkTeamSeatLimit", () => {
+  it("denies seedling at 1/1 and suggests hustler", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 1 }]));
+    const result = await checkTeamSeatLimit(ORG_ID);
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("hustler"); // need 2 → hustler=2
+  });
+
+  it("allows mogul with unlimited seats", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "mogul" }]));
+    db.select.mockReturnValueOnce(selectChain([{ value: 50 }]));
+    const result = await checkTeamSeatLimit(ORG_ID);
+    expect(result.allowed).toBe(true);
+    expect(result.upgradeRequired).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// checkFeatureAccess — generic feature check with upgradeRequired
+// ---------------------------------------------------------------------------
+
+describe("checkFeatureAccess", () => {
+  it("denies credit_rollover for seedling, suggests grower", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    const result = await checkFeatureAccess(ORG_ID, "credit_rollover");
+    expect(result.allowed).toBe(false);
+    expect(result.feature).toBe("credit_rollover");
+    expect(result.upgradeRequired).toBe("grower"); // first tier with creditRollover
+  });
+
+  it("allows credit_rollover for grower", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "grower" }]));
+    const result = await checkFeatureAccess(ORG_ID, "credit_rollover");
+    expect(result.allowed).toBe(true);
+    expect(result.upgradeRequired).toBeUndefined();
+  });
+
+  it("denies autonomous_scheduling for hustler, suggests mogul", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "hustler" }]));
+    const result = await checkFeatureAccess(ORG_ID, "autonomous_scheduling");
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("mogul"); // only mogul has full_autonomous
+  });
+
+  it("allows autonomous_scheduling for mogul", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "mogul" }]));
+    const result = await checkFeatureAccess(ORG_ID, "autonomous_scheduling");
+    expect(result.allowed).toBe(true);
+  });
+
+  it("treats unknown feature as platform name", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "seedling" }]));
+    const result = await checkFeatureAccess(ORG_ID, "linkedin");
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("hustler"); // hustler has linkedin
+  });
+
+  it("denies whatsapp for grower, suggests mogul", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "grower" }]));
+    const result = await checkFeatureAccess(ORG_ID, "whatsapp");
+    expect(result.allowed).toBe(false);
+    expect(result.upgradeRequired).toBe("mogul");
+  });
+
+  it("allows whatsapp for mogul", async () => {
+    db.select.mockReturnValueOnce(selectChain([{ tier: "mogul" }]));
+    const result = await checkFeatureAccess(ORG_ID, "whatsapp");
+    expect(result.allowed).toBe(true);
+    expect(result.upgradeRequired).toBeUndefined();
   });
 });

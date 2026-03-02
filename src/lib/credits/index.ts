@@ -2,6 +2,7 @@ export {
   getBalance,
   hasEnoughCredits,
   deductCredit,
+  hasDeductionForPost,
   getTransactionHistory,
   addCredits,
 } from "./credit-service";

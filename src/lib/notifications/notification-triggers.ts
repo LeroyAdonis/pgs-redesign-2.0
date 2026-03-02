@@ -17,6 +17,11 @@ import type {
   ScheduledReminderData,
   AdminSignupData,
   AdminSubscriptionData,
+  SubscriptionActivatedData,
+  PaymentSucceededData,
+  BillingCreditsLowData,
+  SubscriptionCanceledData,
+  TierChangedData,
 } from "./types";
 
 // ---------------------------------------------------------------------------
@@ -173,6 +178,111 @@ export async function notifyAdminSubscriptionChange(
     type: "system",
     title: "Subscription Change",
     message: `User subscription ${data.action}: ${data.fromTier} → ${data.toTier}.`,
+    data,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Billing — user-facing
+// ---------------------------------------------------------------------------
+
+/**
+ * Notify a user that their subscription has been activated.
+ * Creates a **success** notification with a welcome message.
+ */
+export async function notifySubscriptionActivated(
+  userId: string,
+  data: SubscriptionActivatedData,
+) {
+  return createNotification({
+    userId,
+    type: "success",
+    title: "Subscription Activated",
+    message: `Welcome to the ${data.displayName} plan! You've been allocated ${data.creditAllocation} credits. Lekker — let's get posting!`,
+    data,
+  });
+}
+
+/**
+ * Notify a user that their renewal payment succeeded.
+ * Creates a **success** notification with credit allocation info.
+ */
+export async function notifyPaymentSucceeded(
+  userId: string,
+  data: PaymentSucceededData,
+) {
+  const periodEnd = new Date(data.periodEnd).toLocaleDateString("en-ZA", {
+    timeZone: "Africa/Johannesburg",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  return createNotification({
+    userId,
+    type: "success",
+    title: "Payment Successful",
+    message: `Your ${data.displayName} subscription has been renewed. ${data.creditAllocation} credits have been added to your account. Next renewal: ${periodEnd}.`,
+    data,
+  });
+}
+
+/**
+ * Warn a user that their credits have dropped to 10% or below.
+ * Creates a **warning** notification with a top-up suggestion.
+ */
+export async function notifyBillingCreditsLow(
+  userId: string,
+  data: BillingCreditsLowData,
+) {
+  return createNotification({
+    userId,
+    type: "warning",
+    title: "Credits Running Low",
+    message: `You have ${data.remaining} of ${data.total} credits remaining (${data.percentage}%). Consider topping up to keep your posts flowing.`,
+    data,
+  });
+}
+
+/**
+ * Notify a user that their subscription has been cancelled.
+ * Creates an **info** notification with end-of-service date.
+ */
+export async function notifySubscriptionCanceled(
+  userId: string,
+  data: SubscriptionCanceledData,
+) {
+  const endsAt = new Date(data.endsAt).toLocaleDateString("en-ZA", {
+    timeZone: "Africa/Johannesburg",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  return createNotification({
+    userId,
+    type: "info",
+    title: "Subscription Cancelled",
+    message: `Your ${data.displayName} subscription has been cancelled. You'll retain access until ${endsAt}, after which you'll be moved to the Seedling plan.`,
+    data,
+  });
+}
+
+/**
+ * Notify a user that their subscription tier has changed.
+ * Creates a **success** notification with old→new tier details.
+ */
+export async function notifyTierChanged(
+  userId: string,
+  data: TierChangedData,
+) {
+  const limitLabel =
+    data.newSocialAccounts === -1
+      ? "unlimited"
+      : String(data.newSocialAccounts);
+  return createNotification({
+    userId,
+    type: "success",
+    title: "Plan Changed",
+    message: `You've moved from ${data.fromDisplayName} to ${data.toDisplayName}. Your new allocation is ${data.newCreditAllocation} credits/month with ${limitLabel} social accounts.`,
     data,
   });
 }

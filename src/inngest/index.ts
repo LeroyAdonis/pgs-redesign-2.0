@@ -11,3 +11,7 @@ export {
   retryPost,
   checkScheduledPosts,
 } from "./functions";
+export {
+  creditMonthlyReset,
+  creditExpireRollover,
+} from "./credit-functions";

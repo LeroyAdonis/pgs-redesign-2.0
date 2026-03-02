@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { TIER_CONFIGS, type Tier, type TierLimits } from "@/lib/payments/tier-config";
 import type { LimitType } from "@/lib/payments/types";
 
@@ -10,12 +11,12 @@ import type { LimitType } from "@/lib/payments/types";
 
 const TIER_ORDER: Tier[] = ["seedling", "hustler", "grower", "mogul"];
 
-const LIMIT_TYPE_LABELS: Record<LimitType, string> = {
-  social_accounts: "social accounts",
-  ai_posts: "AI posts",
-  image_gen: "image generations",
-  video_gen: "video generations",
-  team_seats: "team seats",
+const LIMIT_TYPE_KEYS: Record<LimitType, string> = {
+  social_accounts: "limitTypes.social_accounts",
+  ai_posts: "limitTypes.ai_posts",
+  image_gen: "limitTypes.image_gen",
+  video_gen: "limitTypes.video_gen",
+  team_seats: "limitTypes.team_seats",
 };
 
 const LIMIT_TYPE_TO_CONFIG_KEY: Record<LimitType, keyof TierLimits> = {
@@ -62,10 +63,11 @@ export function UpgradePrompt({
   limit,
   onDismiss,
 }: UpgradePromptProps) {
+  const t = useTranslations("billing");
   const tierConfig = TIER_CONFIGS[currentTier];
   const nextTier = getNextTier(currentTier);
   const nextTierConfig = nextTier ? TIER_CONFIGS[nextTier] : null;
-  const featureLabel = LIMIT_TYPE_LABELS[limitType];
+  const featureLabel = t(LIMIT_TYPE_KEYS[limitType]);
   const configKey = LIMIT_TYPE_TO_CONFIG_KEY[limitType];
   const nextTierLimit = nextTierConfig ? nextTierConfig.limits[configKey] : null;
 
@@ -96,16 +98,24 @@ export function UpgradePrompt({
       {/* Content */}
       <div className="flex-1 space-y-1">
         <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-          You&apos;ve reached your {limit} {featureLabel} limit on the{" "}
-          {tierConfig.displayName} plan
+          {t("upgradePrompt", {
+            limit: String(limit),
+            feature: featureLabel,
+            tier: tierConfig.displayName,
+          })}
           <span className="ml-1 text-amber-600 dark:text-amber-400">
             ({currentCount}/{limit === -1 ? "∞" : limit})
           </span>
         </p>
         {nextTierConfig && nextTierLimit !== null && (
           <p className="text-xs text-amber-700 dark:text-amber-300">
-            Upgrade to {nextTierConfig.displayName} for{" "}
-            {nextTierLimit === -1 ? "unlimited" : nextTierLimit} {featureLabel}
+            {t("upgradeToTier", {
+              tier: nextTierConfig.displayName,
+              limit: nextTierLimit === -1
+                ? t("features.unlimited").toLowerCase()
+                : String(nextTierLimit),
+              feature: featureLabel,
+            })}
           </p>
         )}
       </div>
@@ -130,7 +140,7 @@ export function UpgradePrompt({
             <path d="m5 12 7-7 7 7" />
             <path d="M12 19V5" />
           </svg>
-          Upgrade Plan
+          {t("upgradeCta")}
         </Link>
 
         {onDismiss && (
@@ -138,7 +148,7 @@ export function UpgradePrompt({
             type="button"
             onClick={onDismiss}
             className="rounded-md p-1 text-amber-600 transition-colors hover:bg-amber-500/20 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200"
-            aria-label="Dismiss"
+            aria-label={t("dismiss")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

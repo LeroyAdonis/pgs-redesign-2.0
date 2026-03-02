@@ -24,6 +24,7 @@ import { addCredits } from "@/lib/credits";
 import { db } from "@/db";
 import { subscription } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { inngest } from "@/inngest/client";
 
 // ---------------------------------------------------------------------------
 // Extract payload types from WebhooksConfig to avoid dual-SDK type conflicts
@@ -122,6 +123,18 @@ async function handleSubscriptionCreated(
     sub.currentPeriodEnd,
   );
 
+  const config = getTierConfig(tier);
+
+  await inngest.send({
+    name: "billing/subscription.activated",
+    data: {
+      orgId,
+      tier,
+      displayName: config.displayName,
+      creditAllocation: config.creditAllocation,
+    },
+  });
+
   logger.info("Subscription created and activated", {
     subscriptionId: sub.id,
     orgId,
@@ -138,7 +151,7 @@ async function handleSubscriptionUpdated(
   if (!orgId) {
     // Try to find the org via the polar subscription ID in our DB
     const rows = await db
-      .select({ orgId: subscription.orgId })
+      .select({ orgId: subscription.orgId, tier: subscription.tier })
       .from(subscription)
       .where(eq(subscription.polarSubscriptionId, sub.id))
       .limit(1);
@@ -151,6 +164,7 @@ async function handleSubscriptionUpdated(
     }
 
     const resolvedOrgId = rows[0].orgId;
+    const previousTier = rows[0].tier;
 
     if (sub.status === "active") {
       const tier = getTierByPolarProductId(sub.productId);
@@ -162,6 +176,24 @@ async function handleSubscriptionUpdated(
           sub.currentPeriodStart,
           sub.currentPeriodEnd,
         );
+
+        // Emit tier.changed if the tier actually changed
+        if (previousTier && tier !== previousTier) {
+          const oldConfig = getTierConfig(previousTier);
+          const newConfig = getTierConfig(tier);
+          await inngest.send({
+            name: "billing/tier.changed",
+            data: {
+              orgId: resolvedOrgId,
+              fromTier: previousTier,
+              fromDisplayName: oldConfig.displayName,
+              toTier: tier,
+              toDisplayName: newConfig.displayName,
+              newCreditAllocation: newConfig.creditAllocation,
+              newSocialAccounts: newConfig.limits.socialAccounts,
+            },
+          });
+        }
       }
     } else if (sub.status === "past_due") {
       await db
@@ -179,6 +211,15 @@ async function handleSubscriptionUpdated(
   if (sub.status === "active") {
     const tier = getTierByPolarProductId(sub.productId);
     if (tier) {
+      // Look up previous tier before activating the new one
+      const [existingSub] = await db
+        .select({ tier: subscription.tier })
+        .from(subscription)
+        .where(eq(subscription.orgId, orgId))
+        .limit(1);
+
+      const previousTier = existingSub?.tier;
+
       await activateSubscription(
         orgId,
         tier,
@@ -186,6 +227,24 @@ async function handleSubscriptionUpdated(
         sub.currentPeriodStart,
         sub.currentPeriodEnd,
       );
+
+      // Emit tier.changed if the tier actually changed
+      if (previousTier && tier !== previousTier) {
+        const oldConfig = getTierConfig(previousTier);
+        const newConfig = getTierConfig(tier);
+        await inngest.send({
+          name: "billing/tier.changed",
+          data: {
+            orgId,
+            fromTier: previousTier,
+            fromDisplayName: oldConfig.displayName,
+            toTier: tier,
+            toDisplayName: newConfig.displayName,
+            newCreditAllocation: newConfig.creditAllocation,
+            newSocialAccounts: newConfig.limits.socialAccounts,
+          },
+        });
+      }
     }
   } else if (sub.status === "past_due") {
     await db
@@ -202,8 +261,24 @@ async function handleSubscriptionCanceled(
   const sub = payload.data;
   const orgId = sub.metadata?.["orgId"] as string | undefined;
 
+  // Resolve the tier name once — prefer product ID lookup, fall back to DB
+  const resolvedTier = getTierByPolarProductId(sub.productId);
+  const tierName = resolvedTier ?? "unknown";
+  const displayName = resolvedTier
+    ? getTierConfig(resolvedTier).displayName
+    : "Unknown";
+  const endsAt = sub.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd).toISOString()
+    : new Date().toISOString();
+
   if (orgId) {
     await deactivateSubscription(orgId);
+
+    await inngest.send({
+      name: "billing/subscription.canceled",
+      data: { orgId, tier: tierName, displayName, endsAt },
+    });
+
     logger.info("Subscription canceled", { subscriptionId: sub.id, orgId });
     return;
   }
@@ -217,6 +292,17 @@ async function handleSubscriptionCanceled(
 
   if (rows.length > 0) {
     await deactivateSubscription(rows[0].orgId);
+
+    await inngest.send({
+      name: "billing/subscription.canceled",
+      data: {
+        orgId: rows[0].orgId,
+        tier: tierName,
+        displayName,
+        endsAt,
+      },
+    });
+
     logger.info("Subscription canceled (resolved via DB)", {
       subscriptionId: sub.id,
       orgId: rows[0].orgId,
@@ -290,6 +376,27 @@ async function handleOrderCreated(
           "allocation",
           `Monthly renewal credit allocation for ${config.displayName} tier`,
         );
+
+        // Look up period end from our subscription record
+        const [subRecord] = await db
+          .select({ currentPeriodEnd: subscription.currentPeriodEnd })
+          .from(subscription)
+          .where(eq(subscription.orgId, rows[0].orgId))
+          .limit(1);
+
+        await inngest.send({
+          name: "billing/payment.succeeded",
+          data: {
+            orgId: rows[0].orgId,
+            tier: rows[0].tier,
+            displayName: config.displayName,
+            creditAllocation: config.creditAllocation,
+            periodEnd: subRecord?.currentPeriodEnd
+              ? subRecord.currentPeriodEnd.toISOString()
+              : new Date().toISOString(),
+          },
+        });
+
         logger.info("Renewal credits allocated (resolved via subscription)", {
           orderId: order.id,
           orgId: rows[0].orgId,
@@ -323,6 +430,26 @@ async function handleOrderCreated(
     "allocation",
     `Monthly renewal credit allocation for ${config.displayName} tier`,
   );
+
+  // Look up period end from our subscription record
+  const [subRecord] = await db
+    .select({ currentPeriodEnd: subscription.currentPeriodEnd })
+    .from(subscription)
+    .where(eq(subscription.orgId, orgId))
+    .limit(1);
+
+  await inngest.send({
+    name: "billing/payment.succeeded",
+    data: {
+      orgId,
+      tier,
+      displayName: config.displayName,
+      creditAllocation: config.creditAllocation,
+      periodEnd: subRecord?.currentPeriodEnd
+        ? subRecord.currentPeriodEnd.toISOString()
+        : new Date().toISOString(),
+    },
+  });
 
   logger.info("Renewal credits allocated", {
     orderId: order.id,

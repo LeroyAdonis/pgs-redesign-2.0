@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn, formatZAR } from "@/lib/utils";
 import { Card } from "@/components/layout/Card";
 import { TIER_CONFIGS, type Tier, type TierConfig } from "@/lib/payments/tier-config";
@@ -33,46 +34,6 @@ interface PricingCardsProps {
 
 /* ─── Helpers ─── */
 
-/** Build the feature list for a tier card from its config. */
-function getFeatureItems(
-  config: TierConfig,
-): { label: string; available: boolean }[] {
-  return [
-    {
-      label: `${config.limits.socialAccounts === -1 ? "Unlimited" : config.limits.socialAccounts} social accounts`,
-      available: true,
-    },
-    {
-      label: `${config.limits.aiPostsPerMonth} AI posts/month`,
-      available: true,
-    },
-    {
-      label: `${config.creditAllocation} credits/month`,
-      available: true,
-    },
-    {
-      label: `${config.limits.imageGenPerMonth} image generations`,
-      available: config.limits.imageGenPerMonth > 0,
-    },
-    {
-      label: `${config.limits.videoGenPerMonth} video generations`,
-      available: config.limits.videoGenPerMonth > 0,
-    },
-    {
-      label: `${config.limits.teamSeats === -1 ? "Unlimited" : config.limits.teamSeats} team seats`,
-      available: true,
-    },
-    {
-      label: "Credit rollover",
-      available: config.features.creditRollover,
-    },
-    {
-      label: "WhatsApp Business",
-      available: config.features.whatsappBusiness,
-    },
-  ];
-}
-
 /** Annual savings percentage. Returns 0 for free tier. */
 function annualSavingsPercent(config: TierConfig): number {
   if (config.monthlyPriceZAR === 0) return 0;
@@ -80,14 +41,6 @@ function annualSavingsPercent(config: TierConfig): number {
   return Math.round(
     ((yearlyAtMonthly - config.annualPriceZAR) / yearlyAtMonthly) * 100,
   );
-}
-
-/** CTA label for a tier relative to the current tier. */
-function getCtaLabel(tier: Tier, currentTier?: Tier): string {
-  if (currentTier === tier) return "Current Plan";
-  if (!currentTier) return tier === "seedling" ? "Get Started" : "Upgrade";
-  if (TIER_INDEX[tier] > TIER_INDEX[currentTier]) return "Upgrade";
-  return "Downgrade";
 }
 
 /* ─── Component ─── */
@@ -104,6 +57,60 @@ export function PricingCards({
   isLoading = false,
 }: PricingCardsProps) {
   const [interval, setInterval] = useState<"monthly" | "annual">("monthly");
+  const t = useTranslations("billing");
+
+  /** Build the feature list for a tier card from its config. */
+  function getFeatureItems(
+    config: TierConfig,
+  ): { label: string; available: boolean }[] {
+    const unlimited = t("features.unlimited");
+    return [
+      {
+        label: t("features.socialAccountsCount", {
+          count: config.limits.socialAccounts === -1 ? unlimited : String(config.limits.socialAccounts),
+        }),
+        available: true,
+      },
+      {
+        label: t("features.aiPostsCount", { count: String(config.limits.aiPostsPerMonth) }),
+        available: true,
+      },
+      {
+        label: t("features.creditsCount", { count: String(config.creditAllocation) }),
+        available: true,
+      },
+      {
+        label: t("features.imageGenCount", { count: String(config.limits.imageGenPerMonth) }),
+        available: config.limits.imageGenPerMonth > 0,
+      },
+      {
+        label: t("features.videoGenCount", { count: String(config.limits.videoGenPerMonth) }),
+        available: config.limits.videoGenPerMonth > 0,
+      },
+      {
+        label: t("features.teamSeatsCount", {
+          count: config.limits.teamSeats === -1 ? unlimited : String(config.limits.teamSeats),
+        }),
+        available: true,
+      },
+      {
+        label: t("features.creditRollover"),
+        available: config.features.creditRollover,
+      },
+      {
+        label: t("features.whatsappBusiness"),
+        available: config.features.whatsappBusiness,
+      },
+    ];
+  }
+
+  /** CTA label for a tier relative to the current tier. */
+  function getCtaLabel(tier: Tier): string {
+    if (currentTier === tier) return t("currentPlanBadge");
+    if (!currentTier) return tier === "seedling" ? t("getStarted") : t("upgrade");
+    if (TIER_INDEX[tier] > TIER_INDEX[currentTier]) return t("upgrade");
+    return t("downgrade");
+  }
 
   return (
     <div data-testid="pricing-cards">
@@ -115,14 +122,14 @@ export function PricingCards({
             interval === "monthly" ? "text-text" : "text-text-muted",
           )}
         >
-          Monthly
+          {t("monthly")}
         </span>
 
         <button
           type="button"
           role="switch"
           aria-checked={interval === "annual"}
-          aria-label="Toggle annual billing"
+          aria-label={t("toggleAnnual")}
           onClick={() =>
             setInterval((prev) => (prev === "monthly" ? "annual" : "monthly"))
           }
@@ -146,7 +153,7 @@ export function PricingCards({
             interval === "annual" ? "text-text" : "text-text-muted",
           )}
         >
-          Annual
+          {t("annually")}
         </span>
       </div>
 
@@ -162,7 +169,7 @@ export function PricingCards({
               ? config.annualPriceZAR / 12
               : config.monthlyPriceZAR;
           const features = getFeatureItems(config);
-          const ctaLabel = getCtaLabel(tier, currentTier);
+          const ctaLabel = getCtaLabel(tier);
 
           return (
             <Card
@@ -184,7 +191,7 @@ export function PricingCards({
                     className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-0.5 text-xs font-semibold text-white shadow-sm"
                     data-testid="most-popular-badge"
                   >
-                    Most Popular
+                    {t("mostPopular")}
                   </span>
                 )}
                 {isCurrent && (
@@ -192,7 +199,7 @@ export function PricingCards({
                     className="absolute -top-3 right-4 rounded-full bg-emerald-500 px-3 py-0.5 text-xs font-semibold text-white shadow-sm"
                     data-testid="current-plan-badge"
                   >
-                    Current Plan
+                    {t("currentPlanBadge")}
                   </span>
                 )}
 
@@ -214,7 +221,7 @@ export function PricingCards({
                   >
                     {formatZAR(price)}
                   </span>
-                  <span className="text-sm text-text-muted"> / month</span>
+                  <span className="text-sm text-text-muted">{" "}{t("perMonth")}</span>
 
                   {interval === "annual" && savings > 0 && (
                     <div className="mt-1">
@@ -222,7 +229,7 @@ export function PricingCards({
                         className="inline-flex rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400"
                         data-testid={`savings-badge-${tier}`}
                       >
-                        Save {savings}%
+                        {t("savePercent", { percent: savings })}
                       </span>
                     </div>
                   )}
@@ -233,7 +240,7 @@ export function PricingCards({
                   <span className="font-semibold text-text">
                     {config.creditAllocation}
                   </span>{" "}
-                  credits/month
+                  {t("creditsPerMonth")}
                 </div>
 
                 {/* Features */}
@@ -278,7 +285,7 @@ export function PricingCards({
                   )}
                   data-testid={`cta-${tier}`}
                 >
-                  {isLoading && !isCurrent ? "Processing\u2026" : ctaLabel}
+                  {isLoading && !isCurrent ? t("processing") : ctaLabel}
                 </button>
               </div>
             </Card>

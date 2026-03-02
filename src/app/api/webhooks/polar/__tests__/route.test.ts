@@ -33,6 +33,13 @@ vi.mock("@/lib/credits", () => ({
   addCredits: (...args: unknown[]) => mockAddCredits(...args),
 }));
 
+const mockInngestSend = vi.fn().mockResolvedValue(undefined);
+vi.mock("@/inngest/client", () => ({
+  inngest: {
+    send: (...args: unknown[]) => mockInngestSend(...args),
+  },
+}));
+
 vi.mock("@/lib/payments/tier-config", () => ({
   getTierConfig: (tier: string) => {
     const configs: Record<string, { creditAllocation: number; displayName: string }> = {
@@ -54,11 +61,35 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/db", () => ({
-  db: {
-    select: vi.fn(),
-    update: vi.fn(),
-    insert: vi.fn(),
+vi.mock("@/db", () => {
+  const createSelectChain = () => ({
+    from: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        limit: vi.fn().mockResolvedValue([]),
+      }),
+    }),
+  });
+  const createUpdateChain = () => ({
+    set: vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    }),
+  });
+  return {
+    db: {
+      select: vi.fn().mockImplementation(() => createSelectChain()),
+      update: vi.fn().mockImplementation(() => createUpdateChain()),
+      insert: vi.fn(),
+    },
+  };
+});
+
+vi.mock("@/db/schema", () => ({
+  subscription: {
+    orgId: "subscription.orgId",
+    tier: "subscription.tier",
+    polarSubscriptionId: "subscription.polarSubscriptionId",
+    currentPeriodEnd: "subscription.currentPeriodEnd",
+    status: "subscription.status",
   },
 }));
 
@@ -86,6 +117,7 @@ beforeEach(async () => {
   mockDeactivateSubscription.mockResolvedValue(undefined);
   mockAddCredits.mockResolvedValue({ success: true, newBalance: 100 });
   mockGetTierByPolarProductId.mockReturnValue("hustler");
+  mockInngestSend.mockResolvedValue(undefined);
 
   // Re-import the route to get fresh captured config
   const mod = await import("../route");

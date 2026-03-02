@@ -7,6 +7,11 @@
  * Used by API routes and server actions to enforce limits before
  * allowing operations like connecting social accounts, generating
  * AI content, or adding team members.
+ *
+ * Provides both a generic `checkTierLimit()` and named convenience
+ * functions (`checkAccountLimit`, `checkPostLimit`, etc.) that
+ * include an `upgradeRequired` field indicating the cheapest tier
+ * that would satisfy the request.
  */
 
 import { db } from "@/db";
@@ -35,6 +40,12 @@ export interface TierLimitResult {
   tier: Tier;
 }
 
+/** Extended result with upgrade suggestion — returned by named helpers */
+export interface EnforcementResult extends TierLimitResult {
+  /** The cheapest tier that would allow the action, or undefined if already allowed */
+  upgradeRequired?: Tier;
+}
+
 export interface PlatformAccessResult {
   allowed: boolean;
   tier: Tier;
@@ -43,6 +54,14 @@ export interface PlatformAccessResult {
 export interface SchedulingModeResult {
   mode: string;
   tier: Tier;
+}
+
+/** Result for the generic feature access check */
+export interface FeatureAccessResult {
+  allowed: boolean;
+  tier: Tier;
+  feature: string;
+  upgradeRequired?: Tier;
 }
 
 // ---------------------------------------------------------------------------
@@ -149,8 +168,38 @@ async function countCurrentUsage(
   }
 }
 
+/**
+ * Find the next tier above the given one, or null if already at mogul.
+ */
+function getNextTier(currentTier: Tier): Tier | null {
+  const idx = TIER_ORDER.indexOf(currentTier);
+  if (idx === -1 || idx >= TIER_ORDER.length - 1) return null;
+  return TIER_ORDER[idx + 1];
+}
+
+/**
+ * Build an `EnforcementResult` from a `TierLimitResult`.
+ * Attaches `upgradeRequired` when the action is denied.
+ */
+function toEnforcementResult(
+  base: TierLimitResult,
+  limitType: LimitType,
+): EnforcementResult {
+  if (base.allowed) {
+    return base;
+  }
+
+  // Find the cheapest tier that can handle current + 1
+  const upgradeRequired = getRequiredTierForLimit(
+    limitType,
+    base.current + 1,
+  );
+
+  return { ...base, upgradeRequired };
+}
+
 // ---------------------------------------------------------------------------
-// Public API
+// Public API — generic
 // ---------------------------------------------------------------------------
 
 /**
@@ -242,4 +291,137 @@ export function getRequiredTierForLimit(
 
   // Fallback — should only happen when desiredCount exceeds all finite limits
   return "mogul";
+}
+
+// ---------------------------------------------------------------------------
+// Public API — named convenience functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Check if the organisation can add more social accounts.
+ */
+export async function checkAccountLimit(
+  orgId: string,
+): Promise<EnforcementResult> {
+  const result = await checkTierLimit(orgId, "social_accounts");
+  return toEnforcementResult(result, "social_accounts");
+}
+
+/**
+ * Check if the organisation can create more AI posts this month.
+ */
+export async function checkPostLimit(
+  orgId: string,
+): Promise<EnforcementResult> {
+  const result = await checkTierLimit(orgId, "ai_posts");
+  return toEnforcementResult(result, "ai_posts");
+}
+
+/**
+ * Check if the organisation can generate more AI images this month.
+ */
+export async function checkImageGenLimit(
+  orgId: string,
+): Promise<EnforcementResult> {
+  const result = await checkTierLimit(orgId, "image_gen");
+  return toEnforcementResult(result, "image_gen");
+}
+
+/**
+ * Check if the organisation can generate more AI videos this month.
+ */
+export async function checkVideoGenLimit(
+  orgId: string,
+): Promise<EnforcementResult> {
+  const result = await checkTierLimit(orgId, "video_gen");
+  return toEnforcementResult(result, "video_gen");
+}
+
+/**
+ * Check if the organisation can add more team members.
+ */
+export async function checkTeamSeatLimit(
+  orgId: string,
+): Promise<EnforcementResult> {
+  const result = await checkTierLimit(orgId, "team_seats");
+  return toEnforcementResult(result, "team_seats");
+}
+
+/**
+ * Generic feature access check.
+ *
+ * Checks platform access and feature flags. For quantitative limits,
+ * prefer the named helpers above (checkPostLimit, checkAccountLimit, etc.).
+ *
+ * Supported features: platform names ("whatsapp", "tiktok", etc.),
+ * "credit_rollover", "autonomous_scheduling".
+ */
+export async function checkFeatureAccess(
+  orgId: string,
+  feature: string,
+): Promise<FeatureAccessResult> {
+  const tier = await getOrgTier(orgId);
+  const config = TIER_CONFIGS[tier];
+
+  let allowed = false;
+
+  switch (feature) {
+    case "credit_rollover":
+      allowed = config.features.creditRollover;
+      break;
+
+    case "autonomous_scheduling":
+      allowed = config.features.schedulingMode === "full_autonomous";
+      break;
+
+    case "whatsapp":
+      allowed = config.features.whatsappBusiness;
+      break;
+
+    default:
+      // Treat as a platform name
+      allowed = config.features.platforms.includes(feature);
+      break;
+  }
+
+  // Find the cheapest tier that supports this feature
+  let upgradeRequired: Tier | undefined;
+  if (!allowed) {
+    for (const candidate of TIER_ORDER) {
+      const candidateConfig = TIER_CONFIGS[candidate];
+      let candidateAllowed = false;
+
+      switch (feature) {
+        case "credit_rollover":
+          candidateAllowed = candidateConfig.features.creditRollover;
+          break;
+        case "autonomous_scheduling":
+          candidateAllowed =
+            candidateConfig.features.schedulingMode === "full_autonomous";
+          break;
+        case "whatsapp":
+          candidateAllowed = candidateConfig.features.whatsappBusiness;
+          break;
+        default:
+          candidateAllowed =
+            candidateConfig.features.platforms.includes(feature);
+          break;
+      }
+
+      if (candidateAllowed) {
+        upgradeRequired = candidate;
+        break;
+      }
+    }
+  }
+
+  logger.debug("Feature access check", {
+    orgId,
+    feature,
+    tier,
+    allowed,
+    upgradeRequired,
+  });
+
+  return { allowed, tier, feature, upgradeRequired };
 }

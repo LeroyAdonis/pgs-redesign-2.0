@@ -10,6 +10,7 @@ import {
   getBalance,
   hasEnoughCredits,
   deductCredit,
+  hasDeductionForPost,
   getTransactionHistory,
   addCredits,
 } from "../credit-service";
@@ -237,6 +238,24 @@ describe("deductCredit", () => {
     const result = await deductCredit(ORG_ID, "post_2", 5);
 
     expect(result).toEqual({ success: true, newBalance: 75 });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// hasDeductionForPost
+// ---------------------------------------------------------------------------
+
+describe("hasDeductionForPost", () => {
+  it("returns true when a deduction transaction exists for the post", async () => {
+    db.select.mockReturnValue(selectChain([{ id: "tx_1" }]));
+
+    expect(await hasDeductionForPost("post_1")).toBe(true);
+  });
+
+  it("returns false when no deduction transaction exists for the post", async () => {
+    db.select.mockReturnValue(selectChain([]));
+
+    expect(await hasDeductionForPost("post_1")).toBe(false);
   });
 });
 

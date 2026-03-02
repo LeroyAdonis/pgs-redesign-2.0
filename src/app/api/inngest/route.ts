@@ -31,6 +31,17 @@ import {
   notifyOnSignup,
   notifyOnSubscriptionChange,
 } from "@/inngest/notification-functions";
+import {
+  notifyOnSubscriptionActivated,
+  notifyOnPaymentSucceeded,
+  notifyOnBillingCreditsLow,
+  notifyOnSubscriptionCanceled,
+  notifyOnTierChanged,
+} from "@/inngest/billing-notification-functions";
+import {
+  creditMonthlyReset,
+  creditExpireRollover,
+} from "@/inngest/credit-functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -51,5 +62,14 @@ export const { GET, POST, PUT } = serve({
     checkExpiringTokens,
     notifyOnSignup,
     notifyOnSubscriptionChange,
+    // Billing notification handlers
+    notifyOnSubscriptionActivated,
+    notifyOnPaymentSucceeded,
+    notifyOnBillingCreditsLow,
+    notifyOnSubscriptionCanceled,
+    notifyOnTierChanged,
+    // Credit reset pipeline
+    creditMonthlyReset,
+    creditExpireRollover,
   ],
 });

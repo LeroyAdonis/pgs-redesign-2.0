@@ -74,6 +74,51 @@ export interface SystemAlertData {
   details: string;
 }
 
+// ---------------------------------------------------------------------------
+// Billing notification payloads
+// ---------------------------------------------------------------------------
+
+/** Data for a subscription activation notification */
+export interface SubscriptionActivatedData {
+  tier: string;
+  displayName: string;
+  creditAllocation: number;
+}
+
+/** Data for a successful renewal payment notification */
+export interface PaymentSucceededData {
+  tier: string;
+  displayName: string;
+  creditAllocation: number;
+  /** ISO 8601 timestamp */
+  periodEnd: string;
+}
+
+/** Data for a low credits warning notification */
+export interface BillingCreditsLowData {
+  remaining: number;
+  total: number;
+  percentage: number;
+}
+
+/** Data for a subscription cancellation notification */
+export interface SubscriptionCanceledData {
+  tier: string;
+  displayName: string;
+  /** ISO 8601 timestamp — when access ends */
+  endsAt: string;
+}
+
+/** Data for a tier change notification */
+export interface TierChangedData {
+  fromTier: string;
+  fromDisplayName: string;
+  toTier: string;
+  toDisplayName: string;
+  newCreditAllocation: number;
+  newSocialAccounts: number;
+}
+
 /**
  * Union of all typed notification payloads.
  *
@@ -90,7 +135,12 @@ export type NotificationPayload =
   | ScheduledReminderData
   | AdminSignupData
   | AdminSubscriptionData
-  | SystemAlertData;
+  | SystemAlertData
+  | SubscriptionActivatedData
+  | PaymentSucceededData
+  | BillingCreditsLowData
+  | SubscriptionCanceledData
+  | TierChangedData;
 
 // ---------------------------------------------------------------------------
 // Notification type enum (mirrors the DB enum)
