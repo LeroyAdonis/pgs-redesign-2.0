@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="circle-clip">
+      <circle cx="128" cy="128" r="128"/>
+    </clipPath>
+  </defs>
+
+  <!-- Circular background -->
+  <circle cx="128" cy="128" r="128" fill="url(#bg)"/>
+
+  <!-- Subtle ring -->
+  <circle cx="128" cy="128" r="120" fill="none" stroke="#7c3aed" stroke-width="1" opacity="0.15"/>
+
+  <!-- Admin shield icon -->
+  <g filter="url(#glow)" transform="translate(128,118) scale(1)">
+    <!-- Shield body -->
+    <path d="M0,-52 L40,-36 L40,8 C40,32 20,50 0,58 C-20,50 -40,32 -40,8 L-40,-36 Z"
+      fill="none" stroke="url(#icon)" stroke-width="3" opacity="0.9"/>
+
+    <!-- Shield fill (subtle) -->
+    <path d="M0,-52 L40,-36 L40,8 C40,32 20,50 0,58 C-20,50 -40,32 -40,8 L-40,-36 Z"
+      fill="url(#icon)" opacity="0.12"/>
+
+    <!-- Person silhouette inside shield -->
+    <circle cx="0" cy="-14" r="12" fill="url(#icon)" opacity="0.7"/>
+    <path d="M-20,22 C-20,6 -12,0 0,0 C12,0 20,6 20,22"
+      fill="url(#icon)" opacity="0.5"/>
+  </g>
+
+  <!-- Outer glow ring -->
+  <circle cx="128" cy="128" r="110" fill="none" stroke="#7c3aed" stroke-width="0.5" opacity="0.08"/>
+</svg>
