@@ -136,6 +136,7 @@ vi.mock('next-intl', () => ({
         'landing.footer.sitemap': 'Sitemap',
         'landing.footer.mediaWorks': 'Media/Works',
         'landing.footer.login': 'Login',
+        'landing.footer.docs': 'Documentation',
         'landing.footer.featuresCol': 'Features',
         'landing.footer.aiContent': 'AI Content',
         'landing.footer.scheduling': 'Scheduling',
@@ -151,6 +152,25 @@ vi.mock('next-intl', () => ({
 
       return translations[fullKey] ?? fullKey;
     },
+}));
+
+/**
+ * Mock @/i18n/navigation — renders <a> tags for the locale-aware Link component.
+ */
+vi.mock('@/i18n/navigation', () => ({
+  Link: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 
 // Import components after mocking
@@ -356,8 +376,30 @@ describe('Landing Page — LandingFooter', () => {
 
   it('renders footer links', () => {
     render(<LandingFooter />);
-    expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
-    expect(screen.getByText('Terms of Service')).toBeInTheDocument();
+    expect(screen.getAllByText('Privacy Policy').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Terms of Service').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('AI Content')).toBeInTheDocument();
+    expect(screen.getByText('Documentation')).toBeInTheDocument();
+  });
+
+  it('links legal pages to correct routes', () => {
+    render(<LandingFooter />);
+    const privacyLinks = screen.getAllByText('Privacy Policy');
+    expect(privacyLinks[0].closest('a')).toHaveAttribute('href', '/legal/privacy');
+
+    const termsLinks = screen.getAllByText('Terms of Service');
+    expect(termsLinks[0].closest('a')).toHaveAttribute('href', '/legal/terms');
+
+    const fairLink = screen.getByText('Fair Practices');
+    expect(fairLink.closest('a')).toHaveAttribute('href', '/legal/paia');
+  });
+
+  it('links feature items to docs pages', () => {
+    render(<LandingFooter />);
+    const aiLink = screen.getByText('AI Content');
+    expect(aiLink.closest('a')).toHaveAttribute('href', '/docs/ai-content');
+
+    const schedLink = screen.getByText('Scheduling');
+    expect(schedLink.closest('a')).toHaveAttribute('href', '/docs/scheduling');
   });
 });

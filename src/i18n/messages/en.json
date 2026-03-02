@@ -310,6 +310,7 @@
       "sitemap": "Sitemap",
       "mediaWorks": "Media/Works",
       "login": "Login",
+      "docs": "Documentation",
       "featuresCol": "Features",
       "aiContent": "AI Content",
       "scheduling": "Scheduling",
@@ -450,6 +451,114 @@
       "pastDue": "Past Due",
       "canceled": "Canceled",
       "trialing": "Trial"
+    }
+  },
+  "docs": {
+    "title": "Documentation",
+    "subtitle": "Learn how to use Purple Glow Social",
+    "sidebar": {
+      "gettingStarted": "Getting Started",
+      "linkingAccounts": "Linking Accounts",
+      "aiContent": "AI Content Guide",
+      "scheduling": "Scheduling Guide",
+      "billingFaq": "Billing FAQ",
+      "apiReference": "API Reference"
+    },
+    "landing": {
+      "title": "Documentation",
+      "description": "Everything you need to know about Purple Glow Social",
+      "searchPlaceholder": "Search documentation..."
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "description": "Get up and running with Purple Glow Social in minutes",
+      "step1Title": "Create Your Account",
+      "step1Description": "Sign up for Purple Glow Social and choose your plan",
+      "step2Title": "Link Your Accounts",
+      "step2Description": "Connect your social media platforms",
+      "step3Title": "Set Up Your Brand",
+      "step3Description": "Let our AI analyse your brand voice and style",
+      "step4Title": "Create Content",
+      "step4Description": "Generate AI-powered posts tailored to your brand",
+      "step5Title": "Schedule & Publish",
+      "step5Description": "Plan your content calendar and publish automatically"
+    },
+    "linkingAccounts": {
+      "title": "Linking Accounts",
+      "description": "Connect your social media platforms to Purple Glow Social"
+    },
+    "aiContent": {
+      "title": "AI Content Guide",
+      "description": "Create stunning content with our AI-powered tools"
+    },
+    "scheduling": {
+      "title": "Scheduling Guide",
+      "description": "Plan and automate your social media calendar"
+    },
+    "billingFaq": {
+      "title": "Billing FAQ",
+      "description": "Common questions about plans, credits, and payments"
+    },
+    "apiReference": {
+      "title": "API Reference",
+      "description": "Integrate Purple Glow Social into your workflow",
+      "mogulOnly": "API access is available exclusively for Mogul tier subscribers"
+    }
+  },
+  "legal": {
+    "title": "Legal",
+    "lastUpdated": "Last updated",
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How we collect, use, and protect your personal information"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Terms and conditions for using Purple Glow Social"
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "How we use cookies and similar technologies"
+    },
+    "paia": {
+      "title": "PAIA Manual",
+      "description": "Promotion of Access to Information Act Manual"
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use Policy",
+      "description": "Guidelines for using our platform responsibly"
+    },
+    "backToLegal": "Back to Legal"
+  },
+  "tutorial": {
+    "title": "Interactive Tutorial",
+    "welcome": "Welcome to Purple Glow Social!",
+    "description": "Let us show you around. This quick tour will help you get the most out of our platform.",
+    "skip": "Skip Tutorial",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Get Started!",
+    "progress": "Step {current} of {total}",
+    "replay": "Replay Tutorial",
+    "step1": {
+      "title": "Your Dashboard",
+      "description": "This is your command centre. View your analytics, upcoming posts, and account health at a glance."
+    },
+    "step2": {
+      "title": "AI Content Studio",
+      "description": "Create engaging posts with our AI. It learns your brand voice and generates content that sounds like you."
+    },
+    "step3": {
+      "title": "Content Calendar",
+      "description": "Schedule posts across all your platforms. Set optimal posting times for maximum engagement."
+    },
+    "step4": {
+      "title": "Analytics & Insights",
+      "description": "Track your performance across platforms. See what works and optimise your strategy."
+    },
+    "step5": {
+      "title": "Account Settings",
+      "description": "Manage your linked accounts, billing, and preferences all in one place."
     }
   }
 }

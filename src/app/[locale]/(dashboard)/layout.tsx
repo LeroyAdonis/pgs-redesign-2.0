@@ -2,18 +2,20 @@
  * Dashboard route group layout
  *
  * Shared layout for all dashboard pages (e.g. /overview, /posts, /analytics).
- * Renders the sidebar navigation and top header bar.
+ * Renders the sidebar navigation, top header bar, and tutorial overlay.
  *
  * This is a server component that:
  * - Validates the user session via `requireServerSession()`
  * - Passes user data to client-side header component
  * - Provides the sidebar + header + main content structure
+ * - Wraps children with TutorialProvider for first-time user guidance
  */
 
 import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { TutorialProvider, TutorialOverlay } from "@/components/tutorial";
 
 type Props = {
   children: React.ReactNode;
@@ -41,7 +43,12 @@ export default async function DashboardLayout({ children, params }: Props) {
           credits={42}
         />
 
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6">
+          <TutorialProvider>
+            {children}
+            <TutorialOverlay />
+          </TutorialProvider>
+        </main>
       </div>
     </div>
   );

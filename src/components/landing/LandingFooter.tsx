@@ -1,9 +1,15 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+
+/** Shared link classes for footer items */
+const footerLinkClasses =
+  'block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300';
 
 /**
  * Landing page footer — 5-column grid with brand, sitemap, features, legal, social.
  *
  * Server component. Matches the footer design from index-v2.html.
+ * Legal links point to /legal/* routes; feature links point to /docs/* guides.
  */
 export function LandingFooter() {
   const t = useTranslations('landing');
@@ -15,10 +21,10 @@ export function LandingFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-9 lg:gap-12 mb-14">
           {/* Brand column */}
           <div>
-            <a href="#" className="flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-[#F5F5F7]">
+            <Link href="/" className="flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-[#F5F5F7]">
               <span className="w-[3px] h-5 bg-brand rounded-sm" />
               Purple Glow
-            </a>
+            </Link>
             <p className="text-xs text-[#3F3F46] leading-[1.8] max-w-[220px] mt-4">
               {t('footer.brandDescription')}
             </p>
@@ -29,47 +35,50 @@ export function LandingFooter() {
             <h4 className="text-[10px] font-semibold tracking-[2.5px] uppercase text-[#71717A] mb-5">
               {t('footer.sitemap')}
             </h4>
-            <a href="#features" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            <a href="#features" className={footerLinkClasses}>
               {t('navbar.features')}
             </a>
-            <a href="#process" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            <a href="#process" className={footerLinkClasses}>
               {t('footer.mediaWorks')}
             </a>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            <Link href="/login" className={footerLinkClasses}>
               {t('footer.login')}
-            </a>
+            </Link>
+            <Link href="/docs" className={footerLinkClasses}>
+              {t('footer.docs')}
+            </Link>
           </div>
 
-          {/* Features */}
+          {/* Features — link to corresponding docs guides */}
           <div>
             <h4 className="text-[10px] font-semibold tracking-[2.5px] uppercase text-[#71717A] mb-5">
               {t('footer.featuresCol')}
             </h4>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            <Link href="/docs/ai-content" className={footerLinkClasses}>
               {t('footer.aiContent')}
-            </a>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            </Link>
+            <Link href="/docs/scheduling" className={footerLinkClasses}>
               {t('footer.scheduling')}
-            </a>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            </Link>
+            <Link href="/docs/linking-accounts" className={footerLinkClasses}>
               {t('footer.analytics')}
-            </a>
+            </Link>
           </div>
 
-          {/* Legal */}
+          {/* Legal — link to POPIA-compliant legal pages */}
           <div>
             <h4 className="text-[10px] font-semibold tracking-[2.5px] uppercase text-[#71717A] mb-5">
               {t('footer.legal')}
             </h4>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            <Link href="/legal/privacy" className={footerLinkClasses}>
               {t('footer.privacyPolicy')}
-            </a>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            </Link>
+            <Link href="/legal/terms" className={footerLinkClasses}>
               {t('footer.termsOfService')}
-            </a>
-            <a href="#" className="block text-[13px] text-[#3F3F46] py-[5px] font-light hover:text-[#F5F5F7] transition-colors duration-300">
+            </Link>
+            <Link href="/legal/paia" className={footerLinkClasses}>
               {t('footer.fairPractices')}
-            </a>
+            </Link>
           </div>
 
           {/* Social */}
@@ -98,6 +107,15 @@ export function LandingFooter() {
           <span className="text-[10px] text-[#3F3F46] tracking-[1.5px] uppercase">
             {t('footer.copyright')}
           </span>
+          {/* Quick legal links in bottom bar */}
+          <div className="flex gap-4">
+            <Link href="/legal/privacy" className="text-[10px] text-[#3F3F46] tracking-[1px] uppercase hover:text-[#F5F5F7] transition-colors duration-300">
+              {t('footer.privacyPolicy')}
+            </Link>
+            <Link href="/legal/terms" className="text-[10px] text-[#3F3F46] tracking-[1px] uppercase hover:text-[#F5F5F7] transition-colors duration-300">
+              {t('footer.termsOfService')}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
