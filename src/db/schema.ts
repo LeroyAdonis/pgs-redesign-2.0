@@ -429,6 +429,8 @@ export const postSchedule = pgTable(
       withTimezone: true,
       mode: "date",
     }),
+    /** Platform-assigned post ID returned after successful publish (needed for metrics fetching) */
+    platformPostId: text("platform_post_id"),
     failedAt: timestamp("failed_at", { withTimezone: true, mode: "date" }),
     retryCount: integer("retry_count").notNull().default(0),
     lastError: text("last_error"),

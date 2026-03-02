@@ -7,6 +7,8 @@ import type {
   ContentValidation,
   RateLimitConfig,
   PlatformConstraints,
+  FetchMetricsOptions,
+  EngagementMetrics,
 } from "./types";
 
 /**
@@ -26,6 +28,14 @@ export abstract class BasePublisherAdapter implements PublisherAdapter {
    * Called by `publish()` after content validation.
    */
   protected abstract doPublish(options: PublishOptions): Promise<PublishResult>;
+
+  /**
+   * Platform-specific metrics fetching implementation.
+   * Called by `fetchMetrics()` — implement happy-path only.
+   */
+  protected abstract doFetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics>;
 
   /** Publish a post to this platform with validation and error handling */
   async publish(options: PublishOptions): Promise<PublishResult> {
@@ -64,6 +74,36 @@ export abstract class BasePublisherAdapter implements PublisherAdapter {
       return result;
     } catch (err) {
       return this.normalizeError(err);
+    }
+  }
+
+  /** Fetch engagement metrics for a published post with error handling */
+  async fetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics | null> {
+    try {
+      logger.info(`Fetching metrics from ${this.platform}`, {
+        platformPostId: options.platformPostId,
+      });
+
+      const metrics = await this.doFetchMetrics(options);
+
+      logger.info(`Fetched metrics from ${this.platform}`, {
+        platformPostId: options.platformPostId,
+        impressions: metrics.impressions,
+        reach: metrics.reach,
+      });
+
+      return metrics;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+
+      logger.error(`Failed to fetch metrics from ${this.platform}`, {
+        platformPostId: options.platformPostId,
+        error: message,
+      });
+
+      return null;
     }
   }
 
@@ -110,6 +150,21 @@ export abstract class BasePublisherAdapter implements PublisherAdapter {
       errorCode: "UNKNOWN_ERROR",
       retryable: false,
     };
+  }
+
+  /** Deterministic hash from a string to seed mock metric variation */
+  protected hashSeed(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  /** Map a seed into a deterministic value within [min, max] */
+  protected mockRange(seed: number, min: number, max: number): number {
+    return min + (seed % (max - min + 1));
   }
 
   /**

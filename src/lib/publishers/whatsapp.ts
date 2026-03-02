@@ -3,6 +3,8 @@ import type {
   PublishResult,
   PlatformConstraints,
   RateLimitConfig,
+  FetchMetricsOptions,
+  EngagementMetrics,
 } from "./types";
 import { BasePublisherAdapter } from "./base-adapter";
 
@@ -97,6 +99,22 @@ export class WhatsAppPublisher extends BasePublisherAdapter {
         language: { code: "en" },
         components,
       },
+    };
+  }
+
+  // TODO: Replace with real platform API call
+  protected async doFetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics> {
+    const seed = this.hashSeed(options.platformPostId);
+
+    return {
+      impressions: this.mockRange(seed, 10, 100),
+      reach: this.mockRange(seed * 2, 10, 100),
+      likes: 0,
+      shares: this.mockRange(seed * 4, 1, 10),
+      comments: 0,
+      clicks: 0,
     };
   }
 }

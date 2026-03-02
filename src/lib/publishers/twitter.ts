@@ -3,6 +3,8 @@ import type {
   PublishResult,
   PlatformConstraints,
   RateLimitConfig,
+  FetchMetricsOptions,
+  EngagementMetrics,
 } from "./types";
 import { BasePublisherAdapter } from "./base-adapter";
 
@@ -98,5 +100,21 @@ export class TwitterPublisher extends BasePublisherAdapter {
     }
 
     return mediaIds;
+  }
+
+  // TODO: Replace with real platform API call
+  protected async doFetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics> {
+    const seed = this.hashSeed(options.platformPostId);
+
+    return {
+      impressions: this.mockRange(seed, 2000, 20000),
+      reach: this.mockRange(seed * 2, 1000, 10000),
+      likes: this.mockRange(seed * 3, 10, 100),
+      shares: this.mockRange(seed * 4, 5, 50),
+      comments: this.mockRange(seed * 5, 2, 20),
+      clicks: this.mockRange(seed * 6, 30, 300),
+    };
   }
 }

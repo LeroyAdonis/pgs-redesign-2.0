@@ -133,7 +133,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     labelKey: "sectionInsights",
     items: [
-      { labelKey: "analytics", href: "/analytics", icon: <ChartIcon /> },
+      { labelKey: "analytics", href: "/dashboard/analytics", icon: <ChartIcon /> },
       { labelKey: "brand", href: "/dashboard/brand", icon: <PaletteIcon /> },
     ],
   },
@@ -177,9 +177,11 @@ function Sidebar({ className }: SidebarProps) {
 
   /**
    * Check if a nav item is active.
-   * Matches if the pathname equals the href or starts with href + "/".
+   * Exact match for `/dashboard` (overview) to prevent it matching all
+   * sub-routes. Other routes use prefix matching for nested pages.
    */
   function isActive(href: string): boolean {
+    if (href === "/dashboard") return pathname === "/dashboard";
     return pathname === href || pathname.startsWith(href + "/");
   }
 

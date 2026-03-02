@@ -4,6 +4,8 @@ import type {
   ContentValidation,
   PlatformConstraints,
   RateLimitConfig,
+  FetchMetricsOptions,
+  EngagementMetrics,
 } from "./types";
 import { BasePublisherAdapter } from "./base-adapter";
 
@@ -86,6 +88,22 @@ export class TikTokPublisher extends BasePublisherAdapter {
       // TikTok doesn't return a direct URL; the video is processed async
       platformUrl: undefined,
       retryable: false,
+    };
+  }
+
+  // TODO: Replace with real platform API call
+  protected async doFetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics> {
+    const seed = this.hashSeed(options.platformPostId);
+
+    return {
+      impressions: this.mockRange(seed, 5000, 50000),
+      reach: this.mockRange(seed * 2, 3000, 30000),
+      likes: this.mockRange(seed * 3, 100, 1000),
+      shares: this.mockRange(seed * 4, 50, 500),
+      comments: this.mockRange(seed * 5, 20, 200),
+      clicks: this.mockRange(seed * 6, 10, 100),
     };
   }
 }

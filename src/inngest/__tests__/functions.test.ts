@@ -49,6 +49,7 @@ vi.mock("@/db/schema", () => ({
     socialAccountId: "postSchedule.socialAccountId",
     scheduledAt: "postSchedule.scheduledAt",
     publishedAt: "postSchedule.publishedAt",
+    platformPostId: "postSchedule.platformPostId",
     retryCount: "postSchedule.retryCount",
     failedAt: "postSchedule.failedAt",
     lastError: "postSchedule.lastError",
@@ -216,12 +217,13 @@ describe("publishPost", () => {
       step,
     });
 
-    // 4 steps: mark-publishing, publish-to-platform, deduct-credit, update-status
-    expect(step.run).toHaveBeenCalledTimes(4);
+    // 5 steps: mark-publishing, publish-to-platform, deduct-credit, update-status, trigger-analytics
+    expect(step.run).toHaveBeenCalledTimes(5);
     expect(step.run.mock.calls[0][0]).toBe("mark-publishing");
     expect(step.run.mock.calls[1][0]).toBe("publish-to-platform");
     expect(step.run.mock.calls[2][0]).toBe("deduct-credit");
     expect(step.run.mock.calls[3][0]).toBe("update-status");
+    expect(step.run.mock.calls[4][0]).toBe("trigger-analytics");
 
     // Publisher called with decrypted token
     expect(mockPublish).toHaveBeenCalledWith({

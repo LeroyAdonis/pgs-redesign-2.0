@@ -244,7 +244,10 @@ export const publishPost = inngest.createFunction(
       if (publishResult.success) {
         await db
           .update(postSchedule)
-          .set({ publishedAt: new Date() })
+          .set({
+            publishedAt: new Date(),
+            platformPostId: publishResult.platformPostId ?? null,
+          })
           .where(eq(postSchedule.id, scheduleId));
 
         await db
@@ -310,6 +313,21 @@ export const publishPost = inngest.createFunction(
         }
       }
     });
+
+    // Step 5: Trigger analytics fetch after successful publish
+    if (publishResult.success) {
+      await step.run("trigger-analytics", async () => {
+        await inngest.send({
+          name: "analytics/fetch-initial",
+          data: { postScheduleId: scheduleId },
+        });
+
+        logger.info("Analytics fetch-initial event sent", {
+          postId,
+          scheduleId,
+        });
+      });
+    }
   },
 );
 

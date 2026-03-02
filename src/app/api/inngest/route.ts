@@ -17,8 +17,22 @@ import {
   retryPost,
   checkScheduledPosts,
 } from "@/inngest/functions";
+import {
+  fetchInitialMetrics,
+  refreshRecentMetrics,
+  refreshDailyMetrics,
+  weeklyAnalyticsDigest,
+} from "@/inngest/analytics-functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [publishPost, retryPost, checkScheduledPosts],
+  functions: [
+    publishPost,
+    retryPost,
+    checkScheduledPosts,
+    fetchInitialMetrics,
+    refreshRecentMetrics,
+    refreshDailyMetrics,
+    weeklyAnalyticsDigest,
+  ],
 });

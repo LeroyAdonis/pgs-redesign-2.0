@@ -38,6 +38,7 @@ export interface PublisherAdapter {
   platform: Platform;
   publish(options: PublishOptions): Promise<PublishResult>;
   validateContent(content: string): ContentValidation;
+  fetchMetrics(options: FetchMetricsOptions): Promise<EngagementMetrics | null>;
 }
 
 /** Per-platform rate limit configuration */
@@ -46,6 +47,22 @@ export interface RateLimitConfig {
   maxRequests: number;
   /** Window duration in milliseconds */
   windowMs: number;
+}
+
+/** Engagement metrics returned by analytics fetching */
+export interface EngagementMetrics {
+  impressions: number;
+  reach: number;
+  likes: number;
+  shares: number;
+  comments: number;
+  clicks: number;
+}
+
+/** Options for fetching post metrics from a platform */
+export interface FetchMetricsOptions {
+  platformPostId: string;
+  accessToken: string;
 }
 
 /** Per-platform character limit and constraints */

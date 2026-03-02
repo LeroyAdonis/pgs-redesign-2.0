@@ -90,7 +90,7 @@ describe("Sidebar", () => {
     expect(hrefs).toContain("/dashboard");
     expect(hrefs).toContain("/dashboard/posts");
     expect(hrefs).toContain("/dashboard/calendar");
-    expect(hrefs).toContain("/analytics");
+    expect(hrefs).toContain("/dashboard/analytics");
     expect(hrefs).toContain("/dashboard/brand");
     expect(hrefs).toContain("/dashboard/accounts");
     expect(hrefs).toContain("/team");
@@ -117,7 +117,7 @@ describe("Sidebar", () => {
   });
 
   it("highlights the correct item when pathname changes", () => {
-    mockPathname = "/analytics";
+    mockPathname = "/dashboard/analytics";
     render(<Sidebar />);
 
     const analyticsLink = screen.getByRole("link", { name: /analytics/i });

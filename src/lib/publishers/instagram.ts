@@ -3,6 +3,8 @@ import type {
   PublishResult,
   PlatformConstraints,
   RateLimitConfig,
+  FetchMetricsOptions,
+  EngagementMetrics,
 } from "./types";
 import { BasePublisherAdapter } from "./base-adapter";
 
@@ -93,6 +95,22 @@ export class InstagramPublisher extends BasePublisherAdapter {
       platformPostId: publishData.id,
       platformUrl: `https://www.instagram.com/p/${publishData.id}`,
       retryable: false,
+    };
+  }
+
+  // TODO: Replace with real platform API call
+  protected async doFetchMetrics(
+    options: FetchMetricsOptions,
+  ): Promise<EngagementMetrics> {
+    const seed = this.hashSeed(options.platformPostId);
+
+    return {
+      impressions: this.mockRange(seed, 500, 5000),
+      reach: this.mockRange(seed * 2, 300, 3000),
+      likes: this.mockRange(seed * 3, 50, 500),
+      shares: this.mockRange(seed * 4, 10, 100),
+      comments: this.mockRange(seed * 5, 5, 50),
+      clicks: this.mockRange(seed * 6, 20, 200),
     };
   }
 }
