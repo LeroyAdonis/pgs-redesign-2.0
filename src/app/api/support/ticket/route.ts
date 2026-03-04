@@ -14,6 +14,8 @@ import { getServerSession } from "@/lib/auth-session";
 import { logger } from "@/lib/logger";
 import { db } from "@/db";
 import { notification } from "@/db/schema";
+import { sanitizeText } from "@/lib/security/sanitize";
+import { createRateLimiter } from "@/lib/security/rate-limit";
 
 // ---------------------------------------------------------------------------
 // Response types
@@ -42,31 +44,10 @@ interface TicketRequestBody {
 }
 
 // ---------------------------------------------------------------------------
-// Rate limiting — in-memory, per-user, max 5 tickets / minute
+// Rate limiting — 5 tickets / minute per user
 // ---------------------------------------------------------------------------
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 5;
-
-/** userId → list of timestamps within the current window */
-const rateLimitMap = new Map<string, number[]>();
-
-function isRateLimited(userId: string): boolean {
-  const now = Date.now();
-  const timestamps = rateLimitMap.get(userId) ?? [];
-
-  // Evict entries outside the window
-  const recent = timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS);
-
-  if (recent.length >= RATE_LIMIT_MAX) {
-    rateLimitMap.set(userId, recent);
-    return true;
-  }
-
-  recent.push(now);
-  rateLimitMap.set(userId, recent);
-  return false;
-}
+const rateLimiter = createRateLimiter({ maxRequests: 5, windowMs: 60_000 });
 
 // ---------------------------------------------------------------------------
 // Validation helpers
@@ -116,7 +97,7 @@ export async function POST(
     const userId = session.user.id;
 
     // --- Rate limit ---
-    if (isRateLimited(userId)) {
+    if (!rateLimiter.check(userId).allowed) {
       return NextResponse.json(
         {
           success: false,
@@ -136,10 +117,10 @@ export async function POST(
       );
     }
 
-    // Safe to cast after validation
-    const name = (body.name as string).trim();
-    const email = (body.email as string).trim();
-    const message = (body.message as string).trim();
+    // Sanitize user inputs at the API boundary before DB insertion
+    const name = sanitizeText(body.name);
+    const email = sanitizeText(body.email);
+    const message = sanitizeText(body.message);
 
     // --- Insert notification as support ticket ---
     const [inserted] = await db

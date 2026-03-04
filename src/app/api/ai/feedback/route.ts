@@ -11,7 +11,15 @@ import { logger } from "@/lib/logger";
 import { db } from "@/db";
 import { aiFeedback, organizationMember } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { sanitizeText } from "@/lib/security/sanitize";
 import type { AIFeedbackData } from "@/lib/ai/types";
+import { createRateLimiter } from "@/lib/security/rate-limit";
+
+// ---------------------------------------------------------------------------
+// Rate limiting — 10 AI feedback requests / minute per user
+// ---------------------------------------------------------------------------
+
+const rateLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 });
 
 interface FeedbackSuccessResponse {
   success: true;
@@ -38,6 +46,14 @@ export async function POST(
     }
 
     const body = (await request.json()) as AIFeedbackData;
+
+    // --- Rate limit ---
+    if (!rateLimiter.check(session.user.id).allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests. Please wait a minute before trying again." },
+        { status: 429 },
+      );
+    }
 
     if (!body.rating || !body.originalContent || !body.platform || !body.contentType) {
       return NextResponse.json(
@@ -99,15 +115,15 @@ export async function POST(
       );
     }
 
-    // Insert feedback
+    // Insert feedback — sanitize free-text content at the API boundary
     await db.insert(aiFeedback).values({
       orgId: membership.orgId,
       userId: session.user.id,
       rating: body.rating,
-      originalContent: body.originalContent,
-      editedContent: body.editedContent ?? null,
+      originalContent: sanitizeText(body.originalContent),
+      editedContent: body.editedContent ? sanitizeText(body.editedContent) : null,
       aiModel: body.aiModel ?? "unknown",
-      aiPrompt: body.aiPrompt ?? "",
+      aiPrompt: sanitizeText(body.aiPrompt),
       platform,
       contentType: body.contentType,
     });

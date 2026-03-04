@@ -102,6 +102,14 @@ export default async function LocaleLayout({ children, params }: Props) {
       <body
         className={`${sora.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
+        {/* Skip-to-content link — visible only on keyboard focus */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[500] focus:bg-brand focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
+
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
           <ChatbotWidget />

@@ -18,6 +18,14 @@ import { eq } from "drizzle-orm";
 import { checkPostLimit } from "@/lib/payments/tier-enforcement";
 import { hasEnoughCredits } from "@/lib/credits/credit-service";
 import { TIER_CONFIGS } from "@/lib/payments/tier-config";
+import { sanitizeText } from "@/lib/security/sanitize";
+import { createRateLimiter } from "@/lib/security/rate-limit";
+
+// ---------------------------------------------------------------------------
+// Rate limiting — 10 AI draft requests / minute per user
+// ---------------------------------------------------------------------------
+
+const rateLimiter = createRateLimiter({ maxRequests: 10, windowMs: 60_000 });
 
 interface DraftRequestMedia {
   type: "image" | "video" | "gif";
@@ -62,6 +70,14 @@ export async function POST(
     }
 
     const body = (await request.json()) as DraftRequest;
+
+    // --- Rate limit ---
+    if (!rateLimiter.check(session.user.id).allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests. Please wait a minute before trying again." },
+        { status: 429 },
+      );
+    }
 
     if (!body.content || !body.platform) {
       return NextResponse.json(
@@ -146,18 +162,18 @@ export async function POST(
       );
     }
 
-    // Insert the post
+    // Insert the post — sanitize free-text content at the API boundary
     const [newPost] = await db
       .insert(post)
       .values({
         orgId,
         createdById: session.user.id,
-        content: body.content,
+        content: sanitizeText(body.content),
         contentLanguage: body.language ?? "en",
         platform,
         status: "draft",
         aiGenerated: true,
-        aiPrompt: body.aiPrompt,
+        aiPrompt: sanitizeText(body.aiPrompt),
         aiModel: body.aiModel,
       })
       .returning({ id: post.id });

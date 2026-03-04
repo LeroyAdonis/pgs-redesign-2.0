@@ -42,7 +42,7 @@ export default async function DocsLayout({ children, params }: Props) {
 
         {/* Main content area — offset by sidebar width on desktop */}
         <div className="flex flex-col md:ml-[260px]">
-          <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 md:px-8 md:py-12">
+          <main id="main-content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 md:px-8 md:py-12">
             {children}
           </main>
 

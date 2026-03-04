@@ -37,7 +37,7 @@ export default async function HomePage({ params }: Props) {
 
       <LandingNavbar />
 
-      <main>
+      <main id="main-content">
         <HeroSection />
         <MarqueeSection />
         <FeaturesSection />

@@ -26,7 +26,7 @@ After completing each phase, update the status below:
 | Phase 10: Admin Dashboard | ✅ Complete | Copilot Fleet |
 | Phase 11: Docs & Legal | ✅ Complete | Copilot Fleet |
 | Phase 12: Chatbot & Support | ✅ Complete | Copilot Fleet |
-| Phase 13: Testing & Polish | ⬜ Not Started | — |
+| Phase 13: Testing & Polish | ✅ Complete | Copilot Fleet |
 
 ---
 

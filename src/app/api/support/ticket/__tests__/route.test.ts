@@ -30,6 +30,20 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
+const mockRateLimitCheck = vi.fn();
+
+vi.mock('@/lib/security/rate-limit', () => ({
+  createRateLimiter: () => ({
+    check: (...args: unknown[]) => mockRateLimitCheck(...args),
+    reset: vi.fn(),
+  }),
+}));
+
+vi.mock('@/lib/security/sanitize', () => ({
+  sanitizeText: (input: unknown) =>
+    typeof input === 'string' ? input.trim() : '',
+}));
+
 // ── Import after mocks ──
 
 import { POST } from '../route';
@@ -48,6 +62,9 @@ function makeRequest(body: Record<string, unknown>): Request {
 
 beforeEach(() => {
   vi.clearAllMocks();
+
+  // Default: rate limiter allows requests
+  mockRateLimitCheck.mockReturnValue({ allowed: true, remaining: 4, resetAt: new Date() });
 
   // Default: chain insert → values → returning
   mockReturning.mockResolvedValue([{ id: 'test-notification-id' }]);

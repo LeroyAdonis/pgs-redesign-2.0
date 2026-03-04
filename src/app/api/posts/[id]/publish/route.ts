@@ -21,6 +21,13 @@ import { post, postSchedule, organizationMember } from "@/db/schema";
 import { hasEnoughCredits } from "@/lib/credits/credit-service";
 import { inngest } from "@/inngest/client";
 import { logger } from "@/lib/logger";
+import { createRateLimiter } from "@/lib/security/rate-limit";
+
+// ---------------------------------------------------------------------------
+// Rate limiting — 20 publish requests / minute per user
+// ---------------------------------------------------------------------------
+
+const rateLimiter = createRateLimiter({ maxRequests: 20, windowMs: 60_000 });
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -33,6 +40,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Suppress unused-variable warning — request is part of the route signature
     void request;
+
+    // --- Rate limit ---
+    if (!rateLimiter.check(session.user.id).allowed) {
+      return NextResponse.json(
+        { success: false, error: "Too many requests. Please wait a minute before trying again." },
+        { status: 429 },
+      );
+    }
 
     // Step 1: Verify the post exists
     const [foundPost] = await db
