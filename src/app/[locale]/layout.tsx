@@ -16,6 +16,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
+import { ChatbotWidget } from "@/components/chatbot";
 import "../globals.css";
 
 /**
@@ -103,6 +104,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
+          <ChatbotWidget />
         </NextIntlClientProvider>
       </body>
     </html>

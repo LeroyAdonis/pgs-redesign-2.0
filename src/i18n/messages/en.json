@@ -628,5 +628,48 @@
       "title": "Account Settings",
       "description": "Manage your linked accounts, billing, and preferences all in one place."
     }
+  },
+  "chatbot": {
+    "title": "Purple Glow Assistant",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "close": "Close chat",
+    "openChat": "Open chat assistant",
+    "typing": "Typing...",
+    "welcome": "Howzit! 👋 I'm your Purple Glow assistant. Ask me anything about managing your social media.",
+    "suggestedPrompts": {
+      "getStarted": "How do I get started?",
+      "whatCanIPost": "What can I post?",
+      "billing": "How does billing work?"
+    },
+    "generating": "Generating response…",
+    "backToChat": "Back to chat",
+    "support": {
+      "talkToHuman": "Talk to a human",
+      "formTitle": "Contact Support",
+      "name": "Your name",
+      "namePlaceholder": "e.g. Thabo Mokoena",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.co.za",
+      "emailInvalid": "Please enter a valid email address.",
+      "message": "How can we help?",
+      "messagePlaceholder": "Describe your issue or question…",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "success": "Message sent!",
+      "successDetail": "We'll get back to you within 24 hours.",
+      "error": "Something went wrong. Please try again or email support@purpleglow.co.za.",
+      "loginRequired": "Please sign in to submit a support request, or email support@purpleglow.co.za directly.",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "aiUnavailable": "I'm having trouble connecting right now. Please check out our docs or contact support.",
+      "rateLimit": "You're sending messages too quickly. Please wait a moment."
+    },
+    "ariaLabels": {
+      "chatWidget": "Chat support widget",
+      "messageList": "Chat messages",
+      "newMessage": "New message from assistant"
+    }
   }
 }
