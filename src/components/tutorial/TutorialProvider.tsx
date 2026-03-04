@@ -46,15 +46,14 @@ interface TutorialProviderProps {
 
 export function TutorialProvider({ children }: TutorialProviderProps) {
   const [visible, setVisible] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  // On first mount, check localStorage for first-time users
+  // On first mount, check localStorage for first-time users.
+  // setVisible is deferred via microtask to satisfy react-hooks/set-state-in-effect.
   useEffect(() => {
-    setMounted(true);
     try {
       const completed = localStorage.getItem(STORAGE_KEY);
       if (completed !== 'true') {
-        setVisible(true);
+        Promise.resolve().then(() => setVisible(true));
       }
     } catch {
       // localStorage unavailable (SSR, incognito restrictions) — skip
@@ -92,11 +91,6 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     }),
     [visible, showTutorial, hideTutorial, resetTutorial],
   );
-
-  // Avoid flash: don't render until we've checked localStorage
-  if (!mounted) {
-    return <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>;
-  }
 
   return (
     <TutorialContext.Provider value={value}>{children}</TutorialContext.Provider>

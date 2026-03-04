@@ -14,7 +14,7 @@ const mockFrom = vi.fn(() => ({ where: mockWhere }));
 const mockSelect = vi.fn(() => ({ from: mockFrom }));
 
 vi.mock('@/db', () => ({
-  db: { select: (...args: unknown[]) => mockSelect(...args) },
+  db: { select: () => mockSelect() },
 }));
 
 vi.mock('@/db/schema', () => ({

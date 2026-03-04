@@ -15,6 +15,7 @@ import {
   TikTokPublisher,
   WhatsAppPublisher,
   GoogleBusinessPublisher,
+  type PublisherAdapter,
 } from "@/lib/publishers";
 import { PLATFORMS } from "@/lib/social/types";
 import type { Platform } from "@/lib/social/types";
@@ -85,7 +86,7 @@ describe("BasePublisherAdapter.fetchMetrics", () => {
 // ==========================================================================
 
 describe("Platform adapter doFetchMetrics", () => {
-  const adapterMap: Record<string, { adapter: InstanceType<typeof TwitterPublisher>; minImp: number; maxImp: number }> = {
+  const adapterMap: Record<string, { adapter: PublisherAdapter; minImp: number; maxImp: number }> = {
     twitter: { adapter: new TwitterPublisher(), minImp: 2000, maxImp: 20000 },
     facebook: { adapter: new FacebookPublisher(), minImp: 1000, maxImp: 10000 },
     instagram: { adapter: new InstagramPublisher(), minImp: 1500, maxImp: 15000 },

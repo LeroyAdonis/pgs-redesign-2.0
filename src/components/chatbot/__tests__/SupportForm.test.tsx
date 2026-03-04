@@ -19,7 +19,7 @@ function renderForm(overrides?: {
   onSubmit?: (data: { name: string; email: string; message: string }) => Promise<void>;
   onCancel?: () => void;
 }) {
-  const onSubmit = overrides?.onSubmit ?? vi.fn<[], Promise<void>>().mockResolvedValue(undefined);
+  const onSubmit = overrides?.onSubmit ?? vi.fn<(data: { name: string; email: string; message: string }) => Promise<void>>().mockResolvedValue(undefined);
   const onCancel = overrides?.onCancel ?? vi.fn();
   const utils = render(<SupportForm onSubmit={onSubmit} onCancel={onCancel} />);
   return { onSubmit, onCancel, ...utils };
@@ -55,7 +55,7 @@ describe('SupportForm', () => {
 
   it('calls onSubmit with trimmed form data when valid', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn<[], Promise<void>>().mockResolvedValue(undefined);
+    const onSubmit = vi.fn<(data: { name: string; email: string; message: string }) => Promise<void>>().mockResolvedValue(undefined);
     renderForm({ onSubmit });
 
     await user.type(screen.getByLabelText('support.name'), '  Test User  ');
@@ -77,7 +77,7 @@ describe('SupportForm', () => {
 
   it('shows success state after successful submission', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn<[], Promise<void>>().mockResolvedValue(undefined);
+    const onSubmit = vi.fn<(data: { name: string; email: string; message: string }) => Promise<void>>().mockResolvedValue(undefined);
     renderForm({ onSubmit });
 
     await user.type(screen.getByLabelText('support.name'), 'Test User');
@@ -99,7 +99,7 @@ describe('SupportForm', () => {
 
   it('shows error state when onSubmit throws', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn<[], Promise<void>>().mockRejectedValue(
+    const onSubmit = vi.fn<(data: { name: string; email: string; message: string }) => Promise<void>>().mockRejectedValue(
       new Error('Network error'),
     );
     renderForm({ onSubmit });
@@ -130,7 +130,7 @@ describe('SupportForm', () => {
 
   it('shows back to chat button in success state that calls onCancel', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn<[], Promise<void>>().mockResolvedValue(undefined);
+    const onSubmit = vi.fn<(data: { name: string; email: string; message: string }) => Promise<void>>().mockResolvedValue(undefined);
     const onCancel = vi.fn();
     renderForm({ onSubmit, onCancel });
 

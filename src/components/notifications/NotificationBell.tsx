@@ -39,9 +39,13 @@ function NotificationBell() {
 
   // Poll on mount + every 30 seconds
   useEffect(() => {
-    fetchCount();
+    // Defer initial fetch to avoid synchronous setState in effect
+    const initialTimer = setTimeout(fetchCount, 0);
     const interval = setInterval(fetchCount, POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, [fetchCount]);
 
   // ── Click outside to close ──

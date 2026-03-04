@@ -49,11 +49,10 @@ function generateParticles(count: number): Particle[] {
 /* ─── Component ─── */
 
 export function DoneStep({ labels, onFinish }: DoneStepProps) {
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(true);
   const [particles] = useState(() => generateParticles(30));
 
   useEffect(() => {
-    setShowConfetti(true);
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);

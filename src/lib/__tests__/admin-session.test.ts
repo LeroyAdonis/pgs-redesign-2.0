@@ -58,7 +58,7 @@ function makeSession(role: string) {
 // ─── Tests ───
 
 describe("requireAdminSession", () => {
-  let requireAdminSession: () => Promise<ReturnType<typeof makeSession>>;
+  let requireAdminSession: () => Promise<Record<string, unknown>>;
 
   beforeEach(async () => {
     vi.clearAllMocks();

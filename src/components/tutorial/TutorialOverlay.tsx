@@ -35,13 +35,15 @@ export function TutorialOverlay() {
   const [currentStep, setCurrentStep] = useState(FIRST_STEP);
   const [isAnimating, setIsAnimating] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [prevVisible, setPrevVisible] = useState(isTutorialVisible);
 
-  // Reset step when overlay opens
-  useEffect(() => {
+  // Reset step when overlay opens (set state during render — React recommended pattern)
+  if (isTutorialVisible !== prevVisible) {
+    setPrevVisible(isTutorialVisible);
     if (isTutorialVisible) {
       setCurrentStep(FIRST_STEP);
     }
-  }, [isTutorialVisible]);
+  }
 
   const animateTransition = useCallback((direction: 'left' | 'right', callback: () => void) => {
     setSlideDirection(direction);

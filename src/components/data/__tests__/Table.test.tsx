@@ -11,6 +11,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  [key: string]: unknown;
 }
 
 const columns: TableColumn<User>[] = [

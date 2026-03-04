@@ -13,10 +13,8 @@ export function useAnalyticsFetch<T>(url: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refetch = useCallback(() => {
-    setLoading(true);
-    setError(null);
-
+  /** Core fetch logic — only uses async callbacks so it's safe inside effects. */
+  const doFetch = useCallback(() => {
     fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to fetch analytics (${res.status})`);
@@ -33,9 +31,17 @@ export function useAnalyticsFetch<T>(url: string) {
       .finally(() => setLoading(false));
   }, [url]);
 
+  /** Public refetch — resets loading/error state then fetches. */
+  const refetch = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    doFetch();
+  }, [doFetch]);
+
+  // Initial fetch on mount — loading & error already have correct initial values
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    doFetch();
+  }, [doFetch]);
 
   return { data, loading, error, refetch } as const;
 }

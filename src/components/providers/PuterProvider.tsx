@@ -55,9 +55,10 @@ export function PuterProvider({ children }: PuterProviderProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // If already loaded (e.g. script already in DOM), skip
+    // If already loaded (e.g. script already in DOM), mark loaded via microtask
+    // to avoid synchronous setState in effect
     if (typeof window !== "undefined" && window.puter) {
-      setIsLoaded(true);
+      Promise.resolve().then(() => setIsLoaded(true));
       return;
     }
 

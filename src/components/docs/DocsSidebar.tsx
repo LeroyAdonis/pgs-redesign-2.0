@@ -60,13 +60,15 @@ function DocsSidebar({ className }: DocsSidebarProps) {
   const t = useTranslations("docs");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // Close sidebar on route change (set state during render — React recommended pattern)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileOpen(false);
+  }
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
-
-  // Close sidebar on route change
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   // Close on Escape key
   useEffect(() => {
