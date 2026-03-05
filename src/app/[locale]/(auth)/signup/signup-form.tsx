@@ -60,7 +60,7 @@ export function SignupForm({ labels }: SignupFormProps) {
         <button
           type="button"
           onClick={() => handleSocialSignIn("google")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
+          className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GoogleIcon />
           {labels.continueWithGoogle}
@@ -68,7 +68,7 @@ export function SignupForm({ labels }: SignupFormProps) {
         <button
           type="button"
           onClick={() => handleSocialSignIn("github")}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
+          className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GitHubIcon />
           {labels.continueWithGithub}
@@ -90,7 +90,7 @@ export function SignupForm({ labels }: SignupFormProps) {
       {/* Email/password form */}
       <form onSubmit={handleSignUp} className="space-y-4">
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <div className="bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             {error}
           </div>
         )}
@@ -98,7 +98,7 @@ export function SignupForm({ labels }: SignupFormProps) {
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             Name
           </label>
@@ -110,14 +110,14 @@ export function SignupForm({ labels }: SignupFormProps) {
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             {labels.email}
           </label>
@@ -129,14 +129,14 @@ export function SignupForm({ labels }: SignupFormProps) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             {labels.password}
           </label>
@@ -149,14 +149,14 @@ export function SignupForm({ labels }: SignupFormProps) {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
+          className="flex w-full justify-center bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
           {loading ? "..." : labels.signUp}
         </button>

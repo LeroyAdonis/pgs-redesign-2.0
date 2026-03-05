@@ -4,14 +4,17 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * ScrollReveal — viewport-triggered fade-in wrapper.
+ * ScrollReveal — viewport-triggered entrance animation wrapper.
  *
- * Uses IntersectionObserver to detect when children scroll into view,
- * then applies a one-shot CSS transition (opacity + translate).
- * Children start invisible and animate in; once revealed they stay visible.
+ * Progressive-enhancement approach:
+ *   1. Content is ALWAYS visible (SSR and client). Never hidden by default.
+ *   2. On the client, an IntersectionObserver watches for elements entering the
+ *      viewport. Once intersecting, the `has-entered` CSS animation class fires
+ *      a one-time fade-in + slide-up transition.
+ *   3. Elements already in the viewport at page load animate in immediately.
  *
- * All section components remain server components — this wrapper
- * handles the client-side intersection logic only.
+ * This ensures crawlers, screenshots, and reduced-motion users always see
+ * full content without any hidden-then-shown flash.
  */
 
 type Direction = 'up' | 'left' | 'right';
@@ -26,18 +29,11 @@ interface ScrollRevealProps {
   className?: string;
 }
 
-/** Tailwind translate classes for the hidden state, keyed by direction. */
-const TRANSLATE_HIDDEN: Record<Direction, string> = {
-  up: 'translate-y-6',
-  left: 'translate-x-6',
-  right: '-translate-x-6',
-};
-
-/** Tailwind translate classes for the visible state, keyed by direction. */
-const TRANSLATE_VISIBLE: Record<Direction, string> = {
-  up: 'translate-y-0',
-  left: 'translate-x-0',
-  right: 'translate-x-0',
+/** Tailwind translate classes for the animated entrance, keyed by direction. */
+const TRANSLATE_FROM: Record<Direction, string> = {
+  up: 'data-[entered]:translate-y-0',
+  left: 'data-[entered]:translate-x-0',
+  right: 'data-[entered]:translate-x-0',
 };
 
 export function ScrollReveal({
@@ -47,7 +43,7 @@ export function ScrollReveal({
   className,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [entered, setEntered] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -56,33 +52,32 @@ export function ScrollReveal({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(element); // fire once
+          setEntered(true);
+          observer.unobserve(element);
         }
       },
-      { rootMargin: '-50px', threshold: 0.1 },
+      { threshold: 0.05, rootMargin: '0px 0px 100px 0px' },
     );
 
     observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div
       ref={ref}
+      data-entered={entered ? '' : undefined}
       className={cn(
-        'transition-all duration-700 ease-out',
-        isVisible
-          ? `opacity-100 ${TRANSLATE_VISIBLE[direction]}`
-          : `opacity-0 ${TRANSLATE_HIDDEN[direction]}`,
+        // Always visible — transition fires when data-entered is set
+        'opacity-100 transition-all duration-700 ease-out',
+        TRANSLATE_FROM[direction],
         className,
       )}
-      style={isVisible && delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}
+      style={entered && delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
     </div>
   );
 }
+
+

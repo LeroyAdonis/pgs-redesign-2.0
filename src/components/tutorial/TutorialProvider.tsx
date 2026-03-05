@@ -42,14 +42,17 @@ export function useTutorial(): TutorialContextValue {
 
 interface TutorialProviderProps {
   children: React.ReactNode;
+  /** When false, tutorial will not auto-show on first visit (use for non-dashboard contexts). Default: true */
+  autoShow?: boolean;
 }
 
-export function TutorialProvider({ children }: TutorialProviderProps) {
+export function TutorialProvider({ children, autoShow = true }: TutorialProviderProps) {
   const [visible, setVisible] = useState(false);
 
   // On first mount, check localStorage for first-time users.
   // setVisible is deferred via microtask to satisfy react-hooks/set-state-in-effect.
   useEffect(() => {
+    if (!autoShow) return;
     try {
       const completed = localStorage.getItem(STORAGE_KEY);
       if (completed !== 'true') {
@@ -58,7 +61,7 @@ export function TutorialProvider({ children }: TutorialProviderProps) {
     } catch {
       // localStorage unavailable (SSR, incognito restrictions) — skip
     }
-  }, []);
+  }, [autoShow]);
 
   const showTutorial = useCallback(() => {
     setVisible(true);

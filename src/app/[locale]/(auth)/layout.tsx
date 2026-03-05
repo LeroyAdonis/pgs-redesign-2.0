@@ -40,7 +40,7 @@ export default async function AuthLayout({ children, params }: Props) {
         </div>
 
         {/* Auth form card */}
-        <div className="rounded-xl border border-border bg-surface-raised p-6 shadow-lg sm:p-8">
+        <div className="rounded-none border border-border bg-surface-raised p-6 shadow-lg sm:p-8">
           {children}
         </div>
       </div>

@@ -82,7 +82,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
     return (
       <div className="mt-6 space-y-6">
         {/* Success state */}
-        <div className="rounded-lg bg-green-50 p-4 text-center dark:bg-green-950">
+        <div className="bg-green-50 p-4 text-center dark:bg-green-950">
           <svg
             className="mx-auto h-8 w-8 text-green-600 dark:text-green-400"
             fill="none"
@@ -104,7 +104,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
 
         <a
           href="login"
-          className="flex w-full justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          className="flex w-full justify-center bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
         >
           {labels.backToLogin}
         </a>
@@ -116,7 +116,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
     <div className="mt-6 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <div className="bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             {error}
           </div>
         )}
@@ -124,7 +124,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
         <div>
           <label
             htmlFor="new-password"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             {labels.newPassword}
           </label>
@@ -137,14 +137,14 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
             minLength={8}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <div>
           <label
             htmlFor="confirm-password"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             {labels.confirmPassword}
           </label>
@@ -157,14 +157,14 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
             minLength={8}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading || !token}
-          className="flex w-full justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
+          className="flex w-full justify-center bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
           {loading ? "..." : labels.resetPassword}
         </button>

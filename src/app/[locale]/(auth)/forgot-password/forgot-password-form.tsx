@@ -53,7 +53,7 @@ export function ForgotPasswordForm({ labels }: ForgotPasswordFormProps) {
     return (
       <div className="mt-6 space-y-6">
         {/* Success state */}
-        <div className="rounded-lg bg-green-50 p-4 text-center dark:bg-green-950">
+        <div className="bg-green-50 p-4 text-center dark:bg-green-950">
           <svg
             className="mx-auto h-8 w-8 text-green-600 dark:text-green-400"
             fill="none"
@@ -78,7 +78,7 @@ export function ForgotPasswordForm({ labels }: ForgotPasswordFormProps) {
 
         <a
           href="login"
-          className="flex w-full justify-center rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
+          className="flex w-full justify-center border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           {labels.backToLogin}
         </a>
@@ -90,7 +90,7 @@ export function ForgotPasswordForm({ labels }: ForgotPasswordFormProps) {
     <div className="mt-6 space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <div className="bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             {error}
           </div>
         )}
@@ -98,7 +98,7 @@ export function ForgotPasswordForm({ labels }: ForgotPasswordFormProps) {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-text"
+            className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
             {labels.email}
           </label>
@@ -110,14 +110,14 @@ export function ForgotPasswordForm({ labels }: ForgotPasswordFormProps) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className="mt-1 block w-full border border-border bg-surface px-5 py-4 text-text placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
+          className="flex w-full justify-center bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
           {loading ? "..." : labels.sendResetLink}
         </button>

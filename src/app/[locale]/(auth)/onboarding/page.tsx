@@ -95,7 +95,7 @@ function OnboardingContent({ locale }: { locale: string }) {
       skip: t('navigation.skip'),
     },
     progress: {
-      stepOf: t('progress.stepOf'),
+      stepOf: t.raw('progress.stepOf'),
     },
   };
 

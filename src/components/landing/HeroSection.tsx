@@ -26,14 +26,14 @@ export function HeroSection() {
             <h1 className="font-display text-[clamp(40px,12vw,100px)] sm:text-[clamp(56px,7vw,100px)] font-normal leading-[0.9] tracking-[-0.04em] mb-8">
               <span className="block overflow-hidden">
                 <span
-                  className="inline-block [-webkit-text-stroke:1.5px_#F5F5F7] text-transparent animate-[landing-slide-up_1s_cubic-bezier(0.16,1,0.3,1)_0.2s_forwards] translate-y-[110%]"
+                  className="inline-block [-webkit-text-stroke:1.5px_#F5F5F7] text-transparent animate-[landing-slide-up_1s_cubic-bezier(0.16,1,0.3,1)_0.2s_both]"
                 >
                   {t('titleLine1')}
                 </span>
               </span>
               <span className="block overflow-hidden">
                 <span
-                  className="inline-block bg-gradient-to-br from-[#F5F5F7] from-30% to-brand bg-clip-text text-transparent [-webkit-background-clip:text] animate-[landing-slide-up_1s_cubic-bezier(0.16,1,0.3,1)_0.35s_forwards] translate-y-[110%]"
+                  className="inline-block bg-gradient-to-br from-[#F5F5F7] from-30% to-brand bg-clip-text text-transparent [-webkit-background-clip:text] animate-[landing-slide-up_1s_cubic-bezier(0.16,1,0.3,1)_0.35s_both]"
                 >
                   {t('titleLine2')}
                 </span>

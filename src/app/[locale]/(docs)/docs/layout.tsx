@@ -35,7 +35,7 @@ export default async function DocsLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <TutorialProvider>
+    <TutorialProvider autoShow={false}>
       <div className="min-h-dvh bg-slate-950 text-slate-200">
         {/* Sidebar (fixed left on desktop, off-canvas on mobile) */}
         <DocsSidebar />

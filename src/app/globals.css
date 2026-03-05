@@ -96,12 +96,12 @@
  * This keeps dark mode tokens colocated with light ones for easy maintenance.
  */
 [data-theme="dark"] {
-  --color-surface: #0f0a1a;
-  --color-surface-raised: #1a1128;
+  --color-surface: #050507;
+  --color-surface-raised: #0E0E14;
   --color-surface-overlay: rgba(0, 0, 0, 0.7);
-  --color-surface-inset: #150d22;
-  --color-border: #2d2245;
-  --color-border-strong: #3d3060;
+  --color-surface-inset: #0A0A0F;
+  --color-border: rgba(255, 255, 255, 0.05);
+  --color-border-strong: rgba(255, 255, 255, 0.08);
 
   --color-text: #f8fafc;
   --color-text-secondary: #cbd5e1;
@@ -242,10 +242,10 @@ body {
 
 @keyframes landing-slide-up {
   from {
-    transform: translateY(110%);
+    translate: 0 110%;
   }
   to {
-    transform: translateY(0);
+    translate: 0 0;
   }
 }
 

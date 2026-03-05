@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f0a1a" },
+    { media: "(prefers-color-scheme: dark)", color: "#050507" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -98,7 +98,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-theme="dark" suppressHydrationWarning>
       <body
         className={`${sora.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
