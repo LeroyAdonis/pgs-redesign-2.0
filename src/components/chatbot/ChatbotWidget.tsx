@@ -194,6 +194,8 @@ function ChatbotWidget() {
   const [showSupportForm, setShowSupportForm] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [initialised, setInitialised] = useState(false);
+  // null = unknown (SSR / before useEffect), false = first-timer, true = returning user
+  const [hasSeen, setHasSeen] = useState<boolean | null>(null);
 
   // ── Refs ──
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -212,13 +214,15 @@ function ChatbotWidget() {
 
     const stored = loadMessages();
     if (stored.length > 0) {
+      setHasSeen(true);
       setMessages(stored);
       return;
     }
 
     // First-time user: auto-open with welcome after delay
-    const hasSeen = storageGet(STORAGE_KEY_SEEN);
-    if (!hasSeen) {
+    const seen = storageGet(STORAGE_KEY_SEEN);
+    setHasSeen(seen !== null);
+    if (!seen) {
       const timer = setTimeout(() => {
         const welcome: Message = {
           id: messageId(),
@@ -443,7 +447,7 @@ function ChatbotWidget() {
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
           'cursor-pointer',
           // Pulse animation on first appear (when not yet opened)
-          !isOpen && !storageGet(STORAGE_KEY_SEEN) && 'animate-pulse',
+          !isOpen && hasSeen === false && 'animate-pulse',
         )}
       >
         {isOpen ? <CloseIcon /> : <ChatBubbleIcon />}
