@@ -54,7 +54,7 @@ export function QuickStats({ className }: { className?: string }) {
 
   return (
     <div className={className} data-testid="quick-stats">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           icon={<PostsIcon />}
           label={t("totalPosts")}

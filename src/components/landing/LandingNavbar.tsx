@@ -1,23 +1,30 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 /**
- * Landing page navbar — sticky with scroll-aware backdrop and mobile menu.
+ * Landing page navbar — sticky with scroll-aware backdrop, mobile menu,
+ * and scroll-spy active states via IntersectionObserver.
  *
- * Client component: needs scroll detection + mobile menu state.
+ * Client component: needs scroll detection + mobile menu state + section tracking.
  * Matches the navbar design from index-v2.html.
  */
 
 const NAV_LINKS = ['features', 'process', 'stories', 'membership'] as const;
+type NavSection = (typeof NAV_LINKS)[number];
 
 export function LandingNavbar() {
   const t = useTranslations('landing.navbar');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<NavSection | null>(null);
 
+  // Track which sections are visible; pick the topmost one
+  const visibleSections = useRef<Map<NavSection, IntersectionObserverEntry>>(new Map());
+
+  // Scroll-aware backdrop
   useEffect(() => {
     function handleScroll() {
       setIsScrolled(window.scrollY > 40);
@@ -25,6 +32,57 @@ export function LandingNavbar() {
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // IntersectionObserver scroll-spy
+  useEffect(() => {
+    const sections = NAV_LINKS.map((id) => document.getElementById(id)).filter(
+      (el): el is HTMLElement => el !== null,
+    );
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const id = entry.target.id as NavSection;
+          if (entry.isIntersecting) {
+            visibleSections.current.set(id, entry);
+          } else {
+            visibleSections.current.delete(id);
+          }
+        }
+
+        // Pick the visible section closest to the top of the viewport
+        if (visibleSections.current.size === 0) {
+          setActiveSection(null);
+          return;
+        }
+
+        let topSection: NavSection | null = null;
+        let topY = Infinity;
+        for (const [id, entry] of visibleSections.current) {
+          const distance = Math.abs(entry.target.getBoundingClientRect().top);
+          if (distance < topY) {
+            topY = distance;
+            topSection = id;
+          }
+        }
+        setActiveSection(topSection);
+      },
+      {
+        // Trigger when any part of the section enters the top 60% of viewport.
+        // Negative bottom margin ignores the lower 40%.
+        rootMargin: '-80px 0px -40% 0px',
+        threshold: 0,
+      },
+    );
+
+    for (const section of sections) {
+      observer.observe(section);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   const closeMobileMenu = useCallback(() => {
@@ -37,21 +95,31 @@ export function LandingNavbar() {
     document.body.style.overflow = 'hidden';
   }, []);
 
+  /** Smooth-scroll to a section and set it as active immediately */
+  const scrollToSection = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, sectionId: NavSection) => {
+      e.preventDefault();
+      const target = document.getElementById(sectionId);
+      if (!target) return;
+
+      setActiveSection(sectionId);
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    [],
+  );
+
   return (
     <>
       <nav
         className={cn(
-          'fixed top-0 left-0 right-0 z-[100] transition-all duration-400',
-          isScrolled && 'bg-[rgba(8,8,11,0.88)] backdrop-blur-[24px] backdrop-saturate-[180%]',
+          'fixed top-0 left-0 right-0 z-[100] border-b transition-all duration-300',
+          isScrolled
+            ? 'bg-black/80 backdrop-blur-xl border-white/10'
+            : 'bg-transparent border-transparent',
         )}
       >
         <div className="mx-auto max-w-[1240px] px-4 sm:px-8">
-          <div
-            className={cn(
-              'flex items-center justify-between py-[22px] border-b border-transparent transition-all duration-400',
-              isScrolled && 'border-[rgba(255,255,255,0.06)]',
-            )}
-          >
+          <div className="flex items-center justify-between py-[22px]">
             {/* Logo */}
             <a href="#" className="group flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-[#F5F5F7]">
               <span className="w-[3px] h-5 bg-brand rounded-sm transition-all duration-300 group-hover:h-6" />
@@ -64,12 +132,19 @@ export function LandingNavbar() {
                 <a
                   key={link}
                   href={`#${link}`}
+                  onClick={(e) => scrollToSection(e, link)}
                   className={cn(
-                    'relative text-[11px] font-medium tracking-[2px] uppercase text-[#71717A] transition-colors duration-300',
+                    'relative text-[11px] font-medium tracking-[2px] uppercase transition-colors duration-300',
+                    // Active: bright text + brand underline stays visible
+                    activeSection === link
+                      ? 'text-[#F5F5F7] after:w-full'
+                      : 'text-[#71717A] after:w-0',
                     'hover:text-[#F5F5F7]',
-                    'after:content-[""] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-px after:bg-brand after:transition-all after:duration-400',
+                    // Underline pseudo-element: 2px brand bar
+                    'after:content-[""] after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-400',
                     'hover:after:w-full',
                   )}
+                  aria-current={activeSection === link ? 'true' : undefined}
                 >
                   {t(link)}
                 </a>
@@ -79,13 +154,13 @@ export function LandingNavbar() {
             {/* Desktop actions */}
             <div className="flex items-center gap-6">
               <a
-                href="#"
+                href="/login"
                 className="hidden md:block text-[11px] font-medium tracking-[2px] uppercase text-[#71717A] hover:text-[#F5F5F7] transition-colors duration-300"
               >
                 {t('login')}
               </a>
               <a
-                href="#"
+                href="/signup"
                 className="inline-flex items-center justify-center gap-2.5 px-[22px] py-2.5 text-[10px] font-semibold tracking-[1.5px] uppercase bg-brand text-white rounded-[3px] hover:bg-brand-hover hover:-translate-y-0.5 hover:shadow-glow transition-all duration-400"
               >
                 {t('getStarted')}
@@ -136,17 +211,25 @@ export function LandingNavbar() {
             <a
               key={link}
               href={`#${link}`}
-              onClick={closeMobileMenu}
+              onClick={(e) => {
+                scrollToSection(e, link);
+                closeMobileMenu();
+              }}
               className={cn(
-                'font-display text-[clamp(42px,8vw,72px)] italic text-[#3F3F46] leading-[1.3]',
+                'font-display text-[clamp(42px,8vw,72px)] italic leading-[1.3]',
                 'transition-all duration-400 hover:text-[#F5F5F7] hover:translate-x-4',
+                // Active: bright text + slight indent
+                activeSection === link
+                  ? 'text-[#F5F5F7] translate-x-2'
+                  : 'text-[#3F3F46]',
               )}
+              aria-current={activeSection === link ? 'true' : undefined}
             >
               {t(link)}
             </a>
           ))}
           <a
-            href="#"
+            href="/login"
             onClick={closeMobileMenu}
             className="font-display text-[clamp(42px,8vw,72px)] italic text-[#3F3F46] leading-[1.3] mt-8 transition-all duration-400 hover:text-[#F5F5F7] hover:translate-x-4"
           >
@@ -184,7 +267,7 @@ export function LandingNavbar() {
             </p>
           </div>
           <a
-            href="#"
+            href="/signup"
             className="inline-flex items-center justify-center gap-2.5 px-[22px] py-2.5 text-[10px] font-semibold tracking-[1.5px] uppercase bg-brand text-white rounded-[3px] hover:bg-brand-hover transition-all duration-400"
           >
             {t('getStarted')}

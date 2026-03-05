@@ -13,3 +13,4 @@ export { PricingSection } from './PricingSection';
 export { CreditsSection } from './CreditsSection';
 export { ContactSection } from './ContactSection';
 export { LandingFooter } from './LandingFooter';
+export { ScrollReveal } from './ScrollReveal';

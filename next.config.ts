@@ -9,7 +9,9 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self'",
+      // Next.js requires 'unsafe-inline' for its hydration bootstrap scripts.
+      // TODO: Replace with nonce-based CSP via middleware for stricter security.
+      "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.fbcdn.net https://*.cdninstagram.com https://pbs.twimg.com https://abs.twimg.com https://*.licdn.com",
       "font-src 'self'",

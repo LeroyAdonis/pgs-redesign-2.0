@@ -4,6 +4,10 @@
  * Production landing page composed of modular section components.
  * Uses next-intl for all user-facing strings via the landing namespace.
  * Dark-themed by default via data-theme attribute.
+ *
+ * Below-the-fold sections are wrapped in <ScrollReveal> for
+ * viewport-triggered fade-in animations. HeroSection keeps its
+ * own CSS-driven entrance animations.
  */
 
 import { setRequestLocale } from "next-intl/server";
@@ -18,6 +22,7 @@ import {
   CreditsSection,
   ContactSection,
   LandingFooter,
+  ScrollReveal,
 } from "@/components/landing";
 
 type Props = {
@@ -39,13 +44,34 @@ export default async function HomePage({ params }: Props) {
 
       <main id="main-content">
         <HeroSection />
-        <MarqueeSection />
-        <FeaturesSection />
-        <ProcessSection />
-        <TestimonialsSection />
-        <PricingSection />
-        <CreditsSection />
-        <ContactSection />
+
+        <ScrollReveal>
+          <MarqueeSection />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <FeaturesSection />
+        </ScrollReveal>
+
+        <ScrollReveal delay={100}>
+          <ProcessSection />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <TestimonialsSection />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <PricingSection />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <CreditsSection />
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <ContactSection />
+        </ScrollReveal>
       </main>
 
       <LandingFooter />

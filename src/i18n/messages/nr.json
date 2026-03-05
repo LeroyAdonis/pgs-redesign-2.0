@@ -62,7 +62,10 @@
     "credits": "Credits remaining",
     "postsScheduled": "Posts scheduled",
     "accountsConnected": "Accounts connected",
-    "recentActivity": "Recent activity"
+    "recentActivity": "Recent activity",
+    "welcomeBack": "Welcome back, {name}!",
+    "overviewSubtitle": "Here's what's happening with your accounts.",
+    "createPost": "Create Post"
   },
   "errors": {
     "notFound": "Page not found",

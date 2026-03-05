@@ -184,6 +184,73 @@ describe('ChatbotWidget', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('sends a message and displays AI response from /api/chat', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    storage['pgs-chatbot-seen'] = 'true';
+
+    // Mock fetch to simulate /api/chat response
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ reply: 'Lekker! Here is your answer.' }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    render(<ChatbotWidget />);
+
+    // Open the panel
+    const bubble = screen.getByRole('button', { name: 'openChat' });
+    await user.click(bubble);
+
+    // Type and send a message
+    const input = screen.getByRole('textbox');
+    await user.type(input, 'How do credits work?');
+    const sendButton = screen.getByRole('button', { name: 'send' });
+    await user.click(sendButton);
+
+    // User message should appear
+    expect(screen.getByText('How do credits work?')).toBeInTheDocument();
+
+    // Wait for AI response
+    await waitFor(() => {
+      expect(screen.getByText('Lekker! Here is your answer.')).toBeInTheDocument();
+    });
+
+    // Verify fetch was called with correct endpoint and body shape
+    expect(mockFetch).toHaveBeenCalledWith('/api/chat', expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    }));
+  });
+
+  it('displays error message when /api/chat fails', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    storage['pgs-chatbot-seen'] = 'true';
+
+    // Mock fetch to simulate API error
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: 'Something went wrong. Please try again.' }),
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    render(<ChatbotWidget />);
+
+    // Open panel and send a message
+    const bubble = screen.getByRole('button', { name: 'openChat' });
+    await user.click(bubble);
+    const input = screen.getByRole('textbox');
+    await user.type(input, 'Hello');
+    const sendButton = screen.getByRole('button', { name: 'send' });
+    await user.click(sendButton);
+
+    // Error message from server should appear
+    await waitFor(() => {
+      expect(
+        screen.getByText('Something went wrong. Please try again.'),
+      ).toBeInTheDocument();
+    });
+  });
+
   it('loads existing messages from localStorage', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 

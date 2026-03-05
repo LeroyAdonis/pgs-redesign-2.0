@@ -41,3 +41,8 @@ blob-report/
 .worktrees/
 *.log
 creds/
+
+# Local investigation scripts and screenshots
+screenshots/
+investigate_landing.cjs
+.github/skills/webapp-testing/investigate_landing.cjs

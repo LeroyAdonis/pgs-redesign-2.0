@@ -200,10 +200,23 @@ describe('Landing Page — LandingNavbar', () => {
     expect(screen.getAllByText('Membership').length).toBeGreaterThanOrEqual(2);
   });
 
-  it('renders Get Started CTA', () => {
+  it('renders Get Started CTA with signup link', () => {
     render(<LandingNavbar />);
     const ctaLinks = screen.getAllByText('Get Started');
     expect(ctaLinks.length).toBeGreaterThanOrEqual(1);
+    // All "Get Started" buttons should link to /signup
+    ctaLinks.forEach((link) => {
+      expect(link.closest('a')).toHaveAttribute('href', '/signup');
+    });
+  });
+
+  it('renders Login link pointing to /login', () => {
+    render(<LandingNavbar />);
+    const loginLinks = screen.getAllByText('Log In');
+    expect(loginLinks.length).toBeGreaterThanOrEqual(1);
+    loginLinks.forEach((link) => {
+      expect(link.closest('a')).toHaveAttribute('href', '/login');
+    });
   });
 });
 
@@ -227,9 +240,11 @@ describe('Landing Page — HeroSection', () => {
     expect(screen.getByText('Online')).toBeInTheDocument();
   });
 
-  it('renders Start Creating CTA', () => {
+  it('renders Start Creating CTA linking to /signup', () => {
     render(<HeroSection />);
-    expect(screen.getByText('Start Creating')).toBeInTheDocument();
+    const cta = screen.getByText('Start Creating');
+    expect(cta).toBeInTheDocument();
+    expect(cta.closest('a')).toHaveAttribute('href', '/signup');
   });
 });
 

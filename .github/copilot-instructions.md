@@ -2,6 +2,23 @@
 
 South African social media management platform built with Next.js 16, React 19, and Tailwind CSS v4.
 
+## Terminal & File System Guardrails
+
+1. **Workspace Boundary**: You are strictly confined to the current workspace directory for autonomous operations.
+2. **Auto-Approve Criteria**: You may only auto-approve or execute terminal commands and file edits that target paths within the current project root.
+3. **External Action Protocol**: If a task requires reading, writing, or executing commands outside of the current workspace:
+    - **HALT** all autonomous execution.
+    - **EXPLAIN** clearly why access to the external path (e.g., global config, system directories, or other folders) is necessary.
+    - **REQUEST PERMISSION** explicitly in the chat interface.
+    - **WAIT** for manual approval before generating or running the specific command.
+4. **Dangerous Command Ban**: Regardless of location, the following actions are strictly forbidden from auto-approval and require explicit manual confirmation:
+    - Destructive commands: `rm -rf`, `shred`, or recursive deletions.
+    - Database modifications: `DROP`, `TRUNCATE`, or `DELETE` without a `WHERE` clause.
+    - System-level changes: Any command utilizing `sudo`, `chmod 777`, or modifying `/etc/` or `~/.ssh/`.
+    - Network tools: Unsolicited use of `curl`, `wget`, or `netcat` to external unknown IPs.
+5. **No Bypassing**: Never attempt to bypass directory restrictions using `../` shortcuts or absolute system paths without the step-by-step approval process outlined above.
+
+
 ## Build, Test & Lint
 
 ```bash

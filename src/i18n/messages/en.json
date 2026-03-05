@@ -106,7 +106,10 @@
     "upcomingScheduledTitle": "Upcoming Scheduled",
     "viewCalendar": "View Calendar",
     "editAction": "Edit",
-    "cancelAction": "Cancel"
+    "cancelAction": "Cancel",
+    "welcomeBack": "Welcome back, {name}!",
+    "overviewSubtitle": "Here's what's happening with your accounts.",
+    "createPost": "Create Post"
   },
   "generate": {
     "title": "Content Studio",

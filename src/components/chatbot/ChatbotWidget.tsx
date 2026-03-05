@@ -30,17 +30,6 @@ const STORAGE_KEY_SEEN = 'pgs-chatbot-seen';
 const ONBOARDING_DELAY_MS = 2000;
 const SUPPORT_ESCALATION_THRESHOLD = 3;
 
-const SYSTEM_PROMPT = [
-  "You are the Purple Glow Social assistant, a friendly South African chatbot.",
-  "You help users with: linking social accounts, AI content generation,",
-  "scheduling posts, billing (tiers: Seedling free, Hustler R299/mo,",
-  "Grower R799/mo, Mogul R1999/mo), credits, and analytics.",
-  "Use occasional SA expressions like 'Howzit!', 'Lekker!',",
-  "'No worries, we've got you sorted'.",
-  "Keep responses concise (under 150 words).",
-  "If you can't help, suggest the user talk to a human.",
-].join(' ');
-
 const WELCOME_MESSAGE =
   "Howzit! 👋 I'm your Purple Glow assistant. Ask me anything about managing your social media.";
 
@@ -186,8 +175,9 @@ function TypingIndicator() {
 /**
  * ChatbotWidget — floating chat bubble + expandable panel.
  *
- * Provides AI-powered chat via Puter.js, onboarding flow for first-time
- * users, quick-action buttons, and support escalation with an inline form.
+ * Provides AI-powered chat via server-side /api/chat (Gemini),
+ * onboarding flow for first-time users, quick-action buttons,
+ * and support escalation with an inline form.
  *
  * Chat history is persisted to localStorage. The panel opens at z-[500]
  * above all other UI layers.
@@ -306,31 +296,32 @@ function ChatbotWidget() {
     return () => panel.removeEventListener('keydown', trapFocus);
   }, [isOpen, showSupportForm]);
 
-  // ── Puter.js AI chat ──
+  // ── Server-side AI chat via /api/chat ──
   const sendToAI = useCallback(
     async (userContent: string, history: Message[]): Promise<string> => {
-      // Build conversation for the AI
-      const conversation = history.map((m) => ({
-        role: m.role === 'user' ? 'user' : 'assistant',
-        content: m.content,
-      }));
-      conversation.push({ role: 'user', content: userContent });
+      // Build conversation for the API
+      const messages = [
+        ...history.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        { role: 'user' as const, content: userContent },
+      ];
 
-      // Safe check for Puter.js availability
-      if (
-        typeof window !== 'undefined' &&
-        window.puter?.ai?.chat
-      ) {
-        const response = await window.puter.ai.chat(conversation, {
-          model: 'gpt-4o-mini',
-          system: SYSTEM_PROMPT,
-          temperature: 0.7,
-        });
-        return response.message.content;
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages }),
+      });
+
+      const data = (await response.json()) as { reply?: string; error?: string };
+
+      if (!response.ok || !data.reply) {
+        // Use the server's error message if available, otherwise generic
+        throw new Error(data.error ?? t('errors.aiUnavailable'));
       }
 
-      // Fallback when Puter.js is not available
-      return t('errors.aiUnavailable');
+      return data.reply;
     },
     [t],
   );
@@ -368,11 +359,16 @@ function ChatbotWidget() {
           persistMessages(updated);
           return updated;
         });
-      } catch {
+      } catch (err) {
+        const errorText =
+          err instanceof Error && err.message
+            ? err.message
+            : t('errors.aiUnavailable');
+
         const errorMsg: Message = {
           id: messageId(),
           role: 'assistant',
-          content: t('errors.aiUnavailable'),
+          content: errorText,
           timestamp: new Date(),
         };
 

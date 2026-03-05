@@ -141,8 +141,8 @@ const NAV_SECTIONS: NavSection[] = [
     labelKey: "sectionManage",
     items: [
       { labelKey: "accounts", href: "/dashboard/accounts", icon: <UsersIcon /> },
-      { labelKey: "team", href: "/team", icon: <PeopleIcon /> },
-      { labelKey: "settings", href: "/settings", icon: <GearIcon /> },
+      { labelKey: "team", href: "/dashboard/team", icon: <PeopleIcon /> },
+      { labelKey: "settings", href: "/dashboard/settings", icon: <GearIcon /> },
       { labelKey: "billing", href: "/dashboard/billing", icon: <CreditCardIcon /> },
     ],
   },

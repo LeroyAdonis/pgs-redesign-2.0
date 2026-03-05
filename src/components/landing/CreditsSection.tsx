@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 /**
  * Credits section — "Need more ammunition?" with credit pack options.
@@ -65,12 +66,12 @@ export function CreditsSection() {
                 </div>
               </div>
             </div>
-            <a
-              href="#"
+            <Link
+              href="/signup"
               className="w-full inline-flex items-center justify-center gap-2.5 px-8 py-4 text-xs font-semibold tracking-[1.5px] uppercase bg-brand text-white rounded-[3px] hover:bg-brand-hover hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(139,92,246,0.35)] transition-all duration-400"
             >
               {t('buyCredits')}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 /**
  * Hero section — "LIQUID INTELLIGENCE" split-text hero with visual placeholder.
@@ -44,15 +45,15 @@ export function HeroSection() {
             </p>
 
             <div className="flex items-center gap-5 mb-5 opacity-0 animate-[landing-fade-in-up_0.8s_cubic-bezier(0.16,1,0.3,1)_0.8s_forwards]">
-              <a
-                href="#"
+              <Link
+                href="/signup"
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-4 text-xs font-semibold tracking-[1.5px] uppercase bg-brand text-white rounded-[3px] hover:bg-brand-hover hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(139,92,246,0.35)] transition-all duration-400 relative overflow-hidden"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 {t('startCreating')}
-              </a>
+              </Link>
               <button
                 className="inline-flex items-center justify-center w-11 h-11 border border-[#3F3F46] rounded-full transition-all duration-400 hover:border-brand hover:bg-brand-surface hover:scale-[1.08]"
                 aria-label={t('watchDemo')}

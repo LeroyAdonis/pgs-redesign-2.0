@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
 
 /**
  * Membership pricing section with Monthly/Annual toggle.
@@ -136,8 +137,8 @@ export function PricingSection() {
               </ul>
 
               {/* CTA */}
-              <a
-                href="#"
+              <Link
+                href="/signup"
                 className={cn(
                   'w-full inline-flex items-center justify-center gap-2.5 px-8 py-4 text-xs font-semibold tracking-[1.5px] uppercase rounded-[3px] transition-all duration-400',
                   tier.ctaVariant === 'primary'
@@ -146,7 +147,7 @@ export function PricingSection() {
                 )}
               >
                 {t(tier.ctaKey)}
-              </a>
+              </Link>
             </div>
           ))}
         </div>
