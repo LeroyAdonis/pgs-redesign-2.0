@@ -92,6 +92,22 @@ export const auth = betterAuth({
   },
 
   /**
+   * Trusted origins for CORS / Origin header validation.
+   * Better-auth rejects requests whose Origin header doesn't match
+   * the base URL. We list all known origins here so the app is
+   * resilient when developers run on a non-default port, or when
+   * the production URL differs from BETTER_AUTH_URL.
+   */
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+    ...(process.env.NEXT_PUBLIC_APP_URL
+      ? [process.env.NEXT_PUBLIC_APP_URL]
+      : []),
+  ],
+
+  /**
    * Custom user fields.
    * The `role` field is already on our user table for RBAC.
    * We declare it here so Better-auth includes it in session data.
