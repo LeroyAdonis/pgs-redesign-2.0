@@ -116,7 +116,9 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-text">Brand Profile</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-text">
+            Brand Profile
+          </h1>
           <p className="mt-1 text-sm text-text-muted">
             Your brand&apos;s voice, style, and patterns analyzed from social media
           </p>

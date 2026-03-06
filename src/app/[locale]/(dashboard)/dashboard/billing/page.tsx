@@ -19,6 +19,7 @@ import { TransactionHistory } from "@/components/dashboard/widgets/TransactionHi
 import { CurrentPlan } from "@/components/billing/CurrentPlan";
 import { TopUpWidget } from "@/components/billing/TopUpWidget";
 import { PricingSection } from "@/components/billing/PricingSection";
+import { logger } from "@/lib/logger";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -43,12 +44,31 @@ export default async function BillingPage({ params, searchParams }: Props) {
     (session as unknown as { organization?: { id: string } }).organization?.id ??
     session.user.id;
 
-  // Fetch data in parallel
-  const [balance, transactions, subscription] = await Promise.all([
-    getBalance(orgId),
-    getTransactionHistory(orgId, { limit: 10 }),
-    getCurrentSubscription(orgId),
-  ]);
+  let billingDataUnavailable = false;
+  let balance: Awaited<ReturnType<typeof getBalance>> = {
+    balance: 0,
+    monthlyAllocation: 0,
+    rolloverBalance: 0,
+    rolloverExpiresAt: null,
+    usagePercentage: 0,
+    isLowBalance: true,
+  };
+  let transactions: Awaited<ReturnType<typeof getTransactionHistory>> = [];
+  let subscription: Awaited<ReturnType<typeof getCurrentSubscription>> = null;
+
+  try {
+    [balance, transactions, subscription] = await Promise.all([
+      getBalance(orgId),
+      getTransactionHistory(orgId, { limit: 10 }),
+      getCurrentSubscription(orgId),
+    ]);
+  } catch (error) {
+    billingDataUnavailable = true;
+    logger.error("Failed to load billing data", {
+      orgId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   const currentTier = subscription?.tier ?? "seedling";
   const tierConfig = getTierConfig(currentTier);
@@ -59,6 +79,17 @@ export default async function BillingPage({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
+      {billingDataUnavailable && (
+        <div
+          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-5 py-3 text-sm text-amber-300"
+          role="status"
+          data-testid="billing-data-warning"
+        >
+          Billing data is temporarily unavailable. You can still browse this page
+          while we reconnect your credit data.
+        </div>
+      )}
+
       {/* Success banners */}
       {checkoutSuccess && (
         <div

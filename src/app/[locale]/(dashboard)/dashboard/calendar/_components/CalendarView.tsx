@@ -144,7 +144,9 @@ function CalendarView() {
           <rect x="3" y="4" width="18" height="17" rx="2" />
           <path d="M3 9h18M8 4V2M16 4V2" />
         </svg>
-        <h1 className="text-lg font-semibold text-text">Calendar</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-text">
+          Calendar
+        </h1>
       </div>
 
       {/* Toolbar */}
