@@ -10,12 +10,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { logger } from "@/lib/logger";
-import { requireServerSession } from "@/lib/auth-session";
+import { getServerSession } from "@/lib/auth-session";
 import { requireOrgMembership, listAccountsForOrg } from "@/lib/social";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await requireServerSession();
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
 
     const orgId = request.nextUrl.searchParams.get("orgId");
 
@@ -38,7 +44,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { error: "Failed to list accounts" },
+      { success: false, error: "Failed to list accounts" },
       { status: 500 },
     );
   }
