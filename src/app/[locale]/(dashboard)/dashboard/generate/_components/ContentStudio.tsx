@@ -158,7 +158,7 @@ function ContentStudioInner() {
     <div className="mx-auto max-w-6xl">
       {/* Page Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text">Content Studio</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-text">Content Studio</h1>
         <p className="mt-1 text-sm text-text-muted">
           Generate AI-powered social media content for your South African audience
         </p>
