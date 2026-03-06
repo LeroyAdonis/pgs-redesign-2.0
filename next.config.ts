@@ -42,6 +42,15 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  /**
+   * Skip Next.js's integrated TypeScript checking during build.
+   * Standalone `tsc --noEmit` (which passes clean) runs in CI instead.
+   * The integrated checker hangs indefinitely on this codebase (1.8GB RAM)
+   * — a known Turbopack issue with large projects.
+   */
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async headers() {
     return [
       {
