@@ -127,6 +127,57 @@
       "canceled": "Kukhanseliwe",
       "trialing": "Isikhathi Sokuhlola"
     }
+  },
+  "docs": {
+    "title": "Documentation",
+    "subtitle": "Learn how to use Purple Glow Social",
+    "sidebar": {
+      "gettingStarted": "Getting Started",
+      "linkingAccounts": "Linking Accounts",
+      "aiContent": "AI Content Guide",
+      "scheduling": "Scheduling Guide",
+      "billingFaq": "Billing FAQ",
+      "apiReference": "API Reference"
+    },
+    "landing": {
+      "title": "Documentation",
+      "description": "Everything you need to know about Purple Glow Social",
+      "searchPlaceholder": "Search documentation..."
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "description": "Get up and running with Purple Glow Social in minutes",
+      "step1Title": "Create Your Account",
+      "step1Description": "Sign up for Purple Glow Social and choose your plan",
+      "step2Title": "Link Your Accounts",
+      "step2Description": "Connect your social media platforms",
+      "step3Title": "Set Up Your Brand",
+      "step3Description": "Let our AI analyse your brand voice and style",
+      "step4Title": "Create Content",
+      "step4Description": "Generate AI-powered posts tailored to your brand",
+      "step5Title": "Schedule & Publish",
+      "step5Description": "Plan your content calendar and publish automatically"
+    },
+    "linkingAccounts": {
+      "title": "Linking Accounts",
+      "description": "Connect your social media platforms to Purple Glow Social"
+    },
+    "aiContent": {
+      "title": "AI Content Guide",
+      "description": "Create stunning content with our AI-powered tools"
+    },
+    "scheduling": {
+      "title": "Scheduling Guide",
+      "description": "Plan and automate your social media calendar"
+    },
+    "billingFaq": {
+      "title": "Billing FAQ",
+      "description": "Common questions about plans, credits, and payments"
+    },
+    "apiReference": {
+      "title": "API Reference",
+      "description": "Integrate Purple Glow Social into your workflow",
+      "mogulOnly": "API access is available exclusively for Mogul tier subscribers"
+    }
   }
 }
-
