@@ -29,6 +29,7 @@ export function SignupForm({ labels }: SignupFormProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +40,9 @@ export function SignupForm({ labels }: SignupFormProps) {
       await signUp.email(
         { name, email, password },
         {
+          onSuccess: () => {
+            setSuccess(true);
+          },
           onError: (ctx) => {
             setError(ctx.error.message ?? "Sign up failed");
           },
@@ -51,6 +55,20 @@ export function SignupForm({ labels }: SignupFormProps) {
 
   function handleSocialSignIn(provider: "google" | "github") {
     signIn.social({ provider, callbackURL: "/" });
+  }
+
+  if (success) {
+    return (
+      <div className="mt-6 rounded-lg border border-green-500/30 bg-green-950/30 p-6 text-center">
+        <div className="mb-2 text-2xl">✉️</div>
+        <h3 className="text-lg font-semibold text-green-300">
+          Account created!
+        </h3>
+        <p className="mt-2 text-sm text-slate-400">
+          Check your email to verify your account, then sign in to get started.
+        </p>
+      </div>
+    );
   }
 
   return (
