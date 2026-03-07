@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { useTranslations } from 'next-intl';
+import { usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
@@ -185,6 +186,7 @@ function TypingIndicator() {
 function ChatbotWidget() {
   const t = useTranslations('chatbot');
   const panelId = useId();
+  const pathname = usePathname();
 
   // ── State ──
   const [isOpen, setIsOpen] = useState(false);
@@ -222,7 +224,11 @@ function ChatbotWidget() {
     // First-time user: auto-open with welcome after delay
     const seen = storageGet(STORAGE_KEY_SEEN);
     setHasSeen(seen !== null);
-    if (!seen) {
+
+    const AUTH_PATHS = ['/login', '/signup', '/forgot-password', '/reset-password'];
+    const isAuthPage = AUTH_PATHS.some((p) => pathname.endsWith(p));
+
+    if (!seen && !isAuthPage) {
       const timer = setTimeout(() => {
         const welcome: Message = {
           id: messageId(),

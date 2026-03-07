@@ -14,12 +14,18 @@ vi.mock('@/lib/utils', () => ({
   formatDateSAST: () => '10:30',
 }));
 
+let mockPathname = '/en/dashboard';
+vi.mock('@/i18n/navigation', () => ({
+  usePathname: () => mockPathname,
+}));
+
 // ── localStorage stub ──
 
 let storage: Record<string, string> = {};
 
 beforeEach(() => {
   storage = {};
+  mockPathname = '/en/dashboard';
   vi.stubGlobal('localStorage', {
     getItem: vi.fn((key: string) => storage[key] ?? null),
     setItem: vi.fn((key: string, value: string) => {
@@ -281,5 +287,20 @@ describe('ChatbotWidget', () => {
     // Should show the persisted messages
     expect(screen.getByText('Welcome back!')).toBeInTheDocument();
     expect(screen.getByText('Hi there')).toBeInTheDocument();
+  });
+
+  it('does not auto-open on auth pages for first-time users', async () => {
+    mockPathname = '/en/login';
+    storage = {};
+
+    render(<ChatbotWidget />);
+
+    // Advance past ONBOARDING_DELAY_MS (2000ms)
+    await act(async () => {
+      vi.advanceTimersByTime(2500);
+    });
+
+    // Chat panel should NOT be open
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

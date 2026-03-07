@@ -13,6 +13,7 @@
  *   // session.user.role === "admin" guaranteed here
  */
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getServerSession } from "@/lib/auth-session";
 import { logger } from "@/lib/logger";
@@ -34,7 +35,9 @@ export async function requireAdminSession() {
 
   if (!session) {
     logger.warn("Admin access attempted without session");
-    redirect("/login?callbackUrl=%2Fadmin");
+    const headerList = await headers();
+    const pathname = headerList.get("x-next-pathname") ?? "/admin";
+    redirect(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
   }
 
   if (session.user.role !== "admin") {

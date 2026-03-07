@@ -36,6 +36,14 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+// Mock next/headers — tracks the pathname header for callback URL tests
+const mockHeaders = new Map<string, string>();
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => ({
+    get: (key: string) => mockHeaders.get(key) ?? null,
+  })),
+}));
+
 // ─── Helpers ───
 
 function makeSession(role: string) {
@@ -62,6 +70,7 @@ describe("requireAdminSession", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockHeaders.clear();
     // Re-import to ensure fresh module state with mocks
     const mod = await import("../admin-session");
     requireAdminSession = mod.requireAdminSession;
@@ -90,6 +99,25 @@ describe("requireAdminSession", () => {
       "NEXT_REDIRECT:/login?callbackUrl=%2Fadmin",
     );
     expect(mockRedirect).toHaveBeenCalledWith("/login?callbackUrl=%2Fadmin");
+  });
+
+  it("includes the full pathname in the callback URL when unauthenticated", async () => {
+    mockGetServerSession.mockResolvedValue(null);
+    mockHeaders.set("x-next-pathname", "/en/admin/clients");
+
+    await expect(requireAdminSession()).rejects.toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith(
+      "/login?callbackUrl=%2Fen%2Fadmin%2Fclients",
+    );
+  });
+
+  it("falls back to /admin when pathname header is absent", async () => {
+    mockGetServerSession.mockResolvedValue(null);
+
+    await expect(requireAdminSession()).rejects.toThrow("NEXT_REDIRECT");
+    expect(mockRedirect).toHaveBeenCalledWith(
+      "/login?callbackUrl=%2Fadmin",
+    );
   });
 
   it("redirects non-admin roles (e.g. 'moderator')", async () => {
