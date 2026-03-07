@@ -41,6 +41,7 @@ blob-report/
 .worktrees/
 *.log
 creds/
+.eslintcache
 
 # Local investigation scripts and screenshots
 screenshots/

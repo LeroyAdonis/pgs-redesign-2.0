@@ -1,6 +1,5 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextConfig from "eslint-config-next";
-import eslintConfigPrettier from "eslint-config-prettier";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 
 /**
@@ -15,12 +14,36 @@ const a11yRulesAsWarnings = Object.fromEntries(
 );
 
 export default defineConfig([
-  globalIgnores([".next/**", "out/**", "node_modules/**", "coverage/**"]),
+  globalIgnores([
+    // Build & dependency artifacts
+    ".next/**",
+    "out/**",
+    "node_modules/**",
+    "coverage/**",
+    // Test runner output
+    "test-results/**",
+    "playwright-report/**",
+    // E2E / integration test scripts (not source)
+    "e2e/**",
+    // Static assets, screenshots, docs
+    "screenshots/**",
+    "docs/**",
+    "public/**",
+    "creds/**",
+    // Root-level test & helper scripts
+    "*.cjs",
+    "*.py",
+    "*.yaml",
+    "*.html",
+    "*.log",
+    "*.txt",
+    "*.png",
+  ]),
   ...nextConfig,
   {
     // jsx-a11y recommended rules — plugin already registered by eslint-config-next
     name: "jsx-a11y/recommended-rules",
     rules: a11yRulesAsWarnings,
   },
-  eslintConfigPrettier,
+  // Note: eslint-config-prettier removed — Prettier enforced via `npm run format:check`.
 ]);
