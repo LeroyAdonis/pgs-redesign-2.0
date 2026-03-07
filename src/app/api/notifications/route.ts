@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { success: false, error: "Unauthorized" },
         { status: 401 },
       );
     }
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       const parsed = Number(limitParam);
       if (Number.isNaN(parsed) || parsed < 1) {
         return NextResponse.json(
-          { error: "Invalid limit — must be a positive integer" },
+          { success: false, error: "Invalid limit — must be a positive integer" },
           { status: 400 },
         );
       }
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       const parsed = Number(offsetParam);
       if (Number.isNaN(parsed) || parsed < 0) {
         return NextResponse.json(
-          { error: "Invalid offset — must be a non-negative integer" },
+          { success: false, error: "Invalid offset — must be a non-negative integer" },
           { status: 400 },
         );
       }
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       error: error instanceof Error ? error.message : String(error),
     });
     return NextResponse.json(
-      { error: "Failed to fetch notifications" },
+      { success: false, error: "Failed to fetch notifications" },
       { status: 500 },
     );
   }

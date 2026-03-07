@@ -16,7 +16,7 @@ export async function GET() {
     const session = await getServerSession();
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { success: false, error: "Unauthorized" },
         { status: 401 },
       );
     }
@@ -29,7 +29,7 @@ export async function GET() {
       error: error instanceof Error ? error.message : String(error),
     });
     return NextResponse.json(
-      { error: "Failed to fetch unread count" },
+      { success: false, error: "Failed to fetch unread count" },
       { status: 500 },
     );
   }
