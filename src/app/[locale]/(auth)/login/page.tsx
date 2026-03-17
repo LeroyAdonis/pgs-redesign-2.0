@@ -46,10 +46,12 @@ function LoginContent() {
           email: t("email"),
           password: t("password"),
           signIn: t("signIn"),
+          signingIn: t("signingIn"),
           forgotPassword: t("forgotPassword"),
           continueWithGoogle: t("continueWithGoogle"),
           continueWithGithub: t("continueWithGithub"),
           or: "or",
+          oauthAccountError: t("oauthAccountError"),
         }}
       />
     </div>

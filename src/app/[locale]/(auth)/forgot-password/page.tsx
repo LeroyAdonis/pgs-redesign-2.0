@@ -39,6 +39,7 @@ function ForgotPasswordContent() {
         labels={{
           email: t("email"),
           sendResetLink: t("sendResetLink"),
+          sending: t("sending"),
           resetLinkSent: t("resetLinkSent"),
           resetLinkSentDescription: t("resetLinkSentDescription"),
           backToLogin: t("backToLogin"),

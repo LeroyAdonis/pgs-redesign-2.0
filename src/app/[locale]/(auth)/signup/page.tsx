@@ -46,9 +46,11 @@ function SignupContent() {
           email: t("email"),
           password: t("password"),
           signUp: t("signUp"),
+          signingUp: t("signingUp"),
           continueWithGoogle: t("continueWithGoogle"),
           continueWithGithub: t("continueWithGithub"),
           or: "or",
+          name: "Name",
         }}
       />
     </div>

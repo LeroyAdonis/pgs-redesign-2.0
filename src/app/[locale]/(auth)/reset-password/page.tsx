@@ -42,6 +42,7 @@ function ResetPasswordContent() {
           newPassword: t("newPassword"),
           confirmPassword: t("confirmPassword"),
           resetPassword: t("resetPassword"),
+          resetting: t("resetting"),
           passwordResetSuccess: t("passwordResetSuccess"),
           backToLogin: t("backToLogin"),
           passwordsMustMatch: t("passwordsMustMatch"),

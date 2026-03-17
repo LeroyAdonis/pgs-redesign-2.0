@@ -74,7 +74,12 @@
     "continueWithGoogle": "Continue with Google",
     "continueWithGithub": "Continue with GitHub",
     "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?"
+    "hasAccount": "Already have an account?",
+    "signingUp": "Creating account...",
+    "signingIn": "Signing in...",
+    "sending": "Sending...",
+    "resetting": "Resetting...",
+    "oauthAccountError": "This account was created with a social login. Please use Google or GitHub to sign in."
   },
   "dashboard": {
     "title": "Dashboard",

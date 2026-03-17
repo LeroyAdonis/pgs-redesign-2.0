@@ -36,6 +36,7 @@ function DashboardHeader({
   const tAuth = useTranslations("auth");
   const tNav = useTranslations("nav");
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Close user menu when clicking outside
@@ -218,28 +219,41 @@ function DashboardHeader({
               <button
                 type="button"
                 onClick={async () => {
-                  await signOut();
-                  window.location.href = "/login";
+                  setIsSigningOut(true);
+                  try {
+                    await signOut();
+                    window.location.href = "/login";
+                  } catch {
+                    setIsSigningOut(false);
+                  }
                 }}
-                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-error transition-colors hover:bg-error-surface"
+                disabled={isSigningOut}
+                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-error transition-colors hover:bg-error-surface disabled:cursor-not-allowed disabled:opacity-50"
                 role="menuitem"
                 data-testid="sign-out-button"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M10 11l3-3-3-3M6 8h7"
-                  />
-                </svg>
-                {tAuth("signOut")}
+                {isSigningOut ? (
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3M10 11l3-3-3-3M6 8h7"
+                    />
+                  </svg>
+                )}
+                {isSigningOut ? "Signing out..." : tAuth("signOut")}
               </button>
             </div>
           )}
