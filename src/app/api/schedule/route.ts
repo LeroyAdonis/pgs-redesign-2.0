@@ -26,7 +26,12 @@ interface CreateScheduleRequest {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    let session;
+    try {
+      session = await getServerSession();
+    } catch {
+      session = null;
+    }
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
@@ -107,7 +112,12 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession();
+    let session;
+    try {
+      session = await getServerSession();
+    } catch {
+      session = null;
+    }
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },

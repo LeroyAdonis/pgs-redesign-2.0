@@ -24,7 +24,12 @@ type AuthResult =
  * error response without duplicating auth boilerplate.
  */
 export async function requireOrgMembership(): Promise<AuthResult> {
-  const session = await getServerSession();
+  let session;
+  try {
+    session = await getServerSession();
+  } catch {
+    session = null;
+  }
   if (!session) {
     return {
       ok: false,

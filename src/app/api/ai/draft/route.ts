@@ -61,7 +61,12 @@ export async function POST(
 ): Promise<NextResponse<DraftResponse>> {
   try {
     // Auth check
-    const session = await getServerSession();
+    let session;
+    try {
+      session = await getServerSession();
+    } catch {
+      session = null;
+    }
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },

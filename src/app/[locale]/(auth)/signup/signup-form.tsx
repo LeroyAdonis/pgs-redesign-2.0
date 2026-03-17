@@ -8,12 +8,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
 
 interface SignupFormLabels {
   email: string;
   password: string;
   signUp: string;
+  signingUp: string;
   continueWithGoogle: string;
   continueWithGithub: string;
   or: string;
@@ -23,13 +25,39 @@ interface SignupFormProps {
   labels: SignupFormLabels;
 }
 
+/** Inline spinner SVG for button loading states */
+function Spinner({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg
+      className={`animate-spin ${className}`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      />
+    </svg>
+  );
+}
+
 export function SignupForm({ labels }: SignupFormProps) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -41,13 +69,15 @@ export function SignupForm({ labels }: SignupFormProps) {
         { name, email, password },
         {
           onSuccess: () => {
-            setSuccess(true);
+            router.push("/dashboard");
           },
           onError: (ctx) => {
             setError(ctx.error.message ?? "Sign up failed");
           },
         },
       );
+    } catch {
+      setError("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -55,20 +85,6 @@ export function SignupForm({ labels }: SignupFormProps) {
 
   function handleSocialSignIn(provider: "google" | "github") {
     signIn.social({ provider, callbackURL: "/dashboard" });
-  }
-
-  if (success) {
-    return (
-      <div className="mt-6 rounded-lg border border-green-500/30 bg-green-950/30 p-6 text-center">
-        <div className="mb-2 text-2xl">✉️</div>
-        <h3 className="text-lg font-semibold text-green-300">
-          Account created!
-        </h3>
-        <p className="mt-2 text-sm text-slate-400">
-          Check your email to verify your account, then sign in to get started.
-        </p>
-      </div>
-    );
   }
 
   return (
@@ -174,9 +190,16 @@ export function SignupForm({ labels }: SignupFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="flex w-full justify-center bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 bg-brand px-4 py-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
         >
-          {loading ? "..." : labels.signUp}
+          {loading ? (
+            <>
+              <Spinner className="h-4 w-4" />
+              {labels.signingUp}
+            </>
+          ) : (
+            labels.signUp
+          )}
         </button>
       </form>
     </div>

@@ -15,8 +15,11 @@ export function useAnalyticsFetch<T>(url: string) {
 
   /** Core fetch logic — only uses async callbacks so it's safe inside effects. */
   const doFetch = useCallback(() => {
-    fetch(url)
+    fetch(url, { credentials: "include" })
       .then((res) => {
+        if (res.status === 401) {
+          throw new Error("Please log in to view analytics.");
+        }
         if (!res.ok) throw new Error(`Failed to fetch analytics (${res.status})`);
         return res.json() as Promise<{ success: boolean; data: T; error?: string }>;
       })

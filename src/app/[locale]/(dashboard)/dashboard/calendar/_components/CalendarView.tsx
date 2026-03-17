@@ -66,10 +66,19 @@ function CalendarView() {
     try {
       const res = await fetch(
         `/api/schedule?dateFrom=${startDate}&dateTo=${endDate}`,
+        { credentials: "include" },
       );
+
+      if (res.status === 401) {
+        setError("Please log in to view your scheduled posts.");
+        setSchedules([]);
+        return;
+      }
+
       if (!res.ok) {
         throw new Error(`Failed to fetch schedules (${res.status})`);
       }
+
       const data: {
         success: boolean;
         schedules: Array<{
@@ -90,8 +99,8 @@ function CalendarView() {
         throw new Error("Failed to load schedules");
       }
 
-      // Map API response to CalendarSchedule shape
-      const mapped: CalendarSchedule[] = data.schedules.map((s) => ({
+      // Map API response to CalendarSchedule shape — handle empty gracefully
+      const mapped: CalendarSchedule[] = (data.schedules ?? []).map((s) => ({
         id: s.id,
         postId: s.postId,
         content: s.post.content,
@@ -239,27 +248,57 @@ function CalendarView() {
         )}
 
         {!loading && !error && (
-          <DragDropProvider onReschedule={handleReschedule}>
-            {viewMode === "month" && (
-              <MonthGrid
-                currentDate={currentDate}
-                schedules={schedules}
-                onDayClick={handleDayClick}
-              />
+          <>
+            {schedules.length === 0 ? (
+              <div
+                className="flex h-64 items-center justify-center"
+                data-testid="calendar-empty"
+              >
+                <div className="text-center">
+                  <svg
+                    width="48"
+                    height="48"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    className="mx-auto mb-3 text-text-muted"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="4" width="18" height="17" rx="2" />
+                    <path d="M3 9h18M8 4V2M16 4V2" />
+                  </svg>
+                  <p className="text-sm text-text-muted">
+                    No scheduled posts yet
+                  </p>
+                  <p className="mt-1 text-xs text-text-muted">
+                    Schedule posts from the editor to see them here.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <DragDropProvider onReschedule={handleReschedule}>
+                {viewMode === "month" && (
+                  <MonthGrid
+                    currentDate={currentDate}
+                    schedules={schedules}
+                    onDayClick={handleDayClick}
+                  />
+                )}
+                {viewMode === "week" && (
+                  <WeekView
+                    currentDate={currentDate}
+                    schedules={schedules}
+                  />
+                )}
+                {viewMode === "day" && (
+                  <DayView
+                    currentDate={currentDate}
+                    schedules={schedules}
+                  />
+                )}
+              </DragDropProvider>
             )}
-            {viewMode === "week" && (
-              <WeekView
-                currentDate={currentDate}
-                schedules={schedules}
-              />
-            )}
-            {viewMode === "day" && (
-              <DayView
-                currentDate={currentDate}
-                schedules={schedules}
-              />
-            )}
-          </DragDropProvider>
+          </>
         )}
       </div>
     </div>
