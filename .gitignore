@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Build
+build/
+dist/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# Misc
+.worktrees/
+*.log
+creds/
+.eslintcache
+
+# Local investigation scripts and screenshots
+screenshots/
+investigate_landing.cjs
+.github/skills/webapp-testing/investigate_landing.cjs
+.vercel

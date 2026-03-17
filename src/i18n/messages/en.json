@@ -1,0 +1,678 @@
+{
+  "app": {
+    "title": "Purple Glow Social",
+    "description": "AI-powered social media management for South African businesses",
+    "tagline": "AI-Powered Social Media for Mzansi"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "selectLanguage": "Select language",
+    "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "accounts": "Accounts",
+    "generate": "Content Studio",
+    "posts": "Posts",
+    "calendar": "Calendar",
+    "analytics": "Analytics",
+    "brand": "Brand",
+    "billing": "Billing",
+    "settings": "Settings",
+    "team": "Team",
+    "sectionMain": "Main",
+    "sectionInsights": "Insights",
+    "sectionManage": "Manage",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "signInTitle": "Welcome back",
+    "signUpTitle": "Create your account",
+    "email": "Email address",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "forgotPasswordTitle": "Reset your password",
+    "forgotPasswordDescription": "Enter your email and we'll send you a reset link.",
+    "sendResetLink": "Send reset link",
+    "resetLinkSent": "Check your email for a reset link",
+    "resetLinkSentDescription": "If an account exists with that email, we've sent a password reset link.",
+    "backToLogin": "Back to sign in",
+    "resetPasswordTitle": "Set new password",
+    "resetPasswordDescription": "Enter your new password below.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "resetPassword": "Reset password",
+    "passwordResetSuccess": "Your password has been reset successfully.",
+    "passwordsMustMatch": "Passwords must match",
+    "invalidResetToken": "Invalid or expired reset link. Please request a new one.",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back! Here's an overview of your account.",
+    "credits": "Credits remaining",
+    "creditsCount": "{count} credits",
+    "postsScheduled": "Posts scheduled",
+    "accountsConnected": "Accounts connected",
+    "recentActivity": "Recent activity",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "userMenu": "User menu",
+    "creditsSummaryTitle": "Credits Summary",
+    "currentBalance": "Current Balance",
+    "creditsRemaining": "credits remaining",
+    "usedThisMonth": "Used This Month",
+    "monthlyAllocation": "Monthly Allocation",
+    "buyMoreCredits": "Buy More Credits",
+    "usageLabel": "Monthly usage",
+    "totalPosts": "Total Posts",
+    "scheduledPosts": "Scheduled Posts",
+    "connectedAccounts": "Connected Accounts",
+    "engagementRate": "Engagement Rate",
+    "recentPostsTitle": "Recent Posts",
+    "viewAll": "View All",
+    "published": "Published",
+    "scheduled": "Scheduled",
+    "draft": "Draft",
+    "upcomingScheduledTitle": "Upcoming Scheduled",
+    "viewCalendar": "View Calendar",
+    "editAction": "Edit",
+    "cancelAction": "Cancel",
+    "welcomeBack": "Welcome back, {name}!",
+    "overviewSubtitle": "Here's what's happening with your accounts.",
+    "createPost": "Create Post"
+  },
+  "generate": {
+    "title": "Content Studio",
+    "description": "Generate AI-powered social media content for your South African audience",
+    "platforms": "Platforms",
+    "language": "Language",
+    "contentType": "Content Type",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Describe the content you want to generate...",
+    "charCount": "{count}/{max}",
+    "saContext": "Include South African context",
+    "saContextHint": "(slang, hashtags, cultural references)",
+    "generateButton": "Generate Content",
+    "generating": "Generating...",
+    "loadingEngine": "Loading AI engine...",
+    "puterError": "AI engine failed to load. You can still use the interface — content generation requires an internet connection.",
+    "idleTitle": "Your generated content will appear here",
+    "idleHint": "Enter a prompt and click Generate to get started",
+    "generatingText": "Generating {type} content...",
+    "generationFailed": "Generation failed",
+    "generationFailedHint": "An unexpected error occurred. Please try again.",
+    "edit": "Edit",
+    "preview": "Preview",
+    "saveDraft": "Save as Draft",
+    "saving": "Saving...",
+    "regenerate": "Regenerate",
+    "copyClipboard": "Copy to Clipboard",
+    "copied": "Copied!",
+    "download": "Download",
+    "rateThis": "Rate this:",
+    "feedbackThanks": "Thanks for your feedback!",
+    "textTab": "Text",
+    "imageTab": "Image",
+    "videoTab": "Video",
+    "platformInstagram": "Instagram",
+    "platformFacebook": "Facebook",
+    "platformTwitter": "X (Twitter)",
+    "platformLinkedin": "LinkedIn",
+    "platformTiktok": "TikTok"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "notFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "unauthorized": "Unauthorized",
+    "unauthorizedDescription": "You need to sign in to access this page.",
+    "serverError": "Server error",
+    "serverErrorDescription": "Something went wrong on our end. Please try again later.",
+    "goHome": "Go to homepage"
+  },
+  "landing": {
+    "navbar": {
+      "features": "Features",
+      "process": "Process",
+      "stories": "Stories",
+      "membership": "Membership",
+      "login": "Log In",
+      "getStarted": "Get Started",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "hero": {
+      "label": "Made on the Scene",
+      "titleLine1": "LIQUID",
+      "titleLine2": "INTELLIGENCE",
+      "description": "The definitive AI social manager for the modern creator class. Liquid Intelligence that adapts, creates, and scales your digital presence with editorial precision.",
+      "startCreating": "Start Creating",
+      "watchDemo": "Watch demo",
+      "poweredBy": "Powered by",
+      "poweredByLink": "PurpleGlow v2.0",
+      "statsDescription": "Powering the next generation of creator-first social management tools in South Africa.",
+      "statsLanguages": "11+",
+      "statsLanguagesLabel": "Languages",
+      "statsOnline": "24/7",
+      "statsOnlineLabel": "Online",
+      "badgeLabel": "Generated with Magic +",
+      "badgePersona": "The Curator"
+    },
+    "marquee": {
+      "liquidIntelligence": "Liquid Intelligence",
+      "automatedCreativity": "Automated Creativity",
+      "editorialStandards": "Editorial Standards",
+      "masterCreators": "Master Creators"
+    },
+    "features": {
+      "label": "Curated Tools for Growth",
+      "titleThe": "The",
+      "titleEdition": "Edition",
+      "engine": {
+        "label": "Our Branding",
+        "title": "Conversational Engine",
+        "description": "An AI that speaks your language, literally. Crafted to understand context, slang, and sentiment, generating responses that feel authentically human."
+      },
+      "multilingual": {
+        "label": "Our Building",
+        "title": "Multilingual Core",
+        "description": "Seamless translation across 11 official languages, break barriers and reach every corner of the audience spectrum."
+      },
+      "scheduling": {
+        "label": "Our Operating",
+        "title": "Smart Scheduling",
+        "description": "Predictive algorithms determine the perfect moment for impact. Stop guessing, start dominating the timeline."
+      }
+    },
+    "process": {
+      "label": "Our Features Only",
+      "titlePrefix": "From Chaos to",
+      "titleHighlight": "Order",
+      "connect": {
+        "title": "Connect",
+        "description": "Link your social profiles securely. Our system analyzes your historical data to understand your unique voice."
+      },
+      "generate": {
+        "title": "Generate",
+        "description": "Send a topic or let the AI suggest trends. Watch as high-fidelity copy and images are crafted in seconds."
+      },
+      "publish": {
+        "title": "Publish",
+        "description": "Preview, refine, and schedule. The system handles the distribution while you focus on the bigger picture."
+      }
+    },
+    "testimonials": {
+      "titlePrefix": "Voice of the",
+      "titleHighlight": "Industry",
+      "thabo": {
+        "quote": "Finally, a tool that understands the nuance of South African digital culture. It's not just automation, it's cultural intelligence.",
+        "name": "Thabo M.",
+        "role": "Digital Strategist, JHB"
+      },
+      "zanele": {
+        "quote": "The multilingual support is a game-changer. I can run campaigns in Zulu and English simultaneously without losing tone.",
+        "name": "Zanele K.",
+        "role": "Content Creator, DBN"
+      },
+      "pieter": {
+        "quote": "It doubled my output while halving my time. The ROI on the Creator plan is unbeatable for any serious agency.",
+        "name": "Pieter S.",
+        "role": "Agency Owner, CPT"
+      }
+    },
+    "pricing": {
+      "title": "Membership",
+      "titleHighlight": "Tiers",
+      "monthly": "Monthly",
+      "annually": "Annually",
+      "selectPlan": "Select Plan",
+      "joinNow": "Join Now",
+      "contactSales": "Contact Sales",
+      "preferred": "PREFERRED",
+      "period": "/mo",
+      "periodAnnual": "/yr",
+      "hustle": {
+        "name": "The Hustle",
+        "price": "0",
+        "priceAnnual": "0",
+        "feature1": "3 AI Posts",
+        "feature2": "1 Profile",
+        "feature3": "Basic Analytics"
+      },
+      "creator": {
+        "name": "The Creator",
+        "price": "299",
+        "priceAnnual": "2,990",
+        "feature1": "Unlimited Text",
+        "feature2": "50 Image Credits",
+        "feature3": "5 Social Profiles",
+        "feature4": "Translation Engine"
+      },
+      "mogul": {
+        "name": "The Mogul",
+        "price": "999",
+        "priceAnnual": "9,990",
+        "feature1": "Everything in Creator",
+        "feature2": "200 Image/Video Credits",
+        "feature3": "Unlimited Profiles",
+        "feature4": "Team Seats (5)"
+      }
+    },
+    "credits": {
+      "label": "Powered by Purple",
+      "title": "Need more ammunition?",
+      "description": "Top up your creative credits instantly without elevating your membership.",
+      "buyStill": "Buy Still Credits",
+      "buyVideo": "Buy Video Pack",
+      "checkoutLabel": "Checkout",
+      "buyCredits": "Buy Credits",
+      "smallAmount": "100 Credits",
+      "smallPrice": "R150.00",
+      "largeAmount": "500 Credits",
+      "largePrice": "R650.00"
+    },
+    "contact": {
+      "titlePrefix": "Make",
+      "titleHighlight": "Contact",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message",
+      "sendMessage": "Send Message"
+    },
+    "footer": {
+      "brandDescription": "Liquid Intelligence for modern creators. Content strategy, automation, and multi-platform publishing.",
+      "sitemap": "Sitemap",
+      "mediaWorks": "Media/Works",
+      "login": "Login",
+      "docs": "Documentation",
+      "featuresCol": "Features",
+      "aiContent": "AI Content",
+      "scheduling": "Scheduling",
+      "analytics": "Analytics",
+      "legal": "Legal/EAF",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "fairPractices": "Fair Practices",
+      "social": "Social",
+      "copyright": "© 2024 Purple Glow Technologies. All Rights Reserved.",
+      "basedIn": "Based in Cape Town"
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Purple Glow Social",
+      "subtitle": "Let's set up your account in a few quick steps. You'll be creating amazing content for Mzansi in no time!",
+      "getStarted": "Let's get started"
+    },
+    "selectTier": {
+      "title": "Choose your plan",
+      "subtitle": "Start free and upgrade anytime as your business grows.",
+      "free": "Free",
+      "popular": "Popular",
+      "tiers": {
+        "seedling": {
+          "name": "Seedling",
+          "description": "Perfect for getting started. 10 AI posts per month, 1 social account."
+        },
+        "hustler": {
+          "name": "Hustler",
+          "description": "For side-hustlers ready to grow. 50 AI posts, 3 social accounts, brand analysis."
+        },
+        "grower": {
+          "name": "Grower",
+          "description": "For growing businesses. 200 AI posts, 10 accounts, full analytics, team access."
+        },
+        "mogul": {
+          "name": "Mogul",
+          "description": "For serious brands. Unlimited posts, unlimited accounts, priority support, white-label."
+        }
+      }
+    },
+    "linkAccount": {
+      "title": "Link your first account",
+      "subtitle": "Connect your social media accounts to start posting. You can always add more later.",
+      "connect": "Connect",
+      "comingSoon": "Coming soon"
+    },
+    "brandScan": {
+      "title": "Analyse your brand",
+      "subtitle": "Our AI will scan your existing content to learn your unique brand voice and style.",
+      "scanning": "Scanning your brand...",
+      "features": {
+        "tone": "Tone & voice fingerprint analysis",
+        "hashtags": "Hashtag strategy optimisation",
+        "timing": "Best posting times for SA audiences",
+        "audience": "Audience engagement patterns"
+      }
+    },
+    "generatePost": {
+      "title": "Generate your first post",
+      "subtitle": "See the power of AI-generated content tailored to your brand and South African audience.",
+      "prompt": "Your prompt",
+      "generate": "Generate with AI",
+      "mockPost": "\"Eish, what a lekker day to announce our new product! 🇿🇦 Stay tuned Mzansi — big things are coming! #LocalIsLekker #Mzansi\""
+    },
+    "schedule": {
+      "title": "Schedule your content",
+      "subtitle": "Plan your posts at the best times for your SA audience. We'll handle the rest.",
+      "bestTimes": "Suggested times (SAST)",
+      "days": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "timeSlots": {
+        "morning": "08:00 SAST",
+        "lunch": "12:30 SAST",
+        "evening": "18:00 SAST"
+      }
+    },
+    "done": {
+      "title": "You're all set!",
+      "subtitle": "Your account is ready. Head to your dashboard to start creating amazing content for Mzansi.",
+      "goToDashboard": "Go to Dashboard"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "skip": "Skip"
+    },
+    "progress": {
+      "stepOf": "Step {current} of {total}"
+    }
+  },
+  "billing": {
+    "currentPlan": "Current Plan",
+    "choosePlan": "Choose Your Plan",
+    "freePlan": "Free Plan",
+    "nextBilling": "Next billing date:",
+    "changePlan": "Change Plan",
+    "cancelSubscription": "Cancel Subscription",
+    "canceling": "Canceling…",
+    "cancelConfirm": "Are you sure you want to cancel your subscription? Your plan will remain active until the end of the current billing period.",
+    "cancelWarning": "Your plan will remain active until {date}",
+    "activeUntil": "Your plan will remain active until",
+    "cancelSuccess": "Subscription cancelled successfully",
+    "perMonth": "/ month",
+    "freeForever": "— Free forever",
+    "perYear": "per year",
+    "creditsPerMonth": "credits/month",
+    "monthly": "Monthly",
+    "annually": "Annual",
+    "mostPopular": "Most Popular",
+    "currentPlanBadge": "Current Plan",
+    "getStarted": "Get Started",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "savePercent": "Save {percent}%",
+    "toggleAnnual": "Toggle annual billing",
+    "processing": "Processing…",
+    "buy": "Buy",
+    "buyCredits": "Buy Credits",
+    "upgradePrompt": "You've reached your {limit} {feature} limit on the {tier} plan",
+    "upgradeToTier": "Upgrade to {tier} for {limit} {feature}",
+    "upgradeCta": "Upgrade Plan",
+    "dismiss": "Dismiss",
+    "topUp": "Need More Credits?",
+    "topUpDescription": "Purchase additional credits for burst needs",
+    "currentBalance": "Current balance:",
+    "credits": "credits",
+    "moSuffix": "/mo",
+    "freePlanNotice": "You're on the free Seedling plan.",
+    "upgradeToUnlock": "Upgrade to unlock more features →",
+    "invoices": "Invoices",
+    "paymentMethod": "Payment Method",
+    "billingHistory": "Billing History",
+    "confirmUpgrade": "Confirm Upgrade",
+    "confirmDowngrade": "Confirm Downgrade",
+    "confirmChange": "Confirm Change",
+    "keepPlan": "Keep Plan",
+    "comparePlans": "Compare Plans",
+    "limitReached": "Limit Reached",
+    "upgradeToUnlockFeature": "Upgrade to unlock this feature",
+    "lowBalance": "Low Balance",
+    "balance": "Balance",
+    "monthlyAllocation": "Monthly Allocation",
+    "packages": "Packages",
+    "creditPackage": "Credit Package",
+    "featureGained": "Features you'll gain",
+    "featureLost": "Features you'll lose",
+    "tiers": {
+      "seedling": {
+        "name": "Seedling",
+        "tagline": "Perfect for getting started",
+        "description": "Free forever — ideal for trying out AI-powered social media management."
+      },
+      "hustler": {
+        "name": "Hustler",
+        "tagline": "For side-hustlers ready to grow",
+        "description": "Affordable plan for creators building their brand on social media."
+      },
+      "grower": {
+        "name": "Grower",
+        "tagline": "For growing businesses",
+        "description": "Full-featured plan for businesses scaling their social media presence."
+      },
+      "mogul": {
+        "name": "Mogul",
+        "tagline": "For serious brands",
+        "description": "Enterprise-grade plan with unlimited accounts, priority support, and white-label options."
+      }
+    },
+    "features": {
+      "socialAccounts": "Social Accounts",
+      "aiPosts": "AI Posts",
+      "imageGen": "Image Generation",
+      "videoGen": "Video Generation",
+      "teamSeats": "Team Seats",
+      "scheduling": "Scheduling",
+      "creditRollover": "Credit Rollover",
+      "platforms": "Platforms",
+      "unlimited": "Unlimited",
+      "whatsappBusiness": "WhatsApp Business",
+      "socialAccountsCount": "{count} social accounts",
+      "aiPostsCount": "{count} AI posts/month",
+      "creditsCount": "{count} credits/month",
+      "imageGenCount": "{count} image generations",
+      "videoGenCount": "{count} video generations",
+      "teamSeatsCount": "{count} team seats"
+    },
+    "status": {
+      "active": "Active",
+      "pastDue": "Past Due",
+      "canceled": "Canceled",
+      "trialing": "Trialing"
+    },
+    "limitTypes": {
+      "social_accounts": "social accounts",
+      "ai_posts": "AI posts",
+      "image_gen": "image generations",
+      "video_gen": "video generations",
+      "team_seats": "team seats"
+    }
+  },
+  "docs": {
+    "title": "Documentation",
+    "subtitle": "Learn how to use Purple Glow Social",
+    "sidebar": {
+      "gettingStarted": "Getting Started",
+      "linkingAccounts": "Linking Accounts",
+      "aiContent": "AI Content Guide",
+      "scheduling": "Scheduling Guide",
+      "billingFaq": "Billing FAQ",
+      "apiReference": "API Reference"
+    },
+    "landing": {
+      "title": "Documentation",
+      "description": "Everything you need to know about Purple Glow Social",
+      "searchPlaceholder": "Search documentation..."
+    },
+    "gettingStarted": {
+      "title": "Getting Started",
+      "description": "Get up and running with Purple Glow Social in minutes",
+      "step1Title": "Create Your Account",
+      "step1Description": "Sign up for Purple Glow Social and choose your plan",
+      "step2Title": "Link Your Accounts",
+      "step2Description": "Connect your social media platforms",
+      "step3Title": "Set Up Your Brand",
+      "step3Description": "Let our AI analyse your brand voice and style",
+      "step4Title": "Create Content",
+      "step4Description": "Generate AI-powered posts tailored to your brand",
+      "step5Title": "Schedule & Publish",
+      "step5Description": "Plan your content calendar and publish automatically"
+    },
+    "linkingAccounts": {
+      "title": "Linking Accounts",
+      "description": "Connect your social media platforms to Purple Glow Social"
+    },
+    "aiContent": {
+      "title": "AI Content Guide",
+      "description": "Create stunning content with our AI-powered tools"
+    },
+    "scheduling": {
+      "title": "Scheduling Guide",
+      "description": "Plan and automate your social media calendar"
+    },
+    "billingFaq": {
+      "title": "Billing FAQ",
+      "description": "Common questions about plans, credits, and payments"
+    },
+    "apiReference": {
+      "title": "API Reference",
+      "description": "Integrate Purple Glow Social into your workflow",
+      "mogulOnly": "API access is available exclusively for Mogul tier subscribers"
+    }
+  },
+  "legal": {
+    "title": "Legal",
+    "lastUpdated": "Last updated",
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How we collect, use, and protect your personal information"
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Terms and conditions for using Purple Glow Social"
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "description": "How we use cookies and similar technologies"
+    },
+    "paia": {
+      "title": "PAIA Manual",
+      "description": "Promotion of Access to Information Act Manual"
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use Policy",
+      "description": "Guidelines for using our platform responsibly"
+    },
+    "backToLegal": "Back to Legal"
+  },
+  "tutorial": {
+    "title": "Interactive Tutorial",
+    "welcome": "Welcome to Purple Glow Social!",
+    "description": "Let us show you around. This quick tour will help you get the most out of our platform.",
+    "skip": "Skip Tutorial",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Get Started!",
+    "progress": "Step {current} of {total}",
+    "replay": "Replay Tutorial",
+    "step1": {
+      "title": "Your Dashboard",
+      "description": "This is your command centre. View your analytics, upcoming posts, and account health at a glance."
+    },
+    "step2": {
+      "title": "AI Content Studio",
+      "description": "Create engaging posts with our AI. It learns your brand voice and generates content that sounds like you."
+    },
+    "step3": {
+      "title": "Content Calendar",
+      "description": "Schedule posts across all your platforms. Set optimal posting times for maximum engagement."
+    },
+    "step4": {
+      "title": "Analytics & Insights",
+      "description": "Track your performance across platforms. See what works and optimise your strategy."
+    },
+    "step5": {
+      "title": "Account Settings",
+      "description": "Manage your linked accounts, billing, and preferences all in one place."
+    }
+  },
+  "chatbot": {
+    "title": "Purple Glow Assistant",
+    "placeholder": "Type your message...",
+    "send": "Send",
+    "close": "Close chat",
+    "openChat": "Open chat assistant",
+    "typing": "Typing...",
+    "welcome": "Howzit! 👋 I'm your Purple Glow assistant. Ask me anything about managing your social media.",
+    "suggestedPrompts": {
+      "getStarted": "How do I get started?",
+      "whatCanIPost": "What can I post?",
+      "billing": "How does billing work?"
+    },
+    "generating": "Generating response…",
+    "backToChat": "Back to chat",
+    "support": {
+      "talkToHuman": "Talk to a human",
+      "formTitle": "Contact Support",
+      "name": "Your name",
+      "namePlaceholder": "e.g. Thabo Mokoena",
+      "email": "Email address",
+      "emailPlaceholder": "you@example.co.za",
+      "emailInvalid": "Please enter a valid email address.",
+      "message": "How can we help?",
+      "messagePlaceholder": "Describe your issue or question…",
+      "submit": "Send message",
+      "sending": "Sending...",
+      "success": "Message sent!",
+      "successDetail": "We'll get back to you within 24 hours.",
+      "error": "Something went wrong. Please try again or email support@purpleglow.co.za.",
+      "loginRequired": "Please sign in to submit a support request, or email support@purpleglow.co.za directly.",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "aiUnavailable": "I'm having trouble connecting right now. Please check out our docs or contact support.",
+      "rateLimit": "You're sending messages too quickly. Please wait a moment."
+    },
+    "ariaLabels": {
+      "chatWidget": "Chat support widget",
+      "messageList": "Chat messages",
+      "newMessage": "New message from assistant"
+    }
+  }
+}

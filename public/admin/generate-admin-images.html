@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Purple Glow Social — Admin Image Generator</title>
+  <script src="https://js.puter.com/v2/" defer></script>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a; /* slate-900 */
+      color: #e2e8f0; /* slate-200 */
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      margin-bottom: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: #1e293b; /* slate-800 */
+      border: 1px solid #334155; /* slate-700 */
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .card h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .card p {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .prompt-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      color: #cbd5e1;
+      font-size: 0.8125rem;
+      font-family: 'Fira Code', monospace;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #7c3aed;
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #6d28d9;
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .preview {
+      margin-top: 1rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid #334155;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .preview .placeholder {
+      color: #475569;
+      font-size: 0.875rem;
+    }
+
+    .status {
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      min-height: 1.25rem;
+    }
+
+    .status.generating {
+      color: #a78bfa;
+    }
+
+    .status.success {
+      color: #34d399;
+    }
+
+    .status.error {
+      color: #f87171;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #7c3aed;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.375rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .instructions {
+      margin-top: 2rem;
+      padding: 1.25rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      font-size: 0.8125rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    .instructions strong {
+      color: #e2e8f0;
+    }
+
+    .instructions code {
+      background: #0f172a;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎨 Admin Dashboard Image Generator</h1>
+  <p class="subtitle">
+    Uses Puter.js client-side AI (Nano Banana) — no API keys needed.
+    Images are generated in your browser.
+  </p>
+
+  <div class="grid">
+    <!-- Hero / Banner Image -->
+    <div class="card">
+      <h2>Admin Dashboard Hero Banner</h2>
+      <p>1200 × 400 banner for the admin overview page header.</p>
+      <div class="prompt-box" id="hero-prompt">A sleek, modern admin dashboard banner image. Dark background gradient from deep slate-blue (#0f172a) to dark purple (#2e1065). Abstract geometric patterns — glowing purple (#7c3aed) neon lines forming a subtle grid or network graph. Faint data visualization elements: bar charts, line graphs, pie charts as ghostly outlines. Professional, minimal, futuristic. No text. Wide panoramic aspect ratio. High contrast, moody lighting.</div>
+      <div class="actions">
+        <button class="btn btn-primary" id="hero-generate" onclick="generateImage('hero')">
+          ✨ Generate
+        </button>
+        <button class="btn btn-secondary" id="hero-download" onclick="downloadImage('hero')" disabled>
+          ⬇ Download PNG
+        </button>
+      </div>
+      <div class="status" id="hero-status"></div>
+      <div class="preview" id="hero-preview">
+        <span class="placeholder">Image preview will appear here</span>
+      </div>
+    </div>
+
+    <!-- Admin Avatar Placeholder -->
+    <div class="card">
+      <h2>Admin Placeholder Avatar</h2>
+      <p>256 × 256 default avatar for admin users without a profile photo.</p>
+      <div class="prompt-box" id="avatar-prompt">A minimalist admin user avatar placeholder icon on a dark slate (#1e293b) circular background. A simple, abstract human silhouette or shield icon in glowing purple (#7c3aed) with a subtle gradient to violet (#8b5cf6). Clean geometric design, no facial features, gender-neutral. Slight outer glow effect. Square image with the icon centered. Professional, modern, flat design style. No text.</div>
+      <div class="actions">
+        <button class="btn btn-primary" id="avatar-generate" onclick="generateImage('avatar')">
+          ✨ Generate
+        </button>
+        <button class="btn btn-secondary" id="avatar-download" onclick="downloadImage('avatar')" disabled>
+          ⬇ Download PNG
+        </button>
+      </div>
+      <div class="status" id="avatar-status"></div>
+      <div class="preview" id="avatar-preview">
+        <span class="placeholder">Image preview will appear here</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate All -->
+  <div style="margin-top: 1.5rem; text-align: center;">
+    <button class="btn btn-primary" id="generate-all" onclick="generateAll()" style="padding: 0.75rem 2rem; font-size: 1rem;">
+      🚀 Generate All Images
+    </button>
+  </div>
+
+  <div class="instructions">
+    <strong>How to use:</strong><br />
+    1. Open this file in a browser (<code>npx serve public/</code> or double-click the HTML).<br />
+    2. Click <strong>Generate</strong> on each card (or <strong>Generate All</strong>).<br />
+    3. Puter.js will open a quick auth popup on first use — sign in or create a free account.<br />
+    4. Once images appear, click <strong>Download PNG</strong> to save them.<br />
+    5. Place downloaded files in <code>public/admin/</code>:<br />
+    &nbsp;&nbsp;&nbsp;• <code>admin-hero-banner.png</code><br />
+    &nbsp;&nbsp;&nbsp;• <code>admin-avatar-placeholder.png</code><br /><br />
+    <strong>Models available:</strong> gemini-2.5-flash-preview-image-generation (default), dall-e-3, gpt-image-1
+  </div>
+
+  <script>
+    /**
+     * Purple Glow Social — Admin Image Generator
+     *
+     * Uses Puter.js txt2img API for client-side AI image generation.
+     * No API keys required — uses the "User-Pays" model.
+     */
+
+    const IMAGE_CONFIG = {
+      hero: {
+        filename: 'admin-hero-banner.png',
+        model: 'dall-e-3',
+      },
+      avatar: {
+        filename: 'admin-avatar-placeholder.png',
+        model: 'dall-e-3',
+      },
+    };
+
+    /** @type {Record<string, string | null>} */
+    const generatedDataUrls = { hero: null, avatar: null };
+
+    /**
+     * Wait for the global `puter` object to be available.
+     * @returns {Promise<void>}
+     */
+    function waitForPuter() {
+      return new Promise((resolve, reject) => {
+        if (typeof puter !== 'undefined') return resolve();
+        let attempts = 0;
+        const interval = setInterval(() => {
+          if (typeof puter !== 'undefined') {
+            clearInterval(interval);
+            resolve();
+          }
+          if (++attempts > 50) {
+            clearInterval(interval);
+            reject(new Error('Puter.js failed to load after 10 seconds'));
+          }
+        }, 200);
+      });
+    }
+
+    /**
+     * Set the status message for a given image card.
+     * @param {'hero' | 'avatar'} id
+     * @param {string} message
+     * @param {'generating' | 'success' | 'error'} type
+     */
+    function setStatus(id, message, type) {
+      const el = document.getElementById(`${id}-status`);
+      el.className = `status ${type}`;
+      const prefix = type === 'generating' ? '<span class="spinner"></span>' : '';
+      el.innerHTML = `${prefix}${message}`;
+    }
+
+    /**
+     * Generate a single image by card ID.
+     * @param {'hero' | 'avatar'} id
+     */
+    async function generateImage(id) {
+      const generateBtn = document.getElementById(`${id}-generate`);
+      const downloadBtn = document.getElementById(`${id}-download`);
+      const preview = document.getElementById(`${id}-preview`);
+      const prompt = document.getElementById(`${id}-prompt`).textContent;
+      const config = IMAGE_CONFIG[id];
+
+      generateBtn.disabled = true;
+      downloadBtn.disabled = true;
+      setStatus(id, `Generating with ${config.model}…`, 'generating');
+
+      try {
+        await waitForPuter();
+
+        const image = await puter.ai.txt2img(prompt, {
+          model: config.model,
+        });
+
+        // image is an HTMLImageElement with .src as a data URL
+        const dataUrl = image.src;
+        generatedDataUrls[id] = dataUrl;
+
+        // Show preview
+        preview.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = config.filename;
+        preview.appendChild(img);
+
+        downloadBtn.disabled = false;
+        setStatus(id, `✓ Generated successfully — ready to download as ${config.filename}`, 'success');
+      } catch (err) {
+        console.error(`[nano-banana] ${id} generation failed:`, err);
+        setStatus(id, `✗ Generation failed: ${err.message || 'Unknown error'}`, 'error');
+        preview.innerHTML = '<span class="placeholder">Generation failed — try again</span>';
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    /**
+     * Download a generated image.
+     * @param {'hero' | 'avatar'} id
+     */
+    function downloadImage(id) {
+      const dataUrl = generatedDataUrls[id];
+      if (!dataUrl) return;
+
+      const config = IMAGE_CONFIG[id];
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = config.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    /**
+     * Generate all images sequentially.
+     */
+    async function generateAll() {
+      const btn = document.getElementById('generate-all');
+      btn.disabled = true;
+      btn.textContent = '⏳ Generating…';
+
+      for (const id of Object.keys(IMAGE_CONFIG)) {
+        await generateImage(id);
+      }
+
+      btn.disabled = false;
+      btn.textContent = '🚀 Generate All Images';
+    }
+  </script>
+</body>
+</html>
