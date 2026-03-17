@@ -23,6 +23,7 @@ interface GenerationPreviewProps {
   onRegenerate: () => void;
   onCopy: () => void;
   isSaving: boolean;
+  saveSuccess?: boolean;
 }
 
 export function GenerationPreview({
@@ -37,6 +38,7 @@ export function GenerationPreview({
   onRegenerate,
   onCopy,
   isSaving,
+  saveSuccess,
 }: GenerationPreviewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -143,7 +145,7 @@ export function GenerationPreview({
               "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
-            {isSaving ? "Saving..." : "Save as Draft"}
+            {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save as Draft"}
           </button>
           <button
             type="button"
@@ -193,7 +195,7 @@ export function GenerationPreview({
               "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
-            {isSaving ? "Saving..." : "Save as Draft"}
+            {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save as Draft"}
           </button>
           <button
             type="button"
@@ -229,7 +231,7 @@ export function GenerationPreview({
               "disabled:cursor-not-allowed disabled:opacity-50",
             )}
           >
-            {isSaving ? "Saving..." : "Save as Draft"}
+            {isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save as Draft"}
           </button>
           <button
             type="button"

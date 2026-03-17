@@ -31,6 +31,7 @@ export function ContentStudio() {
   const [includeSAContext, setIncludeSAContext] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [lastAiModel, setLastAiModel] = useState("openrouter");
 
   // ── Build prompt with SA context ──────────────────────────
@@ -122,13 +123,24 @@ export function ContentStudio() {
         body.media = [{ type: "image", dataUrl: generatedImageUrl }];
       }
 
-      await fetch("/api/ai/draft", {
+      const res = await fetch("/api/ai/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-    } catch {
-      // Draft save failure is non-critical
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error ?? "Failed to save draft");
+      }
+
+      // Show success feedback — the button will briefly show "Saved!"
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save draft";
+      setErrorMessage(message);
+      setGenerationState("error");
     } finally {
       setIsSaving(false);
     }
@@ -279,6 +291,7 @@ export function ContentStudio() {
             onRegenerate={handleGenerate}
             onCopy={handleCopy}
             isSaving={isSaving}
+            saveSuccess={saveSuccess}
           />
 
           {/* Feedback buttons — only show after successful text generation */}

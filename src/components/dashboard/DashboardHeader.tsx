@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { signOut } from "@/lib/auth-client";
 import { Avatar } from "@/components/ui/Avatar";
 import { LanguageSelector } from "@/components/ui/language-selector";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -216,6 +217,10 @@ function DashboardHeader({
 
               <button
                 type="button"
+                onClick={async () => {
+                  await signOut();
+                  window.location.href = "/login";
+                }}
                 className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-error transition-colors hover:bg-error-surface"
                 role="menuitem"
                 data-testid="sign-out-button"
