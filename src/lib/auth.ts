@@ -43,7 +43,7 @@ export const auth = betterAuth({
   /** Email + password sign-up/sign-in with password reset support */
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Set to true once email flows are tested
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       const { sendNotificationEmail } = await import("@/lib/notifications/email-service");
       await sendNotificationEmail(user.email, "Reset your password — Purple Glow Social", `<p>Hi ${user.name},</p><p>Click <a href="${url}">here</a> to reset your password.</p><p>If you didn't request this, ignore this email.</p>`);
