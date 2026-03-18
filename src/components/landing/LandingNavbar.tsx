@@ -263,7 +263,7 @@ export function LandingNavbar() {
               </a>
             </div>
             <p className="mt-3.5 text-[10px] tracking-[2px] uppercase text-[#3F3F46] leading-relaxed">
-              Based in Cape Town<br />© 2024 Purple Glow
+              Based in Cape Town<br />© 2025 Purple Glow
             </p>
           </div>
           <a

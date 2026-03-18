@@ -29,11 +29,11 @@ interface ScrollRevealProps {
   className?: string;
 }
 
-/** Tailwind translate classes for the animated entrance, keyed by direction. */
+/** Initial translate classes (before reveal) keyed by direction. */
 const TRANSLATE_FROM: Record<Direction, string> = {
-  up: 'data-[entered]:translate-y-0',
-  left: 'data-[entered]:translate-x-0',
-  right: 'data-[entered]:translate-x-0',
+  up: 'translate-y-8',
+  left: '-translate-x-8',
+  right: 'translate-x-8',
 };
 
 export function ScrollReveal({
@@ -66,11 +66,12 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      data-entered={entered ? '' : undefined}
       className={cn(
-        // Always visible — transition fires when data-entered is set
-        'opacity-100 transition-all duration-700 ease-out',
-        TRANSLATE_FROM[direction],
+        // Start hidden + offset, then animate to visible
+        'transition-all duration-700 ease-out',
+        entered
+          ? 'opacity-100 translate-x-0 translate-y-0'
+          : cn('opacity-0', TRANSLATE_FROM[direction]),
         className,
       )}
       style={entered && delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}
