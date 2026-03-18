@@ -9,6 +9,7 @@
  */
 
 import { setRequestLocale } from "next-intl/server";
+import { requireServerSession } from "@/lib/auth-session";
 import { BrandProfileView } from "./_components/BrandProfileView";
 import { EmptyState } from "./_components/EmptyState";
 
@@ -82,6 +83,9 @@ function getMockProfile() {
 export default async function BrandPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Auth guard — redirects to /login if not authenticated
+  await requireServerSession();
 
   // In a real deployment, we'd check for existing profiles:
   // const session = await requireServerSession();

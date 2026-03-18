@@ -10,6 +10,9 @@
 import { setRequestLocale } from "next-intl/server";
 
 import { requireServerSession } from "@/lib/auth-session";
+import { db } from "@/db";
+import { organizationMember } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { listAccountsForOrg } from "@/lib/social/account-service";
 import { PLATFORM_DISPLAY } from "@/lib/social/providers";
 import type { SocialAccountDTO } from "@/lib/social/types";
@@ -28,11 +31,16 @@ export default async function AccountsPage({ params, searchParams }: Props) {
   const session = await requireServerSession();
   const query = await searchParams;
 
-  // Get the user's org — for now use the first org membership
-  // TODO: Support org switcher when multi-org is implemented
-  const orgId = (session.user as Record<string, unknown>).orgId as
-    | string
-    | undefined;
+  // Resolve orgId from the user's org membership (single-org for now).
+  // When multi-org is implemented, this should use an org switcher
+  // to let the user pick which org's accounts to manage.
+  const memberships = await db
+    .select({ orgId: organizationMember.orgId })
+    .from(organizationMember)
+    .where(eq(organizationMember.userId, session.user.id))
+    .limit(1);
+
+  const orgId = memberships[0]?.orgId;
 
   let accounts: SocialAccountDTO[] = [];
 
