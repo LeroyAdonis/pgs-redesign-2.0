@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth-session";
 import { generateText } from "@/lib/ai/openrouter-client";
+import { logger } from "@/lib/logger";
 import { createRateLimiter } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
@@ -75,7 +76,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Generation failed";
-    console.error("[/api/ai/generate] Error:", message);
+    logger.error("AI generation failed", {
+      error: message,
+      route: "/api/ai/generate",
+    });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

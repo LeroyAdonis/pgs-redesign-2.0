@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
+import { getServerSession } from "@/lib/auth-session";
 
 const sql = neon(process.env.DATABASE_URL!);
 
@@ -19,14 +20,15 @@ export async function GET(request: Request) {
       : await sql`SELECT id, content, category, created_at FROM agent_memory ORDER BY created_at DESC LIMIT ${limit}`;
 
     return NextResponse.json({
-      results: results.map((r: any) => ({
+      results: results.map((r: Record<string, unknown>) => ({
         id: r.id,
         content: r.content,
         category: r.category,
         created_at: r.created_at,
       })),
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to fetch recent memories";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

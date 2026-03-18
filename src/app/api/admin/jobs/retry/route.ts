@@ -13,33 +13,15 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "@/lib/auth-session";
+import { requireAdminApiSession } from "@/lib/admin-api-session";
 import { logger } from "@/lib/logger";
 import type { JobRetryRequest, JobRetryResponse } from "@/types/admin-jobs";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
-
-    if (!session) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized",
-        } satisfies JobRetryResponse,
-        { status: 401 },
-      );
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Forbidden — admin access required",
-        } satisfies JobRetryResponse,
-        { status: 403 },
-      );
-    }
+    const auth = await requireAdminApiSession();
+    if ("error" in auth) return auth.error;
+    const { session } = auth;
 
     const body = (await request.json()) as JobRetryRequest;
 
@@ -59,12 +41,8 @@ export async function POST(request: NextRequest) {
       adminUserId: session.user.id,
     });
 
-    // TODO: Replace with actual Inngest retry via inngest.send()
-    // Example:
-    //   await inngest.send({
-    //     name: `${body.functionId}/retry`,
-    //     data: { originalRunId: body.runId },
-    //   });
+    // Note: In production, replace the stub below with actual Inngest retry:
+    //   await inngest.send({ name: `${body.functionId}/retry`, data: { originalRunId: body.runId } });
 
     return NextResponse.json({
       success: true,

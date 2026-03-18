@@ -12,7 +12,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "@/lib/auth-session";
+import { requireAdminApiSession } from "@/lib/admin-api-session";
 import { logger } from "@/lib/logger";
 import { db } from "@/db";
 import { post } from "@/db/schema";
@@ -29,21 +29,9 @@ const VALID_ACTIONS: BulkAction[] = ["approve", "reject", "delete"];
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
-      );
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json(
-        { success: false, error: "Forbidden — admin access required" },
-        { status: 403 },
-      );
-    }
+    const auth = await requireAdminApiSession();
+    if ("error" in auth) return auth.error;
+    const { session } = auth;
 
     const body = (await request.json()) as BulkActionRequest;
 

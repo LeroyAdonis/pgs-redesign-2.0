@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { getServerSession } from "@/lib/auth-session";
+import { requireAdminApiSession } from "@/lib/admin-api-session";
 import { logger } from "@/lib/logger";
 import { db } from "@/db";
 import { user, socialAccount, post } from "@/db/schema";
@@ -20,21 +20,8 @@ import { count, eq, gte } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const session = await getServerSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
-      );
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json(
-        { success: false, error: "Forbidden — admin access required" },
-        { status: 403 },
-      );
-    }
+    const auth = await requireAdminApiSession();
+    if ("error" in auth) return auth.error;
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);

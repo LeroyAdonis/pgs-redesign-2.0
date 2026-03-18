@@ -9,6 +9,7 @@
 
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
+import { getServerSession } from "@/lib/auth-session";
 
 const sql = neon(process.env.DATABASE_URL!);
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY!;
@@ -50,8 +51,9 @@ export async function POST(request: Request) {
       RETURNING id, created_at
     `;
 
-    return NextResponse.json({ id: result[0].id, created_at: result[0].created_at });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ id: (result[0] as Record<string, unknown>).id, created_at: (result[0] as Record<string, unknown>).created_at });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to store memory";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
