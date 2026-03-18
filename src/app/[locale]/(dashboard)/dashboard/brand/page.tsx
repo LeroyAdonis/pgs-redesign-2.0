@@ -3,111 +3,102 @@
  *
  * Route: /[locale]/dashboard/brand
  *
- * Displays the brand analysis results with interactive editors.
- * Fetches brand profile data server-side, delegates interactive
- * elements to client components.
+ * Shows brand analysis once the user has connected social accounts
+ * and generated enough content for analysis. Before that, shows
+ * a helpful empty state guiding the user to connect accounts first.
  */
 
 import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
+import Link from "next/link";
+import { db } from "@/db";
+import { organizationMember, socialAccount } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { BrandProfileView } from "./_components/BrandProfileView";
-import { EmptyState } from "./_components/EmptyState";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
-/**
- * Mock data for development.
- * In production, this would fetch from the database via the profile service.
- * We cannot call the DB directly here without a valid DATABASE_URL at build time,
- * so we use mock data and the client component fetches real data on mount.
- */
-function getMockProfile() {
-  return {
-    id: "mock-profile-id",
-    orgId: "mock-org-id",
-    language: "en",
-    toneFingerprint: {
-      formal: 0.3,
-      casual: 0.7,
-      humorous: 0.4,
-      professional: 0.6,
-      inspirational: 0.5,
-      educational: 0.35,
-    },
-    vocabularyClusters: [
-      { category: "business", words: ["brand", "customer", "launch", "product", "team"], frequency: 42 },
-      { category: "community", words: ["community", "support", "local", "together", "connect"], frequency: 35 },
-      { category: "lifestyle", words: ["coffee", "morning", "weekend", "wellness", "food"], frequency: 28 },
-      { category: "action", words: ["check", "follow", "visit", "discover", "shop"], frequency: 22 },
-      { category: "other", words: ["lekker", "braai", "mzansi", "vibe", "hustle"], frequency: 18 },
-    ],
-    hashtagPatterns: [
-      { hashtag: "#Mzansi", frequency: 28, category: "south_african" },
-      { hashtag: "#ProudlySA", frequency: 22, category: "south_african" },
-      { hashtag: "#LocalIsLekker", frequency: 18, category: "south_african" },
-      { hashtag: "#Joburg", frequency: 15, category: "south_african" },
-      { hashtag: "#SABusiness", frequency: 14, category: "business" },
-      { hashtag: "#SupportLocal", frequency: 12, category: "general" },
-      { hashtag: "#SmallBusiness", frequency: 10, category: "business" },
-      { hashtag: "#CapeTown", frequency: 9, category: "south_african" },
-    ],
-    postingCadence: {
-      dayOfWeek: 2,
-      hourOfDay: 10,
-      postsPerWeek: 4.5,
-    },
-    emojiUsage: [
-      { emoji: "🇿🇦", frequency: 18 },
-      { emoji: "🔥", frequency: 15 },
-      { emoji: "💪", frequency: 12 },
-      { emoji: "🚀", frequency: 10 },
-      { emoji: "❤️", frequency: 9 },
-      { emoji: "☕", frequency: 8 },
-      { emoji: "🎉", frequency: 7 },
-      { emoji: "📈", frequency: 6 },
-      { emoji: "🌟", frequency: 5 },
-      { emoji: "🏔️", frequency: 4 },
-    ],
-    avgContentLength: 185,
-    visualStyle: {
-      colorPalette: ["#8b5cf6", "#f472b6", "#22c55e", "#3b82f6", "#eab308"],
-      filterPreferences: ["none", "clarendon", "gingham"],
-      imageTypes: ["image", "video"],
-    },
-    saCulturalScore: 0.72,
-  };
-}
-
 export default async function BrandPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Auth guard — redirects to /login if not authenticated
-  await requireServerSession();
+  const session = await requireServerSession();
 
-  // In a real deployment, we'd check for existing profiles:
-  // const session = await requireServerSession();
-  // const profiles = await getProfilesForOrg(orgId);
-  // For now, use mock data to demonstrate the UI
-  const hasProfile = true;
-  const profile = hasProfile ? getMockProfile() : null;
+  // Get user's org
+  const memberships = await db
+    .select({ orgId: organizationMember.orgId })
+    .from(organizationMember)
+    .where(eq(organizationMember.userId, session.user.id))
+    .limit(1);
 
-  if (!profile) {
-    return (
-      <div className="mx-auto max-w-5xl">
-        <EmptyState />
-      </div>
-    );
+  const orgId = memberships[0]?.orgId;
+
+  if (!orgId) {
+    return <EmptyState locale={locale} type="onboarding" />;
   }
 
+  // Check if user has connected social accounts
+  const accounts = await db
+    .select({ id: socialAccount.id })
+    .from(socialAccount)
+    .where(eq(socialAccount.orgId, orgId))
+    .limit(1);
+
+  if (accounts.length === 0) {
+    return <EmptyState locale={locale} type="accounts" />;
+  }
+
+  // Check if brand profile exists (placeholder for now)
+  // TODO: Query brandProfile table when it has data
+  return <EmptyState locale={locale} type="generate" />;
+}
+
+/* ─── Empty State Component ─── */
+
+function EmptyState({ locale, type }: { locale: string; type: "onboarding" | "accounts" | "generate" }) {
+  const content = {
+    onboarding: {
+      icon: "🏢",
+      title: "Set up your business first",
+      description: "Complete onboarding to create your organization, then connect your social accounts.",
+      action: { label: "Go to Onboarding", href: `/${locale}/onboarding` },
+    },
+    accounts: {
+      icon: "🔗",
+      title: "Connect a social account",
+      description: "Link your Instagram, Facebook, or Twitter account so we can analyze your brand's voice and style.",
+      action: { label: "Connect Accounts", href: `/${locale}/dashboard/accounts` },
+    },
+    generate: {
+      icon: "✨",
+      title: "Generate some content first",
+      description: "Create a few posts using the AI content generator. Once we have enough data, we'll build your brand profile automatically.",
+      action: { label: "Generate Content", href: `/${locale}/dashboard/generate` },
+    },
+  }[type];
+
   return (
-    <div className="mx-auto max-w-5xl">
-      <BrandProfileView
-        profile={profile}
-        saCulturalScore={profile.saCulturalScore}
-      />
+    <div className="mx-auto max-w-lg py-16 text-center">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-surface text-3xl">
+        {content.icon}
+      </div>
+      <h1 className="mt-6 font-display text-2xl font-bold text-text">
+        {content.title}
+      </h1>
+      <p className="mt-3 text-sm leading-relaxed text-text-muted">
+        {content.description}
+      </p>
+      <Link
+        href={content.action.href}
+        className="mt-8 inline-flex items-center gap-2 bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand/90"
+      >
+        {content.action.label}
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </Link>
     </div>
   );
 }
