@@ -463,10 +463,8 @@ async function handleOrderCreated(
 // Webhook route handler — uses @polar-sh/nextjs Webhooks helper
 // ---------------------------------------------------------------------------
 
-const webhookSecret = process.env.POLAR_WEBHOOK_SECRET ?? "";
-
 const handler = Webhooks({
-  webhookSecret,
+  webhookSecret: process.env.POLAR_WEBHOOK_SECRET ?? "",
   onCheckoutUpdated: handleCheckoutUpdated,
   onSubscriptionCreated: handleSubscriptionCreated,
   onSubscriptionUpdated: handleSubscriptionUpdated,
@@ -476,6 +474,15 @@ const handler = Webhooks({
 });
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  // Guard: webhook secret must be configured
+  const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json(
+      { error: "Webhook secret not configured" },
+      { status: 500 },
+    );
+  }
+
   try {
     const response = await handler(request);
     return response;

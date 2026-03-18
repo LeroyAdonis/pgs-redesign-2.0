@@ -5,6 +5,10 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET() {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const countResult = await sql`SELECT COUNT(*) as total FROM agent_memory`;
     const categoryResult = await sql`SELECT category, COUNT(*) as count FROM agent_memory GROUP BY category`;
     const dateResult = await sql`SELECT MIN(created_at) as oldest, MAX(created_at) as newest FROM agent_memory`;

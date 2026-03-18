@@ -5,6 +5,11 @@ const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "10");
     const category = searchParams.get("category") || undefined;

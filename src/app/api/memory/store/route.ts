@@ -31,6 +31,10 @@ async function getEmbedding(text: string): Promise<number[]> {
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { content, category = "general", metadata = {}, sessionId } = await request.json();
 
     if (!content) {
