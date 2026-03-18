@@ -42,11 +42,15 @@ export default async function AccountsPage({ params, searchParams }: Props) {
 
   const orgId = memberships[0]?.orgId;
 
+  // If user has no organization, redirect to onboarding
+  if (!orgId) {
+    const { redirect } = await import("next/navigation");
+    redirect(`/${locale}/onboarding`);
+  }
+
   let accounts: SocialAccountDTO[] = [];
 
-  if (orgId) {
-    accounts = await listAccountsForOrg(orgId);
-  }
+  accounts = await listAccountsForOrg(orgId);
 
   // Extract status messages from URL params
   const successPlatform =
@@ -57,7 +61,7 @@ export default async function AccountsPage({ params, searchParams }: Props) {
   return (
     <AccountsManager
       accounts={accounts}
-      orgId={orgId ?? ""}
+      orgId={orgId}
       platformDisplay={PLATFORM_DISPLAY}
       successPlatform={successPlatform}
       errorType={errorType}
