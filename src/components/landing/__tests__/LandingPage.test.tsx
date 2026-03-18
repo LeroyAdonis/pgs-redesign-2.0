@@ -146,7 +146,7 @@ vi.mock('next-intl', () => ({
         'landing.footer.termsOfService': 'Terms of Service',
         'landing.footer.fairPractices': 'Fair Practices',
         'landing.footer.social': 'Social',
-        'landing.footer.copyright': '© 2024 Purple Glow Technologies. All Rights Reserved.',
+        'landing.footer.copyright': '© 2025 Purple Glow Technologies. All Rights Reserved.',
         'landing.footer.basedIn': 'Based in Cape Town',
       };
 
@@ -379,7 +379,7 @@ describe('Landing Page — ContactSection', () => {
 describe('Landing Page — LandingFooter', () => {
   it('renders the footer with copyright', () => {
     render(<LandingFooter />);
-    expect(screen.getByText('© 2024 Purple Glow Technologies. All Rights Reserved.')).toBeInTheDocument();
+    expect(screen.getByText('© 2025 Purple Glow Technologies. All Rights Reserved.')).toBeInTheDocument();
   });
 
   it('renders footer column headings', () => {
