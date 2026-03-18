@@ -321,6 +321,8 @@ export const socialAccount = pgTable(
       mode: "date",
     }),
     isActive: boolean("is_active").notNull().default(true),
+    /** Platform-specific page/business ID (Facebook page ID, IG page ID, WhatsApp phone number ID) */
+    pageId: text("page_id"),
     connectedAt: timestamp("connected_at", {
       withTimezone: true,
       mode: "date",
@@ -555,6 +557,7 @@ export const analytic = pgTable(
   },
   (table) => [
     index("analytic_post_schedule_id_idx").on(table.postScheduleId),
+    index("analytic_schedule_fetched_idx").on(table.postScheduleId, table.fetchedAt),
   ],
 );
 
@@ -582,6 +585,7 @@ export const notification = pgTable(
   (table) => [
     index("notification_user_unread_idx").on(table.userId, table.readAt),
     index("notification_org_id_idx").on(table.orgId),
+    index("notification_user_created_idx").on(table.userId, table.createdAt),
   ],
 );
 
@@ -616,6 +620,7 @@ export const aiFeedback = pgTable(
     index("ai_feedback_user_id_idx").on(table.userId),
     index("ai_feedback_post_id_idx").on(table.postId),
     index("ai_feedback_created_at_idx").on(table.createdAt),
+    index("ai_feedback_org_created_idx").on(table.orgId, table.createdAt),
   ],
 );
 

@@ -45,7 +45,7 @@ export class InstagramPublisher extends BasePublisherAdapter {
     }
 
     const firstMedia = options.media[0];
-    const pageId = "me"; // Resolved by access token scope
+    const pageId = options.pageId ?? "me"; // Use stored page ID or fall back to "me"
 
     // Step 1 — Create media container
     const containerParams: Record<string, string> = {

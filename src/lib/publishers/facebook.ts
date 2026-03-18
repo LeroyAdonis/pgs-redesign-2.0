@@ -30,7 +30,7 @@ export class FacebookPublisher extends BasePublisherAdapter {
   };
 
   protected async doPublish(options: PublishOptions): Promise<PublishResult> {
-    const pageId = "me"; // Resolved by page access token
+    const pageId = options.pageId ?? "me";
 
     const hasMedia = options.media && options.media.length > 0;
 

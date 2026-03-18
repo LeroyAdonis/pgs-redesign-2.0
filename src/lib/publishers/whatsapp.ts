@@ -33,7 +33,7 @@ export class WhatsAppPublisher extends BasePublisherAdapter {
   };
 
   protected async doPublish(options: PublishOptions): Promise<PublishResult> {
-    const phoneNumberId = "me"; // Resolved by access token scope
+    const phoneNumberId = options.pageId ?? "me"; // Use stored phone number ID or fall back to "me"
 
     const messagePayload = this.buildTemplateMessage(options);
 
@@ -95,7 +95,7 @@ export class WhatsAppPublisher extends BasePublisherAdapter {
       messaging_product: "whatsapp",
       type: "template",
       template: {
-        name: "social_post_broadcast",
+        name: process.env.WHATSAPP_TEMPLATE_NAME || "social_post_broadcast",
         language: { code: "en" },
         components,
       },
