@@ -102,17 +102,28 @@ export class WhatsAppPublisher extends BasePublisherAdapter {
     };
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
-
+    // WhatsApp Business API does not provide engagement metrics such as
+    // likes, shares, comments, impressions, or reach for broadcast messages.
+    //
+    // The Cloud API only supports:
+    //   - Webhook status updates for delivery/read receipts (sent, delivered, read)
+    //   - These are event-driven (push), not queryable via GET
+    //   - There is no REST endpoint to query delivery/read status for a message
+    //
+    // For broadcast analytics, the WhatsApp Business Management API provides
+    // aggregate quality ratings and message template analytics, but not
+    // per-message engagement metrics.
+    //
+    // Returning zeroed metrics. Upstream consumers should interpret all-zero
+    // metrics as "platform does not support this data" rather than "no engagement".
     return {
-      impressions: this.mockRange(seed, 10, 100),
-      reach: this.mockRange(seed * 2, 10, 100),
+      impressions: 0,
+      reach: 0,
       likes: 0,
-      shares: this.mockRange(seed * 4, 1, 10),
+      shares: 0,
       comments: 0,
       clicks: 0,
     };

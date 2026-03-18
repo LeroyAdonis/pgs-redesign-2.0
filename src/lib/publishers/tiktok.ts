@@ -91,19 +91,46 @@ export class TikTokPublisher extends BasePublisherAdapter {
     };
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
+    // TikTok API v202501 — fetch video query with fields
+    const response = await fetch(
+      `${TIKTOK_API_BASE}/v2/video/query/?fields=view_count,like_count,comment_count,share_count`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${options.accessToken}`,
+        },
+        body: JSON.stringify({
+          filters: {
+            video_ids: [options.platformPostId],
+          },
+        }),
+      },
+    );
+
+    const data = (await this.handleApiResponse(response)) as {
+      data?: {
+        videos?: Array<{
+          view_count: number;
+          like_count: number;
+          comment_count: number;
+          share_count: number;
+        }>;
+      };
+    };
+
+    const video = data.data?.videos?.[0];
 
     return {
-      impressions: this.mockRange(seed, 5000, 50000),
-      reach: this.mockRange(seed * 2, 3000, 30000),
-      likes: this.mockRange(seed * 3, 100, 1000),
-      shares: this.mockRange(seed * 4, 50, 500),
-      comments: this.mockRange(seed * 5, 20, 200),
-      clicks: this.mockRange(seed * 6, 10, 100),
+      impressions: video?.view_count ?? 0,
+      reach: video?.view_count ?? 0, // TikTok doesn't separate reach from views
+      likes: video?.like_count ?? 0,
+      shares: video?.share_count ?? 0,
+      comments: video?.comment_count ?? 0,
+      clicks: 0, // Not available in basic video query
     };
   }
 }

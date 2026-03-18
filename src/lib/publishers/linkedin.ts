@@ -90,19 +90,39 @@ export class LinkedInPublisher extends BasePublisherAdapter {
     };
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
+    // LinkedIn socialActions endpoint returns likes, comments, and shares
+    // The platformPostId is a URN like "urn:li:share:123456" or "urn:li:ugcPost:123456"
+    const encodedUrn = encodeURIComponent(options.platformPostId);
+    const response = await fetch(
+      `${LINKEDIN_API_BASE}/v2/socialActions/${encodedUrn}`,
+      {
+        headers: {
+          Authorization: `Bearer ${options.accessToken}`,
+          "X-Restli-Protocol-Version": "2.0.0",
+        },
+      },
+    );
+
+    const data = (await this.handleApiResponse(response)) as {
+      likesSummary?: { totalLikes: number; likedByCurrentUser: boolean };
+      commentsSummary?: { totalFirstLevelComments: number };
+      shareStatistics?: {
+        shareCount: number;
+        commentCount: number;
+        reactionCount: number;
+      };
+    };
 
     return {
-      impressions: this.mockRange(seed, 500, 5000),
-      reach: this.mockRange(seed * 2, 300, 3000),
-      likes: this.mockRange(seed * 3, 20, 200),
-      shares: this.mockRange(seed * 4, 5, 50),
-      comments: this.mockRange(seed * 5, 10, 100),
-      clicks: this.mockRange(seed * 6, 40, 400),
+      impressions: 0, // Requires LinkedIn Marketing API with organization scope
+      reach: 0, // Not available via standard UGC API
+      likes: data.likesSummary?.totalLikes ?? data.shareStatistics?.reactionCount ?? 0,
+      shares: data.shareStatistics?.shareCount ?? 0,
+      comments: data.commentsSummary?.totalFirstLevelComments ?? data.shareStatistics?.commentCount ?? 0,
+      clicks: 0, // Requires Analytics API with org authorization
     };
   }
 }
