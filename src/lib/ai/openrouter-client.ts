@@ -11,7 +11,8 @@
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 const FALLBACK_MODELS = [
-  "openrouter/auto",           // OpenRouter's auto-router (always valid)
+  "openrouter/hunter-alpha",   // Primary — 1T param, 1M context, free on OpenRouter
+  "openrouter/auto",           // OpenRouter's auto-router fallback
   "minimax/minimax-m2.5:free", // Free minimax fallback
   "openai/gpt-4o-mini",        // Fast GPT fallback
 ] as const;
