@@ -15,7 +15,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.fbcdn.net https://*.cdninstagram.com https://pbs.twimg.com https://abs.twimg.com https://*.licdn.com https://*.googleusercontent.com https://avatars.githubusercontent.com",
       "font-src 'self'",
-      "connect-src 'self' https://api.polar.sh",
+      "connect-src 'self' https://api.polar.sh https://openrouter.ai https://*.openrouter.ai",
       "frame-ancestors 'none'",
     ].join("; ") + ";",
   },
