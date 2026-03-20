@@ -91,8 +91,9 @@ export async function upsertSocialAccount(params: {
   platformUserId: string;
   displayName: string;
   tokens: OAuthTokenResponse;
+  pageId?: string;
 }): Promise<string> {
-  const { orgId, platform, platformUserId, displayName, tokens } = params;
+  const { orgId, platform, platformUserId, displayName, tokens, pageId } = params;
 
   const accessTokenEncrypted = encrypt(tokens.accessToken);
   const refreshTokenEncrypted = tokens.refreshToken
@@ -120,6 +121,7 @@ export async function upsertSocialAccount(params: {
         accessTokenEncrypted,
         refreshTokenEncrypted,
         tokenExpiresAt,
+        pageId: pageId ?? existing.pageId,
         isActive: true,
         connectedAt: new Date(),
       })
@@ -144,6 +146,7 @@ export async function upsertSocialAccount(params: {
       accessTokenEncrypted,
       refreshTokenEncrypted,
       tokenExpiresAt,
+      pageId,
       isActive: true,
     })
     .returning({ id: socialAccount.id });

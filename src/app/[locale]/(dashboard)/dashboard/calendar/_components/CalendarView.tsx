@@ -75,6 +75,12 @@ function CalendarView() {
         return;
       }
 
+      if (res.status === 404) {
+        setError("Complete onboarding to start scheduling posts. Go to Settings → Onboarding.");
+        setSchedules([]);
+        return;
+      }
+
       if (!res.ok) {
         throw new Error(`Failed to fetch schedules (${res.status})`);
       }

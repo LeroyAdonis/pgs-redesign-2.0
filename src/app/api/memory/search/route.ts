@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
+import { getServerSession } from "@/lib/auth-session";
 
 const sql = neon(process.env.DATABASE_URL!);
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY!;
@@ -22,6 +23,11 @@ async function getEmbedding(text: string): Promise<number[]> {
 
 export async function GET(request: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q");
     const limit = parseInt(searchParams.get("limit") || "5");
@@ -39,7 +45,7 @@ export async function GET(request: Request) {
       : await sql`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`;
 
     return NextResponse.json({
-      results: results.map((r: any) => ({
+      results: results.map((r: Record<string, unknown>) => ({
         id: r.id,
         content: r.content,
         category: r.category,
@@ -48,7 +54,8 @@ export async function GET(request: Request) {
         created_at: r.created_at,
       })),
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Memory search failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { getServerSession } from "@/lib/auth-session";
+import { requireAdminApiSession } from "@/lib/admin-api-session";
 import { logger } from "@/lib/logger";
 import type {
   JobRun,
@@ -149,24 +149,8 @@ function generateMockJobs(): JobRun[] {
 
 export async function GET() {
   try {
-    const session = await getServerSession();
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" } satisfies Partial<JobsApiResponse>,
-        { status: 401 },
-      );
-    }
-
-    if (session.user.role !== "admin") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Forbidden — admin access required",
-        } satisfies Partial<JobsApiResponse>,
-        { status: 403 },
-      );
-    }
+    const auth = await requireAdminApiSession();
+    if ("error" in auth) return auth.error;
 
     const jobs = generateMockJobs();
 

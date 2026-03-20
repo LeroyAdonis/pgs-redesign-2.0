@@ -3,6 +3,20 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
 
+interface CategoryRow {
+  category: string;
+  count: string | number;
+}
+
+interface CountRow {
+  total: string | number;
+}
+
+interface DateRow {
+  oldest: string | null;
+  newest: string | null;
+}
+
 export async function GET() {
   try {
     const countResult = await sql`SELECT COUNT(*) as total FROM agent_memory`;
@@ -12,16 +26,17 @@ export async function GET() {
     const checkpointCount = await sql`SELECT COUNT(*) as total FROM agent_checkpoints`;
 
     return NextResponse.json({
-      total: Number(countResult[0]?.total || 0),
+      total: Number((countResult[0] as CountRow | undefined)?.total || 0),
       byCategory: Object.fromEntries(
-        categoryResult.map((r: any) => [r.category, Number(r.count)])
+        (categoryResult as CategoryRow[]).map((r) => [r.category, Number(r.count)])
       ),
-      oldestDate: dateResult[0]?.oldest || null,
-      newestDate: dateResult[0]?.newest || null,
-      patterns: Number(patternCount[0]?.total || 0),
-      checkpoints: Number(checkpointCount[0]?.total || 0),
+      oldestDate: (dateResult[0] as DateRow | undefined)?.oldest || null,
+      newestDate: (dateResult[0] as DateRow | undefined)?.newest || null,
+      patterns: Number((patternCount[0] as CountRow | undefined)?.total || 0),
+      checkpoints: Number((checkpointCount[0] as CountRow | undefined)?.total || 0),
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to fetch memory stats";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

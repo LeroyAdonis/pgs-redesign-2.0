@@ -20,6 +20,9 @@ export function useAnalyticsFetch<T>(url: string) {
         if (res.status === 401) {
           throw new Error("Please log in to view analytics.");
         }
+        if (res.status === 404) {
+          throw new Error("Complete onboarding to access analytics. Go to Settings → Onboarding.");
+        }
         if (!res.ok) throw new Error(`Failed to fetch analytics (${res.status})`);
         return res.json() as Promise<{ success: boolean; data: T; error?: string }>;
       })

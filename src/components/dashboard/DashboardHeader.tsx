@@ -221,10 +221,22 @@ function DashboardHeader({
                 onClick={async () => {
                   setIsSigningOut(true);
                   try {
-                    await signOut();
-                    window.location.href = "/login";
-                  } catch {
+                    await authClient.signOut({
+                      fetchOptions: {
+                        onError(context) {
+                          console.error("Sign out error:", context.error);
+                        },
+                      },
+                    });
+                    // Force full page reload to clear all state
+                    window.location.replace("/login");
+                  } catch (err) {
+                    console.error("Sign out failed:", err);
                     setIsSigningOut(false);
+                    // Fallback: clear cookies manually and redirect
+                    document.cookie = "better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    document.cookie = "__Secure-better-auth.session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    window.location.replace("/login");
                   }
                 }}
                 disabled={isSigningOut}

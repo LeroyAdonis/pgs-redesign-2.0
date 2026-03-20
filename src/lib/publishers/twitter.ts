@@ -102,19 +102,40 @@ export class TwitterPublisher extends BasePublisherAdapter {
     return mediaIds;
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
+    const response = await fetch(
+      `${TWITTER_API_BASE}/2/tweets/${options.platformPostId}?tweet.fields=public_metrics`,
+      {
+        headers: {
+          Authorization: `Bearer ${options.accessToken}`,
+        },
+      },
+    );
+
+    const data = (await this.handleApiResponse(response)) as {
+      data: {
+        public_metrics: {
+          retweet_count: number;
+          reply_count: number;
+          like_count: number;
+          quote_count: number;
+          impression_count: number;
+          bookmark_count: number;
+        };
+      };
+    };
+
+    const metrics = data.data.public_metrics;
 
     return {
-      impressions: this.mockRange(seed, 2000, 20000),
-      reach: this.mockRange(seed * 2, 1000, 10000),
-      likes: this.mockRange(seed * 3, 10, 100),
-      shares: this.mockRange(seed * 4, 5, 50),
-      comments: this.mockRange(seed * 5, 2, 20),
-      clicks: this.mockRange(seed * 6, 30, 300),
+      impressions: metrics.impression_count ?? 0,
+      reach: metrics.impression_count ?? 0, // Twitter v2 doesn't have a separate reach metric
+      likes: metrics.like_count ?? 0,
+      shares: (metrics.retweet_count ?? 0) + (metrics.quote_count ?? 0),
+      comments: metrics.reply_count ?? 0,
+      clicks: 0, // Not available in basic public_metrics
     };
   }
 }

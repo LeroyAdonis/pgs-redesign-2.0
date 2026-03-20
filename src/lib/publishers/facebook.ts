@@ -30,7 +30,7 @@ export class FacebookPublisher extends BasePublisherAdapter {
   };
 
   protected async doPublish(options: PublishOptions): Promise<PublishResult> {
-    const pageId = "me"; // Resolved by page access token
+    const pageId = options.pageId ?? "me";
 
     const hasMedia = options.media && options.media.length > 0;
 
@@ -99,19 +99,45 @@ export class FacebookPublisher extends BasePublisherAdapter {
     };
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
+    const url = `${GRAPH_API_BASE}/${options.platformPostId}?fields=insights.metric(post_impressions,post_impressions_unique,post_reactions_by_type_total),likes.summary(true),comments.summary(true),shares&access_token=${options.accessToken}`;
+
+    const response = await fetch(url);
+    const data = (await this.handleApiResponse(response)) as {
+      insights?: {
+        data: Array<{
+          name: string;
+          values: Array<{ value: number | Record<string, number> }>;
+        }>;
+      };
+      likes?: { summary: { total_count: number } };
+      comments?: { summary: { total_count: number } };
+      shares?: { count: number };
+    };
+
+    let impressions = 0;
+    let reach = 0;
+
+    if (data.insights?.data) {
+      for (const metric of data.insights.data) {
+        const value = metric.values?.[0]?.value;
+        if (metric.name === "post_impressions" && typeof value === "number") {
+          impressions = value;
+        } else if (metric.name === "post_impressions_unique" && typeof value === "number") {
+          reach = value;
+        }
+      }
+    }
 
     return {
-      impressions: this.mockRange(seed, 1000, 10000),
-      reach: this.mockRange(seed * 2, 500, 5000),
-      likes: this.mockRange(seed * 3, 30, 300),
-      shares: this.mockRange(seed * 4, 20, 200),
-      comments: this.mockRange(seed * 5, 3, 30),
-      clicks: this.mockRange(seed * 6, 50, 500),
+      impressions,
+      reach,
+      likes: data.likes?.summary?.total_count ?? 0,
+      shares: data.shares?.count ?? 0,
+      comments: data.comments?.summary?.total_count ?? 0,
+      clicks: 0, // Requires post_insights with post_clicks_by_type
     };
   }
 }

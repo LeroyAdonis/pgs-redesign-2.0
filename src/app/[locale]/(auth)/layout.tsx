@@ -19,7 +19,7 @@ export default async function AuthLayout({ children, params }: Props) {
   setRequestLocale(locale);
 
   return (
-    <main id="main-content" className="flex min-h-dvh items-center justify-center bg-surface px-4 py-12">
+    <main id="main-content" data-theme="dark" className="flex min-h-dvh items-center justify-center bg-surface px-4 py-12">
       <div className="w-full max-w-md">
         {/* Purple glow brand mark */}
         <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-brand-surface shadow-glow">
@@ -40,7 +40,7 @@ export default async function AuthLayout({ children, params }: Props) {
         </div>
 
         {/* Auth form card */}
-        <div className="rounded-none border border-border bg-surface-raised p-6 shadow-lg sm:p-8">
+        <div className="rounded-md border border-border-strong bg-surface-raised p-6 shadow-lg sm:p-8">
           {children}
         </div>
       </div>

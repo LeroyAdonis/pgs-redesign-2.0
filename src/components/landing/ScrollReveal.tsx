@@ -7,14 +7,11 @@ import { cn } from '@/lib/utils';
  * ScrollReveal — viewport-triggered entrance animation wrapper.
  *
  * Progressive-enhancement approach:
- *   1. Content is ALWAYS visible (SSR and client). Never hidden by default.
- *   2. On the client, an IntersectionObserver watches for elements entering the
- *      viewport. Once intersecting, the `has-entered` CSS animation class fires
- *      a one-time fade-in + slide-up transition.
- *   3. Elements already in the viewport at page load animate in immediately.
- *
- * This ensures crawlers, screenshots, and reduced-motion users always see
- * full content without any hidden-then-shown flash.
+ *   1. SSR renders content at full opacity (no hidden state) so crawlers
+ *      and no-JS environments always see complete content.
+ *   2. On the client, an IntersectionObserver watches for elements entering
+ *      the viewport. Once intersecting, a one-time fade-in + slide-up plays.
+ *   3. Users with `prefers-reduced-motion` see content immediately — no animation.
  */
 
 type Direction = 'up' | 'left' | 'right';
@@ -29,11 +26,11 @@ interface ScrollRevealProps {
   className?: string;
 }
 
-/** Tailwind translate classes for the animated entrance, keyed by direction. */
+/** Initial translate classes (before reveal) keyed by direction. */
 const TRANSLATE_FROM: Record<Direction, string> = {
-  up: 'data-[entered]:translate-y-0',
-  left: 'data-[entered]:translate-x-0',
-  right: 'data-[entered]:translate-x-0',
+  up: 'translate-y-8',
+  left: '-translate-x-8',
+  right: 'translate-x-8',
 };
 
 export function ScrollReveal({
@@ -48,6 +45,13 @@ export function ScrollReveal({
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
+
+    // Skip animation for reduced-motion users — show content immediately
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setEntered(true);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -66,11 +70,12 @@ export function ScrollReveal({
   return (
     <div
       ref={ref}
-      data-entered={entered ? '' : undefined}
       className={cn(
-        // Always visible — transition fires when data-entered is set
-        'opacity-100 transition-all duration-700 ease-out',
-        TRANSLATE_FROM[direction],
+        // Start hidden + offset, then animate to visible
+        'transition-all duration-700 ease-out',
+        entered
+          ? 'opacity-100 translate-x-0 translate-y-0'
+          : cn('opacity-0', TRANSLATE_FROM[direction]),
         className,
       )}
       style={entered && delay > 0 ? { transitionDelay: `${delay}ms` } : undefined}

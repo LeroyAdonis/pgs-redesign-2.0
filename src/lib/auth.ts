@@ -23,6 +23,16 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
+/** Escape HTML entities to prevent XSS in email templates. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 export const auth = betterAuth({
   /**
    * Drizzle adapter wired to our Neon PostgreSQL database.
@@ -43,14 +53,22 @@ export const auth = betterAuth({
   /** Email + password sign-up/sign-in with password reset support */
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false, // Set to true once email flows are tested
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       const { sendNotificationEmail } = await import("@/lib/notifications/email-service");
-      await sendNotificationEmail(user.email, "Reset your password — Purple Glow Social", `<p>Hi ${user.name},</p><p>Click <a href="${url}">here</a> to reset your password.</p><p>If you didn't request this, ignore this email.</p>`);
+      await sendNotificationEmail(
+        user.email,
+        "Reset your password — Purple Glow Social",
+        `<p>Hi ${escapeHtml(user.name)},</p><p>Click <a href="${url}">here</a> to reset your password.</p><p>If you didn't request this, ignore this email.</p>`,
+      );
     },
     sendVerificationEmail: async ({ user, url }) => {
       const { sendNotificationEmail } = await import("@/lib/notifications/email-service");
-      await sendNotificationEmail(user.email, "Verify your email — Purple Glow Social", `<p>Hi ${user.name},</p><p>Click <a href="${url}">here</a> to verify your email address.</p>`);
+      await sendNotificationEmail(
+        user.email,
+        "Verify your email — Purple Glow Social",
+        `<p>Hi ${escapeHtml(user.name)},</p><p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+      );
     },
   },
 

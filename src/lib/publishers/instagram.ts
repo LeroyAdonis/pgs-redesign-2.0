@@ -45,7 +45,7 @@ export class InstagramPublisher extends BasePublisherAdapter {
     }
 
     const firstMedia = options.media[0];
-    const pageId = "me"; // Resolved by access token scope
+    const pageId = options.pageId ?? "me"; // Use stored page ID or fall back to "me"
 
     // Step 1 — Create media container
     const containerParams: Record<string, string> = {
@@ -98,19 +98,31 @@ export class InstagramPublisher extends BasePublisherAdapter {
     };
   }
 
-  // TODO: Replace with real platform API call
   protected async doFetchMetrics(
     options: FetchMetricsOptions,
   ): Promise<EngagementMetrics> {
-    const seed = this.hashSeed(options.platformPostId);
+    const metricsUrl = `${GRAPH_API_BASE}/${options.platformPostId}/insights?metric=impressions,reach,engagement,saved&access_token=${options.accessToken}`;
+
+    const response = await fetch(metricsUrl);
+    const data = (await this.handleApiResponse(response)) as {
+      data: Array<{
+        name: string;
+        values: Array<{ value: number }>;
+      }>;
+    };
+
+    const metricsMap: Record<string, number> = {};
+    for (const item of data.data ?? []) {
+      metricsMap[item.name] = item.values?.[0]?.value ?? 0;
+    }
 
     return {
-      impressions: this.mockRange(seed, 500, 5000),
-      reach: this.mockRange(seed * 2, 300, 3000),
-      likes: this.mockRange(seed * 3, 50, 500),
-      shares: this.mockRange(seed * 4, 10, 100),
-      comments: this.mockRange(seed * 5, 5, 50),
-      clicks: this.mockRange(seed * 6, 20, 200),
+      impressions: metricsMap.impressions ?? 0,
+      reach: metricsMap.reach ?? 0,
+      likes: 0, // Requires separate /likes or engagement breakdown
+      shares: 0, // Instagram doesn't expose share count via API
+      comments: 0, // Requires separate /comments endpoint
+      clicks: metricsMap.engagement ?? 0, // Engagement metric captures interactions
     };
   }
 }

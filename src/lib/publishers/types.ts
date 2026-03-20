@@ -6,6 +6,8 @@ export interface PublishOptions {
   content: string;
   platform: Platform;
   accessToken: string;
+  /** Platform-specific page/business ID (Facebook page ID, IG page ID, etc.) */
+  pageId?: string;
   media?: PublishMedia[];
 }
 
@@ -63,6 +65,8 @@ export interface EngagementMetrics {
 export interface FetchMetricsOptions {
   platformPostId: string;
   accessToken: string;
+  /** Platform-specific page/business ID (Facebook page ID, IG page ID, etc.) */
+  pageId?: string;
 }
 
 /** Per-platform character limit and constraints */

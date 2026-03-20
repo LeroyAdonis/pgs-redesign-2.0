@@ -141,7 +141,7 @@ export function LoginForm({ labels }: LoginFormProps) {
       {/* Email/password form */}
       <form onSubmit={handleEmailSignIn} className="space-y-4">
         {error && (
-          <div className="bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <div className="rounded bg-error-surface p-3 text-sm text-error">
             {error}
           </div>
         )}
