@@ -76,8 +76,8 @@ export async function POST(request: Request) {
     const membership = memberships[0];
     if (!membership) {
       return NextResponse.json(
-        { success: false, error: "No organization found" },
-        { status: 404 },
+        { success: false, error: "No organization found. Please complete account setup." },
+        { status: 400 },
       );
     }
 
@@ -135,8 +135,8 @@ export async function GET(request: Request) {
     const membership = memberships[0];
     if (!membership) {
       return NextResponse.json(
-        { success: false, error: "No organization found" },
-        { status: 404 },
+        { success: true, schedules: [], total: 0, page: 1, limit: 20 },
+        { status: 200 },
       );
     }
 

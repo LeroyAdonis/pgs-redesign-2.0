@@ -48,3 +48,4 @@ screenshots/
 investigate_landing.cjs
 .github/skills/webapp-testing/investigate_landing.cjs
 .vercel
+.env*.local

@@ -99,7 +99,20 @@ export function AnalyticsOverview({ className }: { className?: string }) {
     );
   }
 
-  if (!data || data.totalPosts === 0) {
+  if (!data) {
+    return (
+      <div className={className}>
+        <Card>
+          <AnalyticsEmpty />
+        </Card>
+      </div>
+    );
+  }
+
+  // Show overview stats — even if no analytics data yet, show derived counts
+  const hasDerivedStats = (data.connectedAccounts ?? 0) > 0 || (data.scheduledPosts ?? 0) > 0 || (data.publishedPosts ?? 0) > 0 || data.totalPosts > 0;
+
+  if (!hasDerivedStats && data.totalImpressions === 0) {
     return (
       <div className={className}>
         <Card>
@@ -127,7 +140,7 @@ export function AnalyticsOverview({ className }: { className?: string }) {
     },
     {
       icon: <PostsIcon />,
-      label: "Posts Analysed",
+      label: "Total Posts",
       value: formatCompact(data.totalPosts),
     },
     {

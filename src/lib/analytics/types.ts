@@ -36,6 +36,10 @@ export interface OrgAnalyticsSummary {
   topPlatform: string | null;
   totalPosts: number;
   periodDays: number;
+  // Derived stats from post/socialAccount tables
+  connectedAccounts?: number;
+  scheduledPosts?: number;
+  publishedPosts?: number;
 }
 
 /** Per-platform aggregate metrics */

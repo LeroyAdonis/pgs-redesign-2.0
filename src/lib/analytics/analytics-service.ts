@@ -14,7 +14,7 @@
  */
 
 import { db } from "@/db";
-import { analytic, post, postSchedule } from "@/db/schema";
+import { analytic, post, postSchedule, socialAccount } from "@/db/schema";
 import {
   eq,
   and,
@@ -23,6 +23,7 @@ import {
   desc,
   sql,
   isNotNull,
+  count,
 } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 import type {
@@ -221,6 +222,39 @@ export async function getOrgAnalytics(
     ),
   );
 
+  // Fall back to derived stats from post/socialAccount tables when analytic table is empty
+  const derivedRows = await db
+    .select({
+      totalPosts: sql<number>`COUNT(DISTINCT ${post.id})`,
+    })
+    .from(post)
+    .where(eq(post.orgId, orgId));
+
+  const connectedAccountRows = await db
+    .select({
+      connectedAccounts: sql<number>`COUNT(*)`,
+    })
+    .from(socialAccount)
+    .where(eq(socialAccount.orgId, orgId));
+
+  const scheduledPostRows = await db
+    .select({
+      scheduledPosts: sql<number>`COUNT(*)`,
+    })
+    .from(postSchedule)
+    .innerJoin(post, eq(postSchedule.postId, post.id))
+    .where(and(eq(post.orgId, orgId), sql`${postSchedule.publishedAt} IS NULL`));
+
+  const publishedPostRows = await db
+    .select({
+      publishedPosts: sql<number>`COUNT(*)`,
+    })
+    .from(post)
+    .where(and(eq(post.orgId, orgId), eq(post.status, "published")));
+
+  const derivedTotalPosts = Number(derivedRows[0]?.totalPosts ?? 0);
+  const analyticsPostCount = Number(summary?.totalPosts ?? 0);
+
   return {
     totalImpressions: Number(summary?.totalImpressions ?? 0),
     totalReach: Number(summary?.totalReach ?? 0),
@@ -228,8 +262,13 @@ export async function getOrgAnalytics(
     avgEngagementRate:
       Math.round(Number(summary?.avgEngagementRate ?? 0) * 100) / 100,
     topPlatform: topPlatformRows[0]?.platform ?? null,
-    totalPosts: Number(summary?.totalPosts ?? 0),
+    // Use derived total posts count if analytics table is empty
+    totalPosts: analyticsPostCount > 0 ? analyticsPostCount : derivedTotalPosts,
     periodDays,
+    // Extra derived stats for overview
+    connectedAccounts: Number(connectedAccountRows[0]?.connectedAccounts ?? 0),
+    scheduledPosts: Number(scheduledPostRows[0]?.scheduledPosts ?? 0),
+    publishedPosts: Number(publishedPostRows[0]?.publishedPosts ?? 0),
   };
 }
 

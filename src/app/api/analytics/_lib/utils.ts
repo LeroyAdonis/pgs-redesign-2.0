@@ -51,8 +51,8 @@ export async function requireOrgMembership(): Promise<AuthResult> {
     return {
       ok: false,
       response: NextResponse.json(
-        { success: false, error: "No organization found" },
-        { status: 404 },
+        { success: true, data: [], total: 0 },
+        { status: 200 },
       ),
     };
   }

@@ -36,8 +36,8 @@ export async function GET(request: Request) {
     const membership = memberships[0];
     if (!membership) {
       return NextResponse.json(
-        { success: false, error: "No organization found" },
-        { status: 404 },
+        { success: true, posts: [], total: 0, page: 1, limit: 20 },
+        { status: 200 },
       );
     }
 

@@ -105,7 +105,7 @@ export function TutorialOverlay() {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 pointer-events-none"
       role="dialog"
       aria-modal="true"
       aria-label={t('title')}
@@ -114,7 +114,7 @@ export function TutorialOverlay() {
       {/* Card */}
       <div
         className={cn(
-          'relative mx-4 w-full max-w-lg',
+          'relative mx-4 w-full max-w-lg pointer-events-auto',
           'rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl',
           'animate-in zoom-in-95 fade-in duration-300',
         )}

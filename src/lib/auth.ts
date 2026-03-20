@@ -22,6 +22,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
+import { createId } from "@paralleldrive/cuid2";
 
 /** Escape HTML entities to prevent XSS in email templates. */
 function escapeHtml(str: string): string {
@@ -118,9 +119,12 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     "http://localhost:3001",
-    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL.trim()] : []),
     ...(process.env.NEXT_PUBLIC_APP_URL
-      ? [process.env.NEXT_PUBLIC_APP_URL]
+      ? [process.env.NEXT_PUBLIC_APP_URL.trim()]
+      : []),
+    ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS
+      ? [process.env.BETTER_AUTH_TRUSTED_ORIGINS.trim()]
       : []),
   ],
 
@@ -135,6 +139,55 @@ export const auth = betterAuth({
         type: "string",
         defaultValue: "user",
         input: false, // not settable via sign-up
+      },
+    },
+  },
+
+  /**
+   * Database hooks — auto-create a personal organization for every new user.
+   *
+   * When a user signs up (email/password or social OAuth), Better-auth
+   * inserts the user row and then calls this hook. We create an org
+   * named after the user and make them the owner + member.
+   *
+   * Without this, all API routes that query `organizationMember` return 404
+   * for newly registered users who have no org membership.
+   */
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            const orgId = createId();
+            const memberId = createId();
+            // Derive a URL-safe slug from the user's name or email local-part
+            const baseName = user.name || user.email.split("@")[0] || "my-workspace";
+            const slug = baseName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, "")
+              .slice(0, 48)
+              + "-" + orgId.slice(-6);
+
+            await db.insert(schema.organization).values({
+              id: orgId,
+              name: baseName.charAt(0).toUpperCase() + baseName.slice(1) + "'s Workspace",
+              slug,
+              ownerId: user.id,
+              tier: "seedling",
+            });
+
+            await db.insert(schema.organizationMember).values({
+              id: memberId,
+              orgId,
+              userId: user.id,
+              role: "owner",
+            });
+          } catch (err) {
+            // Log but don't block sign-up — org can be created later
+            console.error("[auth] Failed to auto-create org for user", user.id, err);
+          }
+        },
       },
     },
   },
