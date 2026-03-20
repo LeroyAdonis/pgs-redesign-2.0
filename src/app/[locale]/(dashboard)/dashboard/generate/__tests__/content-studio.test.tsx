@@ -53,7 +53,7 @@ beforeEach(() => {
             Promise.resolve({
               content:
                 "Eish, what a lekker day! 🇿🇦 Check out our new product launch in Joburg! #Mzansi #LocalIsLekker #ProudlySA",
-              model: "openrouter/hunter-alpha",
+              model: "xiaomi/mimo-v2-pro",
             }),
         });
       }
