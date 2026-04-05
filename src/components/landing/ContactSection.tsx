@@ -18,7 +18,7 @@ export function ContactSection() {
   }, []);
 
   return (
-    <section id="contact" className="py-[100px] lg:py-[140px] border-t border-[rgba(255,255,255,0.06)]">
+    <section id="contact" className="py-[100px] lg:py-[140px] border-t border-border">
       <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-8">
         {/* Header */}
         <div className="text-center mb-14">
@@ -35,19 +35,19 @@ export function ContactSection() {
               type="text"
               name="name"
               placeholder={t('name')}
-              className="w-full px-[18px] py-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded text-[#F5F5F7] font-body text-[13px] font-normal placeholder:text-[#3F3F46] placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300"
+              className="w-full px-[18px] py-4 bg-surface-inset border border-border rounded text-text-inverse font-body text-[13px] font-normal placeholder:text-text-muted placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300"
             />
             <input
               type="email"
               name="email"
               placeholder={t('email')}
-              className="w-full px-[18px] py-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded text-[#F5F5F7] font-body text-[13px] font-normal placeholder:text-[#3F3F46] placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300"
+              className="w-full px-[18px] py-4 bg-surface-inset border border-border rounded text-text-inverse font-body text-[13px] font-normal placeholder:text-text-muted placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300"
             />
           </div>
           <textarea
             name="message"
             placeholder={t('message')}
-            className="w-full px-[18px] py-4 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded text-[#F5F5F7] font-body text-[13px] font-normal placeholder:text-[#3F3F46] placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300 resize-y min-h-[130px] mb-3.5"
+            className="w-full px-[18px] py-4 bg-surface-inset border border-border rounded text-text-inverse font-body text-[13px] font-normal placeholder:text-text-muted placeholder:text-[10px] placeholder:tracking-[2.5px] placeholder:uppercase focus:outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(139,92,246,0.1)] transition-all duration-300 resize-y min-h-[130px] mb-3.5"
           />
           <button
             type="submit"

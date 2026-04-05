@@ -28,7 +28,8 @@ export const ThemeContext = createContext<ThemeContextValue | null>(null);
 // ─── Blocking inline script ─────────────────────────────────────
 // Runs synchronously before React hydration to prevent flash of
 // wrong theme. Mirrors the logic in getInitialTheme() below.
-const themeInitScript = `(function(){try{var s=localStorage.getItem("${STORAGE_KEY}");var t=s==="light"||s==="dark"?s:null;if(!t){t=window.matchMedia("(prefers-color-scheme:light)").matches?"light":"dark"}document.documentElement.setAttribute("${ATTRIBUTE}",t)}catch(e){document.documentElement.setAttribute("${ATTRIBUTE}","dark")}})()`;
+// Sets BOTH data-theme attribute AND .dark class for Tailwind v4.
+const themeInitScript = `(function(){try{var s=localStorage.getItem("${STORAGE_KEY}");var t=s==="light"||s==="dark"?s:null;if(!t){t=window.matchMedia("(prefers-color-scheme:light)").matches?"light":"dark"}document.documentElement.setAttribute("${ATTRIBUTE}",t);document.documentElement.classList.toggle("dark",t==="dark")}catch(e){document.documentElement.setAttribute("${ATTRIBUTE}","dark");document.documentElement.classList.add("dark")}})()`;
 
 // ─── Helpers ────────────────────────────────────────────────────
 
@@ -65,11 +66,12 @@ function getInitialTheme(): Theme {
 
 /**
  * Apply a theme to the document and persist to localStorage.
- * Extracted so both setTheme and toggleTheme can call it
- * synchronously (no waiting for a useEffect render cycle).
+ * Sets both `data-theme` attribute (for CSS variables) and a `.dark` class
+ * on `<html>` so Tailwind v4 `dark:` variants work.
  */
 function applyTheme(next: Theme): void {
   document.documentElement.setAttribute(ATTRIBUTE, next);
+  document.documentElement.classList.toggle('dark', next === 'dark');
   try {
     localStorage.setItem(STORAGE_KEY, next);
   } catch {
@@ -100,6 +102,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // already set it, but this covers edge cases like HMR).
   useEffect(() => {
     document.documentElement.setAttribute(ATTRIBUTE, theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
   // Follow OS preference changes when the user hasn't explicitly chosen.

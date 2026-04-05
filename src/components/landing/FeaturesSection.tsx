@@ -17,7 +17,7 @@ export function FeaturesSection() {
             <span className="text-brand">{t('titleThe')}</span>{' '}
             <em>{t('titleEdition')}</em>
           </h2>
-          <span className="hidden sm:block text-[10px] font-semibold tracking-[3px] uppercase text-[#71717A]">
+          <span className="hidden sm:block text-[10px] font-semibold tracking-[3px] uppercase text-text-muted">
             {t('label')}
           </span>
         </div>
@@ -25,7 +25,7 @@ export function FeaturesSection() {
         {/* Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-5">
           {/* Large card */}
-          <div className="lg:row-span-2 bg-[#131318] border border-[rgba(255,255,255,0.06)] rounded-lg overflow-hidden flex flex-col transition-all duration-500 hover:border-[rgba(139,92,246,0.25)] hover:shadow-[0_24px_64px_rgba(0,0,0,0.3),0_0_0_1px_rgba(139,92,246,0.1)] hover:-translate-y-1">
+          <div className="lg:row-span-2 bg-surface-raised border border-border rounded-lg overflow-hidden flex flex-col transition-all duration-500 hover:border-brand hover:shadow-[0_24px_64px_rgba(0,0,0,0.3),0_0_0_1px_rgba(139,92,246,0.1)] hover:-translate-y-1">
             <div className="w-full aspect-[16/10] bg-gradient-to-br from-[#111118] via-[#1a1528] to-[#12121a] flex items-center justify-center relative overflow-hidden">
               {/* Rotating conic gradient */}
               <div className="absolute w-[200%] h-[200%] top-[-50%] left-[-50%] bg-[conic-gradient(from_180deg_at_50%_50%,rgba(139,92,246,0.06)_0deg,transparent_90deg,rgba(139,92,246,0.04)_180deg,transparent_270deg)] animate-[landing-mesh-rotate_20s_linear_infinite]" />
@@ -41,7 +41,7 @@ export function FeaturesSection() {
               <h3 className="font-display text-[clamp(22px,2.5vw,30px)] font-normal italic leading-[1.25] mb-3.5">
                 {t('engine.title')}
               </h3>
-              <p className="text-sm leading-[1.8] text-[#A1A1AA] font-light">
+              <p className="text-sm leading-[1.8] text-text-secondary font-light">
                 {t('engine.description')}
               </p>
             </div>
@@ -50,7 +50,7 @@ export function FeaturesSection() {
           {/* Small cards stack */}
           <div className="flex flex-col gap-5">
             {/* Multilingual Core */}
-            <div className="flex-1 bg-[#131318] border border-[rgba(255,255,255,0.06)] rounded-lg px-8 py-9 flex flex-col justify-end relative overflow-hidden transition-all duration-500 hover:border-[rgba(139,92,246,0.25)] hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1 group">
+            <div className="flex-1 bg-surface-raised border border-border rounded-lg px-8 py-9 flex flex-col justify-end relative overflow-hidden transition-all duration-500 hover:border-brand hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1 group">
               <div className="absolute top-[-60px] right-[-60px] w-[200px] h-[200px] bg-[radial-gradient(circle,rgba(139,92,246,0.04),transparent_70%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <span className="block mb-3.5 text-[10px] font-semibold tracking-[3px] uppercase text-brand">
                 {t('multilingual.label')}
@@ -58,13 +58,13 @@ export function FeaturesSection() {
               <h3 className="font-display text-[clamp(22px,2.5vw,30px)] font-normal italic leading-[1.25] mb-3.5">
                 {t('multilingual.title')}
               </h3>
-              <p className="text-sm leading-[1.8] text-[#A1A1AA] font-light">
+              <p className="text-sm leading-[1.8] text-text-secondary font-light">
                 {t('multilingual.description')}
               </p>
             </div>
 
             {/* Smart Scheduling */}
-            <div className="flex-1 bg-[#131318] border border-[rgba(255,255,255,0.06)] rounded-lg px-8 py-9 flex flex-col justify-end relative overflow-hidden transition-all duration-500 hover:border-[rgba(139,92,246,0.25)] hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1 group">
+            <div className="flex-1 bg-surface-raised border border-border rounded-lg px-8 py-9 flex flex-col justify-end relative overflow-hidden transition-all duration-500 hover:border-brand hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1 group">
               <div className="absolute top-[-60px] right-[-60px] w-[200px] h-[200px] bg-[radial-gradient(circle,rgba(139,92,246,0.04),transparent_70%)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <span className="block mb-3.5 text-[10px] font-semibold tracking-[3px] uppercase text-brand">
                 {t('scheduling.label')}
@@ -72,7 +72,7 @@ export function FeaturesSection() {
               <h3 className="font-display text-[clamp(22px,2.5vw,30px)] font-normal italic leading-[1.25] mb-3.5">
                 {t('scheduling.title')}
               </h3>
-              <p className="text-sm leading-[1.8] text-[#A1A1AA] font-light">
+              <p className="text-sm leading-[1.8] text-text-secondary font-light">
                 {t('scheduling.description')}
               </p>
             </div>

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode: triggered by .dark class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Purple Glow Social 2.0 — Design Tokens
  *

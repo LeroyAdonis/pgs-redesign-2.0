@@ -59,13 +59,13 @@ export function PricingSection() {
           </h2>
 
           {/* Toggle */}
-          <div className="flex gap-0.5 bg-[#131318] border border-[rgba(255,255,255,0.06)] rounded-md p-[3px]">
+          <div className="flex gap-0.5 bg-surface-raised border border-border rounded-md p-[3px]">
             <button
               className={cn(
                 'px-[22px] py-[9px] text-[11px] font-medium tracking-[0.5px] rounded transition-all duration-300',
                 !isAnnual
                   ? 'bg-brand text-white shadow-[0_2px_8px_rgba(139,92,246,0.3)]'
-                  : 'text-[#71717A]',
+                  : 'text-text-muted',
               )}
               onClick={() => setIsAnnual(false)}
             >
@@ -76,7 +76,7 @@ export function PricingSection() {
                 'px-[22px] py-[9px] text-[11px] font-medium tracking-[0.5px] rounded transition-all duration-300',
                 isAnnual
                   ? 'bg-brand text-white shadow-[0_2px_8px_rgba(139,92,246,0.3)]'
-                  : 'text-[#71717A]',
+                  : 'text-text-muted',
               )}
               onClick={() => setIsAnnual(true)}
             >
@@ -91,10 +91,10 @@ export function PricingSection() {
             <div
               key={tier.key}
               className={cn(
-                'bg-[#131318] border rounded-lg px-9 py-11 relative transition-all duration-500 hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1.5',
+                'bg-surface-raised border rounded-lg px-9 py-11 relative transition-all duration-500 hover:shadow-[0_24px_64px_rgba(0,0,0,0.3)] hover:-translate-y-1.5',
                 tier.preferred
                   ? 'border-brand hover:border-brand'
-                  : 'border-[rgba(255,255,255,0.06)] hover:border-[rgba(139,92,246,0.25)]',
+                  : 'border-border hover:border-brand',
               )}
             >
               {/* Preferred badge */}
@@ -107,18 +107,18 @@ export function PricingSection() {
               {/* Tier name */}
               <div className={cn(
                 'text-[10px] font-semibold tracking-[3px] uppercase mb-2.5',
-                tier.preferred ? 'text-brand' : 'text-[#71717A]',
+                tier.preferred ? 'text-brand' : 'text-text-muted',
               )}>
                 {t(`${tier.key}.name`)}
               </div>
 
               {/* Price */}
               <div className="flex items-baseline gap-1 mb-8" data-testid={`price-${tier.key}`}>
-                <span className="font-display text-xl text-[#71717A]">R</span>
+                <span className="font-display text-xl text-text-muted">R</span>
                 <span className="font-display text-[52px] font-normal leading-none">
                   {isAnnual ? t(`${tier.key}.priceAnnual`) : t(`${tier.key}.price`)}
                 </span>
-                <span className="text-[13px] text-[#71717A]">
+                <span className="text-[13px] text-text-muted">
                   {isAnnual ? t('periodAnnual') : t('period')}
                 </span>
               </div>
@@ -128,7 +128,7 @@ export function PricingSection() {
                 {tier.features.map((featureKey) => (
                   <li
                     key={featureKey}
-                    className="flex items-center gap-3 text-sm text-[#A1A1AA] font-light py-[9px]"
+                    className="flex items-center gap-3 text-sm text-text-secondary font-light py-[9px]"
                   >
                     <span className="w-[5px] h-[5px] rounded-full bg-brand shrink-0" aria-hidden="true" />
                     {t(`${tier.key}.${featureKey}`)}
@@ -143,7 +143,7 @@ export function PricingSection() {
                   'w-full inline-flex items-center justify-center gap-2.5 px-8 py-4 text-xs font-semibold tracking-[1.5px] uppercase rounded-[3px] transition-all duration-400',
                   tier.ctaVariant === 'primary'
                     ? 'bg-brand text-white hover:bg-brand-hover hover:-translate-y-0.5 hover:shadow-[0_8px_32px_rgba(139,92,246,0.35)]'
-                    : 'bg-transparent text-[#F5F5F7] border border-[#3F3F46] hover:border-[#A1A1AA] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]',
+                    : 'bg-transparent text-text-inverse border border-border-strong hover:border-[#A1A1AA] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]',
                 )}
               >
                 {t(tier.ctaKey)}

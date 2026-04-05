@@ -13,11 +13,11 @@ export function ProcessSection() {
   const t = useTranslations('landing.process');
 
   return (
-    <section id="process" className="py-[100px] lg:py-[140px] border-t border-[rgba(255,255,255,0.06)]">
+    <section id="process" className="py-[100px] lg:py-[140px] border-t border-border">
       <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-8">
         {/* Header */}
         <div className="mb-24">
-          <span className="block mb-5 text-[10px] font-semibold tracking-[3px] uppercase text-[#71717A]">
+          <span className="block mb-5 text-[10px] font-semibold tracking-[3px] uppercase text-text-muted">
             {t('label')}
           </span>
           <h2 className="font-display text-[clamp(40px,5vw,64px)] font-normal leading-[1.1] tracking-[-0.025em]">
@@ -37,7 +37,7 @@ export function ProcessSection() {
               <h3 className="font-display text-[22px] font-normal italic mb-4">
                 {t(`${step}.title`)}
               </h3>
-              <p className="text-[13px] leading-[1.85] text-[#71717A] font-light">
+              <p className="text-[13px] leading-[1.85] text-text-muted font-light">
                 {t(`${step}.description`)}
               </p>
             </div>

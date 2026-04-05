@@ -121,7 +121,7 @@ export function LandingNavbar() {
         <div className="mx-auto max-w-[1240px] px-4 sm:px-8">
           <div className="flex items-center justify-between py-[22px]">
             {/* Logo */}
-            <a href="#" className="group flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-[#F5F5F7]">
+            <a href="#" className="group flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-text-inverse">
               <span className="w-[3px] h-5 bg-brand rounded-sm transition-all duration-300 group-hover:h-6" />
               Purple Glow
             </a>
@@ -137,9 +137,9 @@ export function LandingNavbar() {
                     'relative text-[11px] font-medium tracking-[2px] uppercase transition-colors duration-300',
                     // Active: bright text + brand underline stays visible
                     activeSection === link
-                      ? 'text-[#F5F5F7] after:w-full'
-                      : 'text-[#71717A] after:w-0',
-                    'hover:text-[#F5F5F7]',
+                      ? 'text-text-inverse after:w-full'
+                      : 'text-text-muted after:w-0',
+                    'hover:text-text-inverse',
                     // Underline pseudo-element: 2px brand bar
                     'after:content-[""] after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:bg-brand after:transition-all after:duration-400',
                     'hover:after:w-full',
@@ -155,7 +155,7 @@ export function LandingNavbar() {
             <div className="flex items-center gap-6">
               <a
                 href="/login"
-                className="hidden md:block text-[11px] font-medium tracking-[2px] uppercase text-[#71717A] hover:text-[#F5F5F7] transition-colors duration-300"
+                className="hidden md:block text-[11px] font-medium tracking-[2px] uppercase text-text-muted hover:text-text-inverse transition-colors duration-300"
               >
                 {t('login')}
               </a>
@@ -192,12 +192,12 @@ export function LandingNavbar() {
       >
         {/* Mobile menu header */}
         <div className="flex items-center justify-between px-5 sm:px-8 py-[22px]">
-          <a href="#" className="flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-[#F5F5F7]">
+          <a href="#" className="flex items-center gap-2.5 text-[13px] font-bold tracking-[2.5px] uppercase text-text-inverse">
             <span className="w-[3px] h-5 bg-brand rounded-sm" />
             Purple Glow
           </a>
           <button
-            className="flex items-center justify-center w-8 h-8 text-2xl text-[#F5F5F7]"
+            className="flex items-center justify-center w-8 h-8 text-2xl text-text-inverse"
             onClick={closeMobileMenu}
             aria-label={t('closeMenu')}
           >
@@ -217,10 +217,10 @@ export function LandingNavbar() {
               }}
               className={cn(
                 'font-display text-[clamp(42px,8vw,72px)] italic leading-[1.3]',
-                'transition-all duration-400 hover:text-[#F5F5F7] hover:translate-x-4',
+                'transition-all duration-400 hover:text-text-inverse hover:translate-x-4',
                 // Active: bright text + slight indent
                 activeSection === link
-                  ? 'text-[#F5F5F7] translate-x-2'
+                  ? 'text-text-inverse translate-x-2'
                   : 'text-[#3F3F46]',
               )}
               aria-current={activeSection === link ? 'true' : undefined}
@@ -231,30 +231,30 @@ export function LandingNavbar() {
           <a
             href="/login"
             onClick={closeMobileMenu}
-            className="font-display text-[clamp(42px,8vw,72px)] italic text-[#3F3F46] leading-[1.3] mt-8 transition-all duration-400 hover:text-[#F5F5F7] hover:translate-x-4"
+            className="font-display text-[clamp(42px,8vw,72px)] italic text-[#3F3F46] leading-[1.3] mt-8 transition-all duration-400 hover:text-text-inverse hover:translate-x-4"
           >
             {t('login')}
           </a>
         </nav>
 
         {/* Mobile menu footer */}
-        <div className="px-6 sm:px-16 py-8 border-t border-[rgba(255,255,255,0.06)] flex items-center justify-between">
+        <div className="px-6 sm:px-16 py-8 border-t border-border flex items-center justify-between">
           <div>
             <div className="flex gap-5">
               {/* Social icons */}
-              <a href="#" aria-label="Instagram" className="text-[#71717A] hover:text-[#F5F5F7] transition-colors duration-300">
+              <a href="#" aria-label="Instagram" className="text-text-muted hover:text-text-inverse transition-colors duration-300">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="2" y="2" width="20" height="20" rx="5" />
                   <circle cx="12" cy="12" r="5" />
                   <circle cx="17.5" cy="6.5" r="1.5" />
                 </svg>
               </a>
-              <a href="#" aria-label="Twitter" className="text-[#71717A] hover:text-[#F5F5F7] transition-colors duration-300">
+              <a href="#" aria-label="Twitter" className="text-text-muted hover:text-text-inverse transition-colors duration-300">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                 </svg>
               </a>
-              <a href="#" aria-label="LinkedIn" className="text-[#71717A] hover:text-[#F5F5F7] transition-colors duration-300">
+              <a href="#" aria-label="LinkedIn" className="text-text-muted hover:text-text-inverse transition-colors duration-300">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />

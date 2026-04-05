@@ -30,7 +30,7 @@ export function TestimonialsSection() {
           {TESTIMONIAL_KEYS.map((key) => (
             <div
               key={key}
-              className="bg-[#131318] border border-[rgba(255,255,255,0.06)] rounded-lg px-8 py-10 flex flex-col transition-all duration-500 hover:border-[rgba(139,92,246,0.25)] hover:-translate-y-1"
+              className="bg-surface-raised border border-border rounded-lg px-8 py-10 flex flex-col transition-all duration-500 hover:border-brand hover:-translate-y-1"
             >
               {/* Quote icon */}
               <div className="font-display text-[56px] text-brand leading-[0.8] mb-6 opacity-70" aria-hidden="true">
@@ -38,18 +38,18 @@ export function TestimonialsSection() {
               </div>
 
               {/* Quote text */}
-              <p className="text-[15px] leading-[1.8] text-[#A1A1AA] font-light flex-1 mb-8">
+              <p className="text-[15px] leading-[1.8] text-text-secondary font-light flex-1 mb-8">
                 &ldquo;{t(`${key}.quote`)}&rdquo;
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3.5 pt-6 border-t border-[rgba(255,255,255,0.06)]">
+              <div className="flex items-center gap-3.5 pt-6 border-t border-border">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3F3F46] to-[#18181B] shrink-0" aria-hidden="true" />
                 <div>
                   <div className="text-[13px] font-semibold tracking-[0.3px]">
                     {t(`${key}.name`)}
                   </div>
-                  <div className="text-[11px] text-[#71717A] tracking-[0.5px] mt-0.5">
+                  <div className="text-[11px] text-text-muted tracking-[0.5px] mt-0.5">
                     {t(`${key}.role`)}
                   </div>
                 </div>
