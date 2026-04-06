@@ -7,7 +7,7 @@
  * the interactive client component for managing them.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 
 import { requireServerSession } from "@/lib/auth-session";
 import { db } from "@/db";

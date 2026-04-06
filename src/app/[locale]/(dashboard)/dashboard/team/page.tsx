@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { MembersList } from "./_components/members-list";
 

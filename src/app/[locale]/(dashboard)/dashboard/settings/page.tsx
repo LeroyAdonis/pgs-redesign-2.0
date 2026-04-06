@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { ProfileForm } from "./_components/profile-form";
 
@@ -11,13 +11,14 @@ export async function generateMetadata() {
 export default async function SettingsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("dashboard");
   const session = await requireServerSession();
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight text-text">Settings</h1>
-        <p className="mt-1 text-sm text-text-muted">Manage your account preferences.</p>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-text">{t("profile")}</h1>
+        <p className="mt-1 text-sm text-text-muted">{t("welcomeBack")}</p>
       </div>
 
       {/* Profile Section */}
