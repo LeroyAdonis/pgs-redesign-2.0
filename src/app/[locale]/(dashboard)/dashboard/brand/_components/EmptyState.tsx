@@ -4,9 +4,11 @@
  * Server component. Displays a CTA to link social accounts first.
  */
 
+import { getTranslations } from 'next-intl/server';
 import { cn } from '@/lib/utils';
 
-export function EmptyState() {
+export async function EmptyState() {
+  const t = await getTranslations('dashboard');
   return (
     <div className="flex flex-col items-center py-16 text-center">
       {/* Icon */}
@@ -35,12 +37,10 @@ export function EmptyState() {
 
       {/* Text */}
       <h2 className="mt-6 text-xl font-semibold text-text">
-        No brand profile yet
+        {t('brand.noProfileTitle')}
       </h2>
       <p className="mt-2 max-w-md text-sm text-text-muted">
-        Connect your social media accounts first, then we&apos;ll analyze your
-        content to build your unique brand profile — including tone, vocabulary,
-        hashtag patterns, and SA cultural awareness.
+        {t('brand.noProfileDesc')}
       </p>
 
       {/* CTA */}
@@ -69,7 +69,7 @@ export function EmptyState() {
             d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
           />
         </svg>
-        Link Social Accounts
+        {t('brand.linkAccounts')}
       </a>
     </div>
   );

@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { isSAHashtag } from '@/lib/brand/sa-context';
 import type { HashtagPattern } from '@/lib/brand/types';
@@ -18,6 +19,7 @@ interface HashtagManagerProps {
 }
 
 export function HashtagManager({ patterns, onAdd, onRemove }: HashtagManagerProps) {
+  const t = useTranslations('dashboard');
   const [newHashtag, setNewHashtag] = useState('');
 
   const handleAdd = () => {
@@ -49,13 +51,13 @@ export function HashtagManager({ patterns, onAdd, onRemove }: HashtagManagerProp
               handleAdd();
             }
           }}
-          placeholder="Add hashtag..."
+          placeholder={t('brand.addHashtagPlaceholder')}
           className={cn(
             'flex-1 h-9 rounded-none border border-border bg-surface px-3',
             'text-sm text-text placeholder:text-text-muted',
             'focus:outline-2 focus:outline-brand',
           )}
-          aria-label="Add new hashtag"
+          aria-label={t('brand.addHashtagLabel')}
         />
         <button
           onClick={handleAdd}
@@ -68,14 +70,14 @@ export function HashtagManager({ patterns, onAdd, onRemove }: HashtagManagerProp
             'transition-colors',
           )}
         >
-          Add
+          {t('brand.addHashtag')}
         </button>
       </div>
 
       {/* Hashtag list */}
       {patterns.length === 0 ? (
         <p className="text-sm text-text-muted">
-          No hashtags yet. Add some above or run a brand scan.
+          {t('brand.noHashtags')}
         </p>
       ) : (
         <div className="flex flex-wrap gap-2">
@@ -93,13 +95,13 @@ export function HashtagManager({ patterns, onAdd, onRemove }: HashtagManagerProp
                     : 'bg-surface-inset border-border text-text-secondary',
                 )}
               >
-                {isSA && <span aria-label="South African hashtag">🇿🇦</span>}
+                {isSA && <span aria-label={t('brand.saHashtagLabel')}>🇿🇦</span>}
                 {pattern.hashtag}
                 <span className="text-text-muted">({pattern.frequency})</span>
                 <button
                   onClick={() => onRemove(pattern.hashtag)}
                   className="ml-0.5 text-text-muted hover:text-error transition-colors"
-                  aria-label={`Remove ${pattern.hashtag}`}
+                  aria-label={t('brand.removeHashtag', { hashtag: pattern.hashtag })}
                 >
                   ×
                 </button>

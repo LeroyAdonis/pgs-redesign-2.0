@@ -7,6 +7,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui';
 import { ToneSliders } from './ToneSliders';
@@ -44,6 +45,7 @@ interface BrandProfileViewProps {
 }
 
 export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewProps) {
+  const t = useTranslations('dashboard');
   const [tone, setTone] = useState<ToneFingerprint>(profile.toneFingerprint);
   const [hashtags, setHashtags] = useState<HashtagPattern[]>(profile.hashtagPatterns);
   const [isSaving, setIsSaving] = useState(false);
@@ -117,10 +119,10 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight text-text">
-            Brand Profile
+            {t('brand.title')}
           </h1>
           <p className="mt-1 text-sm text-text-muted">
-            Your brand&apos;s voice, style, and patterns analyzed from social media
+            {t('brand.subtitle')}
           </p>
         </div>
 
@@ -138,7 +140,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
               'h-10 rounded-none border border-border bg-surface px-3 text-sm text-text',
               'focus:outline-2 focus:outline-brand',
             )}
-            aria-label="Select language"
+            aria-label={t('common.selectLanguage')}
           >
             {languages.map((lang) => (
               <option key={lang.code} value={lang.code}>
@@ -157,7 +159,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           isLoading={isScanning}
           onClick={handleReScan}
         >
-          Re-Scan Brand
+          {t('brand.reScan')}
         </Button>
         <Button
           variant="primary"
@@ -166,10 +168,10 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           disabled={!hasChanges}
           onClick={handleSave}
         >
-          Save Changes
+          {t('brand.saveChanges')}
         </Button>
         {hasChanges && (
-          <span className="text-xs text-warning">Unsaved changes</span>
+          <span className="text-xs text-warning">{t('brand.unsavedChanges')}</span>
         )}
       </div>
 
@@ -181,7 +183,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
         )}
       >
         <h2 className="mb-4 text-lg font-semibold text-text">
-          Tone Fingerprint
+          {t('brand.toneFingerprint')}
         </h2>
         <ToneSliders tone={tone} onChange={handleToneChange} />
       </section>
@@ -196,7 +198,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           )}
         >
           <h2 className="mb-4 text-lg font-semibold text-text">
-            Vocabulary Cloud
+            {t('brand.vocabularyCloud')}
           </h2>
           <VocabularyCloud clusters={profile.vocabularyClusters} />
         </section>
@@ -209,7 +211,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           )}
         >
           <h2 className="mb-4 text-lg font-semibold text-text">
-            Hashtag Patterns
+            {t('brand.hashtagPatterns')}
           </h2>
           <HashtagManager
             patterns={hashtags}
@@ -226,7 +228,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           )}
         >
           <h2 className="mb-4 text-lg font-semibold text-text">
-            Posting Cadence
+            {t('brand.postingCadence')}
           </h2>
           <PostingCadenceChart cadence={profile.postingCadence} />
         </section>
@@ -239,7 +241,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
           )}
         >
           <h2 className="mb-4 text-lg font-semibold text-text">
-            Emoji Usage
+            {t('brand.emojiUsage')}
           </h2>
           <EmojiGallery emojis={profile.emojiUsage} />
         </section>
@@ -253,7 +255,7 @@ export function BrandProfileView({ profile, saCulturalScore }: BrandProfileViewP
         )}
       >
         <h2 className="mb-4 text-lg font-semibold text-text">
-          Content Stats
+          {t('brand.contentStats')}
         </h2>
         <ContentStats
           avgContentLength={profile.avgContentLength}

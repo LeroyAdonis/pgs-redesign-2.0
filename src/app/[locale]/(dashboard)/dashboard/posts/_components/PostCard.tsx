@@ -8,6 +8,7 @@
  * via checkbox.
  */
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { formatDateSAST } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
@@ -22,14 +23,6 @@ const STATUS_VARIANT: Record<PostStatus, "default" | "success" | "info" | "warni
   publishing: "warning",
   published: "success",
   failed: "error",
-};
-
-const STATUS_LABEL: Record<PostStatus, string> = {
-  draft: "Draft",
-  scheduled: "Scheduled",
-  publishing: "Publishing",
-  published: "Published",
-  failed: "Failed",
 };
 
 /* ─── Props ─── */
@@ -53,9 +46,20 @@ export function PostCard({
   onSchedule,
   onDelete,
 }: PostCardProps) {
+  const t = useTranslations("dashboard");
+
   const platform = PLATFORM_CONFIG[post.platform as PlatformId];
   const status = post.status as PostStatus;
   const statusVariant = STATUS_VARIANT[status] ?? "default";
+
+  const STATUS_LABEL: Record<PostStatus, string> = {
+    draft: t("posts.statusDraft"),
+    scheduled: t("posts.statusScheduled"),
+    publishing: t("posts.statusPublishing"),
+    published: t("posts.statusPublished"),
+    failed: t("posts.statusFailed"),
+  };
+
   const statusLabel = STATUS_LABEL[status] ?? post.status;
 
   // Content preview: first 140 chars
@@ -86,7 +90,7 @@ export function PostCard({
           type="checkbox"
           checked={isSelected}
           onChange={(e) => onSelect(post.id, e.target.checked)}
-          aria-label={`Select post ${post.id}`}
+          aria-label={t("posts.selectPost", { id: post.id })}
           className={cn(
             "h-4 w-4 rounded border-border text-brand",
             "focus:ring-brand focus:ring-offset-0",
@@ -115,7 +119,7 @@ export function PostCard({
 
           {post.aiGenerated && (
             <Badge variant="brand" size="sm">
-              AI
+              {t("posts.aiBadge")}
             </Badge>
           )}
         </div>
@@ -126,7 +130,7 @@ export function PostCard({
         {/* Meta row: dates */}
         <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
           <span>
-            Created{" "}
+            {t("posts.createdLabel")}{" "}
             {formatDateSAST(new Date(post.createdAt), {
               day: "numeric",
               month: "short",
@@ -136,7 +140,7 @@ export function PostCard({
 
           {nextSchedule && (
             <span className="text-info">
-              Scheduled{" "}
+              {t("posts.scheduledLabel")}{" "}
               {formatDateSAST(new Date(nextSchedule.scheduledAt), {
                 day: "numeric",
                 month: "short",
@@ -159,7 +163,7 @@ export function PostCard({
         <button
           type="button"
           onClick={() => onEdit(post.id)}
-          aria-label="Edit post"
+          aria-label={t("posts.editPost")}
           className={cn(
             "rounded-none p-1.5 text-text-muted",
             "hover:bg-brand-surface hover:text-brand",
@@ -175,7 +179,7 @@ export function PostCard({
         <button
           type="button"
           onClick={() => onSchedule(post.id)}
-          aria-label="Schedule post"
+          aria-label={t("posts.schedulePost")}
           className={cn(
             "rounded-none p-1.5 text-text-muted",
             "hover:bg-info-surface hover:text-info",
@@ -191,7 +195,7 @@ export function PostCard({
         <button
           type="button"
           onClick={() => onDelete(post.id)}
-          aria-label="Delete post"
+          aria-label={t("posts.deletePost")}
           className={cn(
             "rounded-none p-1.5 text-text-muted",
             "hover:bg-error-surface hover:text-error",

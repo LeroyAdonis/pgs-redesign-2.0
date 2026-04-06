@@ -6,6 +6,7 @@
  * Each slider ranges 0–1 with visual gradient feedback and labels.
  */
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { ToneFingerprint } from '@/lib/brand/types';
 
@@ -16,59 +17,63 @@ interface ToneSlidersProps {
 
 const TONE_CONFIG: Array<{
   key: keyof ToneFingerprint;
-  label: string;
-  leftLabel: string;
-  rightLabel: string;
+  labelKey: string;
+  leftKey: string;
+  rightKey: string;
   color: string;
 }> = [
   {
     key: 'formal',
-    label: 'Formality',
-    leftLabel: 'Informal',
-    rightLabel: 'Formal',
+    labelKey: 'brand.toneFormality',
+    leftKey: 'brand.toneFormalityLeft',
+    rightKey: 'brand.toneFormalityRight',
     color: 'bg-blue-500',
   },
   {
     key: 'casual',
-    label: 'Casualness',
-    leftLabel: 'Structured',
-    rightLabel: 'Casual',
+    labelKey: 'brand.toneCasualness',
+    leftKey: 'brand.toneCasualnessLeft',
+    rightKey: 'brand.toneCasualnessRight',
     color: 'bg-green-500',
   },
   {
     key: 'humorous',
-    label: 'Humor',
-    leftLabel: 'Serious',
-    rightLabel: 'Humorous',
+    labelKey: 'brand.toneHumor',
+    leftKey: 'brand.toneHumorLeft',
+    rightKey: 'brand.toneHumorRight',
     color: 'bg-yellow-500',
   },
   {
     key: 'professional',
-    label: 'Professionalism',
-    leftLabel: 'Personal',
-    rightLabel: 'Professional',
+    labelKey: 'brand.toneProfessionalism',
+    leftKey: 'brand.toneProfessionalismLeft',
+    rightKey: 'brand.toneProfessionalismRight',
     color: 'bg-purple-500',
   },
   {
     key: 'inspirational',
-    label: 'Inspiration',
-    leftLabel: 'Practical',
-    rightLabel: 'Inspirational',
+    labelKey: 'brand.toneInspiration',
+    leftKey: 'brand.toneInspirationLeft',
+    rightKey: 'brand.toneInspirationRight',
     color: 'bg-pink-500',
   },
   {
     key: 'educational',
-    label: 'Educational',
-    leftLabel: 'Entertaining',
-    rightLabel: 'Educational',
+    labelKey: 'brand.toneEducational',
+    leftKey: 'brand.toneEducationalLeft',
+    rightKey: 'brand.toneEducationalRight',
     color: 'bg-cyan-500',
   },
 ];
 
 export function ToneSliders({ tone, onChange }: ToneSlidersProps) {
+  const t = useTranslations('dashboard');
   return (
     <div className="space-y-5">
-      {TONE_CONFIG.map(({ key, label, leftLabel, rightLabel, color }) => {
+      {TONE_CONFIG.map(({ key, labelKey, leftKey, rightKey, color }) => {
+        const label = t(labelKey as Parameters<typeof t>[0]);
+        const leftLabel = t(leftKey as Parameters<typeof t>[0]);
+        const rightLabel = t(rightKey as Parameters<typeof t>[0]);
         const value = tone[key];
         const percentage = Math.round(value * 100);
 

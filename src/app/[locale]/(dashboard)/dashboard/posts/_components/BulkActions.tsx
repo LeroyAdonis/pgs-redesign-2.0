@@ -8,6 +8,7 @@
  */
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 
@@ -30,10 +31,13 @@ export function BulkActions({
   onDelete,
   onClearSelection,
 }: BulkActionsProps) {
+  const t = useTranslations("dashboard");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const count = selectedIds.length;
 
   if (count === 0) return null;
+
+  const noun = count === 1 ? t("posts.bulkPostSingular") : t("posts.bulkPostPlural");
 
   return (
     <div
@@ -44,21 +48,21 @@ export function BulkActions({
         "animate-in slide-in-from-bottom-4 duration-200",
       )}
       role="toolbar"
-      aria-label="Bulk actions"
+      aria-label={t("posts.bulkActionsLabel")}
       data-testid="bulk-actions"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         {/* Selection count */}
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-text">
-            {count} {count === 1 ? "post" : "posts"} selected
+            {t("posts.bulkPostsSelected", { count, noun })}
           </span>
           <button
             type="button"
             onClick={onClearSelection}
             className="text-xs text-text-muted hover:text-text transition-colors"
           >
-            Clear
+            {t("posts.bulkClear")}
           </button>
         </div>
 
@@ -69,7 +73,7 @@ export function BulkActions({
             size="sm"
             onClick={() => onApprove(selectedIds)}
           >
-            Approve All
+            {t("posts.bulkApproveAll")}
           </Button>
 
           <Button
@@ -77,12 +81,12 @@ export function BulkActions({
             size="sm"
             onClick={() => onReschedule(selectedIds)}
           >
-            Reschedule
+            {t("posts.bulkReschedule")}
           </Button>
 
           {confirmDelete ? (
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-error">Confirm?</span>
+              <span className="text-xs text-error">{t("posts.bulkConfirm")}</span>
               <Button
                 variant="danger"
                 size="sm"
@@ -91,14 +95,14 @@ export function BulkActions({
                   setConfirmDelete(false);
                 }}
               >
-                Yes, Delete
+                {t("posts.bulkYesDelete")}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setConfirmDelete(false)}
               >
-                Cancel
+                {t("posts.bulkCancel")}
               </Button>
             </div>
           ) : (
@@ -107,7 +111,7 @@ export function BulkActions({
               size="sm"
               onClick={() => setConfirmDelete(true)}
             >
-              Delete
+              {t("common.delete")}
             </Button>
           )}
         </div>

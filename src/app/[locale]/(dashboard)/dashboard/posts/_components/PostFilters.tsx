@@ -6,6 +6,7 @@
  * Stateless controlled component. All filter state lives in PostsManager.
  */
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ALL_PLATFORM_IDS, PLATFORM_CONFIG } from "./platform-config";
 import type { PostFiltersState } from "./types";
@@ -17,20 +18,20 @@ interface PostFiltersProps {
   onFilterChange: (filters: PostFiltersState) => void;
 }
 
-/* ─── Status options ─── */
-
-const STATUS_OPTIONS = [
-  { value: "", label: "All statuses" },
-  { value: "draft", label: "Draft" },
-  { value: "scheduled", label: "Scheduled" },
-  { value: "publishing", label: "Publishing" },
-  { value: "published", label: "Published" },
-  { value: "failed", label: "Failed" },
-] as const;
-
 /* ─── Component ─── */
 
 export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
+  const t = useTranslations("dashboard");
+
+  const STATUS_OPTIONS = [
+    { value: "", label: t("posts.filterAllStatuses") },
+    { value: "draft", label: t("posts.filterStatusDraft") },
+    { value: "scheduled", label: t("posts.filterStatusScheduled") },
+    { value: "publishing", label: t("posts.filterStatusPublishing") },
+    { value: "published", label: t("posts.filterStatusPublished") },
+    { value: "failed", label: t("posts.filterStatusFailed") },
+  ] as const;
+
   function update(patch: Partial<PostFiltersState>) {
     onFilterChange({ ...filters, ...patch });
   }
@@ -45,7 +46,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
         "rounded-none border border-border bg-surface p-3",
       )}
       role="search"
-      aria-label="Filter posts"
+      aria-label={t("posts.filterAriaLabel")}
     >
       {/* Platform */}
       <div className="flex flex-col gap-1.5">
@@ -53,7 +54,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
           htmlFor="filter-platform"
           className="text-xs font-medium text-text-muted"
         >
-          Platform
+          {t("posts.filterPlatform")}
         </label>
         <select
           id="filter-platform"
@@ -66,7 +67,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
             "transition-colors",
           )}
         >
-          <option value="">All platforms</option>
+          <option value="">{t("posts.filterAllPlatforms")}</option>
           {ALL_PLATFORM_IDS.map((id) => (
             <option key={id} value={id}>
               {PLATFORM_CONFIG[id].label}
@@ -81,7 +82,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
           htmlFor="filter-status"
           className="text-xs font-medium text-text-muted"
         >
-          Status
+          {t("posts.filterStatus")}
         </label>
         <select
           id="filter-status"
@@ -108,7 +109,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
           htmlFor="filter-date-from"
           className="text-xs font-medium text-text-muted"
         >
-          From
+          {t("posts.filterFrom")}
         </label>
         <input
           id="filter-date-from"
@@ -130,7 +131,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
           htmlFor="filter-date-to"
           className="text-xs font-medium text-text-muted"
         >
-          To
+          {t("posts.filterTo")}
         </label>
         <input
           id="filter-date-to"
@@ -164,7 +165,7 @@ export function PostFilters({ filters, onFilterChange }: PostFiltersProps) {
             "transition-colors",
           )}
         >
-          Clear filters
+          {t("posts.filterClear")}
         </button>
       )}
     </div>
