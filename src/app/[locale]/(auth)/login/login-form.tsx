@@ -8,24 +8,13 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 
-interface LoginFormLabels {
-  email: string;
-  password: string;
-  signIn: string;
-  signingIn: string;
-  forgotPassword: string;
-  continueWithGoogle: string;
-  continueWithGithub: string;
-  or: string;
-  oauthAccountError: string;
-}
+// Labels are now sourced from translations via useTranslations
 
-interface LoginFormProps {
-  labels: LoginFormLabels;
-}
+interface LoginFormProps {}
 
 /** Inline spinner SVG for button loading states */
 function Spinner({ className = "h-5 w-5" }: { className?: string }) {
@@ -53,8 +42,9 @@ function Spinner({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function LoginForm({ labels }: LoginFormProps) {
+export function LoginForm({}: LoginFormProps) {
   const router = useRouter();
+  const t = useTranslations('auth');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +57,7 @@ export function LoginForm({ labels }: LoginFormProps) {
       lower.includes("social") ||
       lower.includes("already linked")
     ) {
-      return labels.oauthAccountError;
+      return t('oauthAccountError');
     }
     return message;
   }

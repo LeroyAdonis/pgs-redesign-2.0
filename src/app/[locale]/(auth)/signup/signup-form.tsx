@@ -9,21 +9,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signUp, signIn } from "@/lib/auth-client";
-
-interface SignupFormLabels {
-  email: string;
-  password: string;
-  signUp: string;
-  signingUp: string;
-  continueWithGoogle: string;
-  continueWithGithub: string;
-  or: string;
-}
-
-interface SignupFormProps {
-  labels: SignupFormLabels;
-}
 
 /** Inline spinner SVG for button loading states */
 function Spinner({ className = "h-5 w-5" }: { className?: string }) {
@@ -51,7 +38,8 @@ function Spinner({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
-export function SignupForm({ labels }: SignupFormProps) {
+export function SignupForm() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -97,7 +85,7 @@ export function SignupForm({ labels }: SignupFormProps) {
           className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GoogleIcon />
-          {labels.continueWithGoogle}
+          {t("continueWithGoogle")}
         </button>
         <button
           type="button"
@@ -105,7 +93,7 @@ export function SignupForm({ labels }: SignupFormProps) {
           className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GitHubIcon />
-          {labels.continueWithGithub}
+          {t("continueWithGithub")}
         </button>
       </div>
 
@@ -116,7 +104,7 @@ export function SignupForm({ labels }: SignupFormProps) {
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-surface-raised px-2 text-text-muted">
-            {labels.or}
+            {t("or")}
           </span>
         </div>
       </div>
@@ -153,7 +141,7 @@ export function SignupForm({ labels }: SignupFormProps) {
             htmlFor="email"
             className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
-            {labels.email}
+            {t("email")}
           </label>
           <input
             id="email"
@@ -172,7 +160,7 @@ export function SignupForm({ labels }: SignupFormProps) {
             htmlFor="password"
             className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
-            {labels.password}
+            {t("password")}
           </label>
           <input
             id="password"
@@ -195,10 +183,10 @@ export function SignupForm({ labels }: SignupFormProps) {
           {loading ? (
             <>
               <Spinner className="h-4 w-4" />
-              {labels.signingUp}
+              {t("signingUp")}
             </>
           ) : (
-            labels.signUp
+            t("signUp")
           )}
         </button>
       </form>
