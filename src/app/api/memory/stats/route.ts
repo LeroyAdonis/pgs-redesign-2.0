@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.DATABASE_URL!);
+const getSql = () => { const url = process.env.DATABASE_URL; if (!url) throw new Error("DATABASE_URL is not set"); return neon(url); };
 
 interface CategoryRow {
   category: string;
@@ -19,11 +19,11 @@ interface DateRow {
 
 export async function GET() {
   try {
-    const countResult = await sql`SELECT COUNT(*) as total FROM agent_memory`;
-    const categoryResult = await sql`SELECT category, COUNT(*) as count FROM agent_memory GROUP BY category`;
-    const dateResult = await sql`SELECT MIN(created_at) as oldest, MAX(created_at) as newest FROM agent_memory`;
-    const patternCount = await sql`SELECT COUNT(*) as total FROM agent_patterns`;
-    const checkpointCount = await sql`SELECT COUNT(*) as total FROM agent_checkpoints`;
+    const countResult = await getSql()`SELECT COUNT(*) as total FROM agent_memory`;
+    const categoryResult = await getSql()`SELECT category, COUNT(*) as count FROM agent_memory GROUP BY category`;
+    const dateResult = await getSql()`SELECT MIN(created_at) as oldest, MAX(created_at) as newest FROM agent_memory`;
+    const patternCount = await getSql()`SELECT COUNT(*) as total FROM agent_patterns`;
+    const checkpointCount = await getSql()`SELECT COUNT(*) as total FROM agent_checkpoints`;
 
     return NextResponse.json({
       total: Number((countResult[0] as CountRow | undefined)?.total || 0),

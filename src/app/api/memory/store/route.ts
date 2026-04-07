@@ -11,7 +11,7 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
-const sql = neon(process.env.DATABASE_URL!);
+const getSql = () => { const url = process.env.DATABASE_URL; if (!url) throw new Error("DATABASE_URL is not set"); return neon(url); };
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY!;
 
 async function getEmbedding(text: string): Promise<number[]> {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const embedding = await getEmbedding(content);
     const embStr = `[${embedding.join(",")}]`;
 
-    const result = await sql`
+    const result = await getSql()`
       INSERT INTO agent_memory (content, embedding, category, metadata, session_id)
       VALUES (${content}, ${embStr}::vector, ${category}, ${JSON.stringify(metadata)}, ${sessionId || null})
       RETURNING id, created_at

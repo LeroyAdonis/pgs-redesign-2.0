@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
-const sql = neon(process.env.DATABASE_URL!);
+const getSql = () => { const url = process.env.DATABASE_URL; if (!url) throw new Error("DATABASE_URL is not set"); return neon(url); };
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY!;
 
 async function getEmbedding(text: string): Promise<number[]> {
@@ -41,8 +41,8 @@ export async function GET(request: Request) {
     const embStr = `[${embedding.join(",")}]`;
 
     const results = category
-      ? await sql`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory WHERE category = ${category} ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`
-      : await sql`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`;
+      ? await getSql()`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory WHERE category = ${category} ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`
+      : await getSql()`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`;
 
     return NextResponse.json({
       results: results.map((r: Record<string, unknown>) => ({

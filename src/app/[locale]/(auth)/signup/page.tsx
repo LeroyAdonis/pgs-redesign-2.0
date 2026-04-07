@@ -41,18 +41,7 @@ function SignupContent() {
           {t("signIn")}
         </a>
       </p>
-      <SignupForm
-        labels={{
-          email: t("email"),
-          password: t("password"),
-          signUp: t("signUp"),
-          signingUp: t("signingUp"),
-          continueWithGoogle: t("continueWithGoogle"),
-          continueWithGithub: t("continueWithGithub"),
-          or: "or",
-          name: "Name",
-        }}
-      />
+      <SignupForm />
     </div>
   );
 }

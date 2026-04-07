@@ -104,7 +104,7 @@ export function LoginForm({}: LoginFormProps) {
           className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GoogleIcon />
-          {labels.continueWithGoogle}
+          {t("continueWithGoogle")}
         </button>
         <button
           type="button"
@@ -112,7 +112,7 @@ export function LoginForm({}: LoginFormProps) {
           className="flex w-full items-center justify-center gap-2 border border-border bg-surface px-4 py-4 text-sm font-medium text-text transition-colors hover:bg-surface-raised"
         >
           <GitHubIcon />
-          {labels.continueWithGithub}
+          {t("continueWithGithub")}
         </button>
       </div>
 
@@ -123,7 +123,7 @@ export function LoginForm({}: LoginFormProps) {
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-surface-raised px-2 text-text-muted">
-            {labels.or}
+            {t("or")}
           </span>
         </div>
       </div>
@@ -141,7 +141,7 @@ export function LoginForm({}: LoginFormProps) {
             htmlFor="email"
             className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
           >
-            {labels.email}
+            {t("email")}
           </label>
           <input
             id="email"
@@ -161,13 +161,13 @@ export function LoginForm({}: LoginFormProps) {
               htmlFor="password"
               className="block font-mono text-[10px] uppercase tracking-widest text-text-muted"
             >
-              {labels.password}
+              {t("password")}
             </label>
             <a
               href="forgot-password"
               className="text-sm text-brand hover:text-brand/80"
             >
-              {labels.forgotPassword}
+              {t("forgotPassword")}
             </a>
           </div>
           <input
@@ -190,10 +190,10 @@ export function LoginForm({}: LoginFormProps) {
           {loading ? (
             <>
               <Spinner className="h-4 w-4" />
-              {labels.signingIn}
+              {t("signingIn")}
             </>
           ) : (
-            labels.signIn
+            t("signIn")
           )}
         </button>
       </form>
