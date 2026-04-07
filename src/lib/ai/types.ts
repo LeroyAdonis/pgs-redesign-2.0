@@ -195,7 +195,11 @@ export type GenerationState = "idle" | "generating" | "success" | "error";
 /** OpenRouter API availability status */
 export interface OpenRouterAvailability {
   /** Whether the OPENROUTER_API_KEY env var is set */
-  configured: boolean;
+  configured?: boolean;
+  /** Whether the SDK is loaded and reachable */
+  available: boolean;
+  /** Whether the AI module is available */
+  aiAvailable: boolean;
   /** Reason if unavailable */
   reason?: string;
 }
