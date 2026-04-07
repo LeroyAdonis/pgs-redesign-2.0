@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * FeedbackButtons — 👍/👎 rating pills for AI-generated content
  *

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 import { CalendarEvent } from "./CalendarEvent";
 import { useDragDrop } from "./DragDropContext";

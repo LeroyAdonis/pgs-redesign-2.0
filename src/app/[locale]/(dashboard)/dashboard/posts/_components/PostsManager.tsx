@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * PostsManager — Main client component for the posts management dashboard.
  *

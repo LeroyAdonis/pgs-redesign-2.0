@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * ContentTypeSelector — Tab pills for Text | Image | Video
  *

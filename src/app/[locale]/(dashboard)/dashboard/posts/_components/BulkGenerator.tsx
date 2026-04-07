@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * BulkGenerator — Multi-step wizard for generating posts in bulk.
  *

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * LanguageSelector — Dropdown for South Africa's 11 official languages
  *

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * ScheduleModal — Modal for scheduling or rescheduling posts.
  *

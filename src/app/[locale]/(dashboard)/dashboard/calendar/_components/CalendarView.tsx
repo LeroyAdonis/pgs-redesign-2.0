@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useEffect, useCallback } from "react";
 import { CalendarToolbar } from "./CalendarToolbar";
 import { MonthGrid } from "./MonthGrid";

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/lib/utils";
 import { PLATFORM_COLORS, STATUS_CLASSES } from "./types";
 import type { CalendarSchedule } from "./types";

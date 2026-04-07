@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * AutonomousToggle — Toggle between manual and autonomous scheduling modes.
  *
