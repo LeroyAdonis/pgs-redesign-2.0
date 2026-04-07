@@ -26,7 +26,7 @@ export {
 
 // Email service
 export { sendNotificationEmail, emailConfig } from "./email-service";
-export type { EmailConfig, SendEmailResult } from "./email-service";
+export type { SendEmailResult } from "./email-service";
 
 // Email templates
 export {

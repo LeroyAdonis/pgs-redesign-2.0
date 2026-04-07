@@ -1,12 +1,60 @@
 /**
  * Tests for notification preferences
  *
- * Validates in-memory preference store behaviour: defaults for new
- * users, partial updates, and email-sending decisions based on
- * enabled/disabled state and muted types.
+ * Validates preference retrieval, partial updates, and email-sending
+ * decisions based on enabled/disabled state and muted types.
+ *
+ * Mocks the database layer (Drizzle ORM) so tests run without DATABASE_URL.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// ---------------------------------------------------------------------------
+// Mock chain helpers (Drizzle ORM query chains)
+// ---------------------------------------------------------------------------
+
+function mockChain(result: unknown = []) {
+  const chain: Record<string, unknown> = {};
+  const methods = ["from", "where", "limit", "set", "values"];
+  for (const m of methods) {
+    chain[m] = vi.fn().mockReturnValue(chain);
+  }
+  chain.onConflictDoUpdate = vi.fn().mockReturnValue(chain);
+  chain.then = (
+    onFulfilled?: (v: unknown) => unknown,
+    onRejected?: (e: unknown) => unknown,
+  ) => Promise.resolve(result).then(onFulfilled, onRejected);
+  return chain;
+}
+
+// ---------------------------------------------------------------------------
+// Mocks — declared before module import
+// ---------------------------------------------------------------------------
+
+const mockSelect = vi.fn();
+const mockInsert = vi.fn();
+
+vi.mock("@/db", () => ({
+  db: {
+    select: (...args: unknown[]) => mockSelect(...args),
+    insert: (...args: unknown[]) => mockInsert(...args),
+  },
+}));
+
+vi.mock("@/db/schema", () => ({
+  notificationPreference: {
+    userId: "notificationPreference.userId",
+    inApp: "notificationPreference.inApp",
+    emailEnabled: "notificationPreference.emailEnabled",
+    emailFrequency: "notificationPreference.emailFrequency",
+    mutedTypes: "notificationPreference.mutedTypes",
+    updatedAt: "notificationPreference.updatedAt",
+  },
+}));
+
+vi.mock("drizzle-orm", () => ({
+  eq: vi.fn((...args: unknown[]) => ({ type: "eq", args })),
+}));
 
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -17,8 +65,9 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-// We must re-import the module fresh for each test to reset the in-memory store.
-// Use dynamic imports and vi.resetModules to achieve isolation.
+// ---------------------------------------------------------------------------
+// Re-import per test to ensure clean state
+// ---------------------------------------------------------------------------
 
 let getPreferences: typeof import("../notification-preferences")["getPreferences"];
 let updatePreferences: typeof import("../notification-preferences")["updatePreferences"];
@@ -40,7 +89,9 @@ const USER_ID = "user_pref_123";
 // ---------------------------------------------------------------------------
 
 describe("getPreferences", () => {
-  it("returns defaults for a new user", async () => {
+  it("returns defaults for a new user (no DB row found)", async () => {
+    mockSelect.mockReturnValue(mockChain([]));
+
     const prefs = await getPreferences(USER_ID);
 
     expect(prefs).toEqual({
@@ -51,12 +102,23 @@ describe("getPreferences", () => {
     });
   });
 
-  it("returns a fresh copy (no mutation leaks)", async () => {
-    const prefs1 = await getPreferences(USER_ID);
-    prefs1.mutedTypes.push("error");
+  it("returns persisted preferences when DB row exists", async () => {
+    mockSelect.mockReturnValue(
+      mockChain([
+        {
+          inApp: false,
+          emailEnabled: true,
+          emailFrequency: "weekly",
+          mutedTypes: ["error"],
+        },
+      ]),
+    );
 
-    const prefs2 = await getPreferences(USER_ID);
-    expect(prefs2.mutedTypes).toEqual([]);
+    const prefs = await getPreferences(USER_ID);
+
+    expect(prefs.inApp).toBe(false);
+    expect(prefs.emailFrequency).toBe("weekly");
+    expect(prefs.mutedTypes).toEqual(["error"]);
   });
 });
 
@@ -65,10 +127,14 @@ describe("getPreferences", () => {
 // ---------------------------------------------------------------------------
 
 describe("updatePreferences", () => {
-  it("updates and persists partial preferences", async () => {
-    await updatePreferences(USER_ID, { emailEnabled: false });
+  it("updates and returns merged preferences", async () => {
+    // First call: select returns defaults (no row)
+    mockSelect.mockReturnValue(mockChain([]));
+    // Insert mock
+    mockInsert.mockReturnValue(mockChain());
 
-    const prefs = await getPreferences(USER_ID);
+    const prefs = await updatePreferences(USER_ID, { emailEnabled: false });
+
     expect(prefs.emailEnabled).toBe(false);
     // Other defaults remain
     expect(prefs.inApp).toBe(true);
@@ -76,39 +142,25 @@ describe("updatePreferences", () => {
   });
 
   it("updates email frequency", async () => {
-    await updatePreferences(USER_ID, { emailFrequency: "weekly" });
+    mockSelect.mockReturnValue(mockChain([]));
+    mockInsert.mockReturnValue(mockChain());
 
-    const prefs = await getPreferences(USER_ID);
+    const prefs = await updatePreferences(USER_ID, {
+      emailFrequency: "weekly",
+    });
+
     expect(prefs.emailFrequency).toBe("weekly");
   });
 
   it("updates muted types", async () => {
-    await updatePreferences(USER_ID, {
-      mutedTypes: ["info", "system"],
+    mockSelect.mockReturnValue(mockChain([]));
+    mockInsert.mockReturnValue(mockChain());
+
+    const prefs = await updatePreferences(USER_ID, {
+      mutedTypes: ["info", "error"],
     });
 
-    const prefs = await getPreferences(USER_ID);
-    expect(prefs.mutedTypes).toEqual(["info", "system"]);
-  });
-
-  it("returns the merged preferences", async () => {
-    const result = await updatePreferences(USER_ID, {
-      emailEnabled: false,
-      emailFrequency: "immediate",
-    });
-
-    expect(result.emailEnabled).toBe(false);
-    expect(result.emailFrequency).toBe("immediate");
-    expect(result.inApp).toBe(true); // default preserved
-  });
-
-  it("applies multiple sequential updates correctly", async () => {
-    await updatePreferences(USER_ID, { emailEnabled: false });
-    await updatePreferences(USER_ID, { emailFrequency: "weekly" });
-
-    const prefs = await getPreferences(USER_ID);
-    expect(prefs.emailEnabled).toBe(false);
-    expect(prefs.emailFrequency).toBe("weekly");
+    expect(prefs.mutedTypes).toEqual(["info", "error"]);
   });
 });
 
@@ -117,35 +169,67 @@ describe("updatePreferences", () => {
 // ---------------------------------------------------------------------------
 
 describe("shouldSendEmail", () => {
-  it("returns true when email is enabled and type is not muted", async () => {
-    const result = await shouldSendEmail(USER_ID, "success");
+  it("returns true when email enabled and type not muted", async () => {
+    mockSelect.mockReturnValue(
+      mockChain([
+        {
+          inApp: true,
+          emailEnabled: true,
+          emailFrequency: "daily",
+          mutedTypes: [],
+        },
+      ]),
+    );
 
+    const result = await shouldSendEmail(USER_ID, "info");
     expect(result).toBe(true);
   });
 
-  it("returns false when emailEnabled is disabled", async () => {
-    await updatePreferences(USER_ID, { emailEnabled: false });
+  it("returns false when email is globally disabled", async () => {
+    mockSelect.mockReturnValue(
+      mockChain([
+        {
+          inApp: true,
+          emailEnabled: false,
+          emailFrequency: "daily",
+          mutedTypes: [],
+        },
+      ]),
+    );
 
-    const result = await shouldSendEmail(USER_ID, "success");
-
+    const result = await shouldSendEmail(USER_ID, "info");
     expect(result).toBe(false);
   });
 
-  it("returns false when type is in muted list", async () => {
-    await updatePreferences(USER_ID, {
-      mutedTypes: ["warning", "info"],
-    });
+  it("returns false when the notification type is muted", async () => {
+    mockSelect.mockReturnValue(
+      mockChain([
+        {
+          inApp: true,
+          emailEnabled: true,
+          emailFrequency: "daily",
+          mutedTypes: ["error"],
+        },
+      ]),
+    );
 
-    expect(await shouldSendEmail(USER_ID, "warning")).toBe(false);
-    expect(await shouldSendEmail(USER_ID, "info")).toBe(false);
+    const result = await shouldSendEmail(USER_ID, "error");
+    expect(result).toBe(false);
   });
 
-  it("returns true for non-muted type when other types are muted", async () => {
-    await updatePreferences(USER_ID, {
-      mutedTypes: ["warning"],
-    });
+  it("returns true for non-muted type even if other types are muted", async () => {
+    mockSelect.mockReturnValue(
+      mockChain([
+        {
+          inApp: true,
+          emailEnabled: true,
+          emailFrequency: "daily",
+          mutedTypes: ["error"],
+        },
+      ]),
+    );
 
-    expect(await shouldSendEmail(USER_ID, "success")).toBe(true);
-    expect(await shouldSendEmail(USER_ID, "error")).toBe(true);
+    const result = await shouldSendEmail(USER_ID, "info");
+    expect(result).toBe(true);
   });
 });

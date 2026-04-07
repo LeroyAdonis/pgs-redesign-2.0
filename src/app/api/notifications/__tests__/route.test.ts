@@ -30,7 +30,7 @@ describe("GET /api/notifications — error format", () => {
     const { GET } = await import("../route");
     const { NextRequest } = await import("next/server");
     const req = new NextRequest("http://localhost:3000/api/notifications");
-    const res = await GET(req);
+    const res = await GET(req as any);
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body).toHaveProperty("success", false);
@@ -44,11 +44,7 @@ describe("GET /api/notifications/count — error format", () => {
   it("returns { success: false, error } when unauthenticated", async () => {
     vi.mocked(getServerSession).mockResolvedValue(null);
     const { GET } = await import("../../notifications/count/route");
-    const { NextRequest } = await import("next/server");
-    const req = new NextRequest(
-      "http://localhost:3000/api/notifications/count",
-    );
-    const res = await GET(req);
+    const res = await GET();
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body).toHaveProperty("success", false);

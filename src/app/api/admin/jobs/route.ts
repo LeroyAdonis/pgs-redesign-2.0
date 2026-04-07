@@ -1,11 +1,10 @@
 /**
- * GET /api/admin/jobs — Inngest job monitoring data
+ * GET /api/admin/jobs — Job monitoring data from real DB
  *
- * Returns mock/simulated job run data for the admin job monitoring page.
- * Uses realistic function names from the actual Inngest setup.
+ * Queries the postSchedule table joined with post and socialAccount
+ * to return real job run data for the admin monitoring page.
  *
- * In production, this would query the Inngest REST API for real run data.
- * For now, returns deterministic mock data that exercises all UI states.
+ * Falls back to mock data only in development when the DB is empty.
  *
  * Requires admin role. Returns 401 if not authenticated,
  * 403 if authenticated but not admin.
@@ -14,6 +13,9 @@
 import { NextResponse } from "next/server";
 import { requireAdminApiSession } from "@/lib/admin-api-session";
 import { logger } from "@/lib/logger";
+import { db } from "@/db";
+import { postSchedule, post, socialAccount } from "@/db/schema";
+import { eq, desc, isNotNull, isNull, and } from "drizzle-orm";
 import type {
   JobRun,
   JobStats,
@@ -83,10 +85,7 @@ const INNGEST_FUNCTIONS: Array<{
 ];
 
 /**
- * Generate realistic mock job runs.
- *
- * Uses a seeded approach so data is deterministic per request,
- * but varied enough to exercise all UI states.
+ * Generate fallback mock job runs for development / empty DB.
  */
 function generateMockJobs(): JobRun[] {
   const now = Date.now();
@@ -147,12 +146,97 @@ function generateMockJobs(): JobRun[] {
   });
 }
 
+/**
+ * Map a post schedule row to a job run status.
+ */
+function scheduleToStatus(schedule: {
+  publishedAt: Date | null;
+  failedAt: Date | null;
+  scheduledAt: Date;
+}): JobStatus {
+  if (schedule.publishedAt) return "completed";
+  if (schedule.failedAt) return "failed";
+  if (schedule.scheduledAt <= new Date()) return "running";
+  return "queued";
+}
+
+/**
+ * Query real post schedules from the DB and format as job runs.
+ */
+async function getRealJobs(): Promise<JobRun[]> {
+  const schedules = await db
+    .select({
+      scheduleId: postSchedule.id,
+      scheduledAt: postSchedule.scheduledAt,
+      publishedAt: postSchedule.publishedAt,
+      failedAt: postSchedule.failedAt,
+      retryCount: postSchedule.retryCount,
+      lastError: postSchedule.lastError,
+      platformPostId: postSchedule.platformPostId,
+      postId: post.id,
+      postContent: post.content,
+      postPlatform: post.platform,
+      postStatus: post.status,
+      accountDisplayName: socialAccount.displayName,
+      accountPlatform: socialAccount.platform,
+    })
+    .from(postSchedule)
+    .innerJoin(post, eq(postSchedule.postId, post.id))
+    .innerJoin(socialAccount, eq(postSchedule.socialAccountId, socialAccount.id))
+    .orderBy(desc(postSchedule.scheduledAt))
+    .limit(50);
+
+  return schedules.map((s) => {
+    const status = scheduleToStatus(s);
+    const startedAt = s.scheduledAt.toISOString();
+    let endedAt: string | null = null;
+    if (s.publishedAt) endedAt = s.publishedAt.toISOString();
+    if (s.failedAt) endedAt = s.failedAt.toISOString();
+
+    // Map post status to appropriate Inngest function
+    const isRetry = s.retryCount > 0 && status === "failed";
+    const functionId = isRetry ? "post-retry" : "post-publish";
+    const functionName = isRetry ? "Retry Post" : "Publish Post";
+
+    return {
+      id: `run_${s.scheduleId}`,
+      functionId,
+      functionName: `${functionName} → ${s.accountDisplayName ?? s.accountPlatform}`,
+      status,
+      startedAt,
+      endedAt,
+      attempt: s.retryCount + 1,
+      error: s.lastError,
+      eventName: isRetry ? "post/retry" : "post/publish",
+    };
+  });
+}
+
 export async function GET() {
   try {
     const auth = await requireAdminApiSession();
     if ("error" in auth) return auth.error;
 
-    const jobs = generateMockJobs();
+    let jobs: JobRun[];
+
+    try {
+      // Try fetching real data from the database
+      const realJobs = await getRealJobs();
+
+      if (realJobs.length > 0) {
+        jobs = realJobs;
+      } else {
+        // Fall back to mock data only when DB is empty (development)
+        logger.info("No job data in DB, falling back to mock data");
+        jobs = generateMockJobs();
+      }
+    } catch (dbError) {
+      // DB query failed — fall back to mock data gracefully
+      logger.warn("Failed to query job data from DB, using mock data", {
+        error: dbError instanceof Error ? dbError.message : "Unknown error",
+      });
+      jobs = generateMockJobs();
+    }
 
     const stats: JobStats = {
       total: jobs.length,

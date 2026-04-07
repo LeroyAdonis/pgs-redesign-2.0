@@ -93,8 +93,8 @@ describe("Sidebar", () => {
     expect(hrefs).toContain("/dashboard/analytics");
     expect(hrefs).toContain("/dashboard/brand");
     expect(hrefs).toContain("/dashboard/accounts");
-    expect(hrefs).toContain("/team");
-    expect(hrefs).toContain("/settings");
+    expect(hrefs).toContain("/dashboard/team");
+    expect(hrefs).toContain("/dashboard/settings");
     expect(hrefs).toContain("/dashboard/billing");
   });
 

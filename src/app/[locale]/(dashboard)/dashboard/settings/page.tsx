@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { ProfileForm } from "./_components/profile-form";
+import { NotificationSettings } from "./_components/notification-settings";
+import { SecuritySettings } from "./_components/security-settings";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -31,14 +33,14 @@ export default async function SettingsPage({ params }: Props) {
 
       {/* Notifications Section */}
       <div className="rounded-xl border border-border bg-surface p-6">
-        <h2 className="mb-2 text-base font-semibold text-text">Notifications</h2>
-        <p className="text-sm text-text-muted">Email notification preferences coming soon.</p>
+        <h2 className="mb-4 text-base font-semibold text-text">Notifications</h2>
+        <NotificationSettings />
       </div>
 
       {/* Security Section */}
       <div className="rounded-xl border border-border bg-surface p-6">
-        <h2 className="mb-2 text-base font-semibold text-text">Security</h2>
-        <p className="text-sm text-text-muted">Password management and 2FA coming soon.</p>
+        <h2 className="mb-4 text-base font-semibold text-text">Security</h2>
+        <SecuritySettings />
       </div>
     </div>
   );

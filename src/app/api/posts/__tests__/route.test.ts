@@ -175,16 +175,17 @@ describe("GET /api/posts", () => {
 
   // ─ Org membership ─
 
-  it("returns 404 when user has no organization", async () => {
+  it("returns empty list when user has no organization", async () => {
     mockGetServerSession.mockResolvedValue(mockSession());
     mockSelect.mockReturnValueOnce(mockChain([])); // no membership
 
     const res = await GET(makeGetRequest());
     const body = await res.json();
 
-    expect(res.status).toBe(404);
-    expect(body.success).toBe(false);
-    expect(body.error).toBe("No organization found");
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.posts).toEqual([]);
+    expect(body.total).toBe(0);
   });
 
   // ─ Success cases ─

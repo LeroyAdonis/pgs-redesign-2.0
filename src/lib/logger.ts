@@ -17,6 +17,17 @@ interface LogEntry {
   data?: Record<string, unknown>;
 }
 
+type LogShipper = (entry: LogEntry) => void;
+const shippers: LogShipper[] = [];
+
+/**
+ * Register an external log shipper (e.g., Axiom, Datadog, Sentry).
+ * Shippers receive every log entry after it's been emitted to the console.
+ */
+export function registerLogShipper(shipper: LogShipper): void {
+  shippers.push(shipper);
+}
+
 function createEntry(
   level: LogLevel,
   message: string,
@@ -48,6 +59,15 @@ function emit(entry: LogEntry): void {
       break;
     default:
       console.info(msg, entry.data ?? "");
+  }
+
+  // Ship to external providers
+  for (const ship of shippers) {
+    try {
+      ship(entry);
+    } catch {
+      // Silently ignore shipper errors to prevent infinite loops
+    }
   }
 }
 

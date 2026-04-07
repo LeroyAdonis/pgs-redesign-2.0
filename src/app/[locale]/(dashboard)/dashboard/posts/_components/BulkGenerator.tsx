@@ -4,7 +4,7 @@
  * BulkGenerator — Multi-step wizard for generating posts in bulk.
  *
  * Step 1: Configuration (count, platforms, language, topic, SA context)
- * Step 2: Preview (shows mock content as placeholder — real AI via Puter.js in Phase 4)
+ * Step 2: Preview (AI-generated content via /api/ai/generate)
  * Step 3: Schedule (start time + interval, then schedule all)
  *
  * Rendered as a fullscreen modal.
@@ -40,6 +40,8 @@ interface GeneratedPost {
   content: string;
   platform: string;
   included: boolean;
+  isLoading?: boolean;
+  error?: string;
 }
 
 interface BulkGenerationResult {
@@ -59,23 +61,102 @@ const INTERVALS = [
   { value: "24h", label: "Every 24 hours" },
 ] as const;
 
-/* ─── Mock content generator ─── */
+/* ─── AI content generation ─── */
 
-function generateMockPosts(config: BulkConfig): GeneratedPost[] {
-  const mockContents = [
-    `🇿🇦 Exciting things are happening with ${config.topic}! Stay tuned for more updates. #Mzansi #LocalIsLekker`,
-    `Check out how ${config.topic} is making waves in SA! 🌟 #ProudlySA #SouthAfrica`,
-    `Eish, ${config.topic} is truly lekker! Don't miss out on this opportunity 🔥 #MadeInSA`,
-    `Big news for our Mzansi community about ${config.topic}! 🎉 #Ubuntu #SABusiness`,
-    `From Joburg to Cape Town, ${config.topic} is changing the game! 💪 #CityOfGold #MotherCity`,
-  ];
+const PLATFORM_GUIDELINES: Record<string, string> = {
+  instagram: "Instagram post (visual-first, use emojis, max 2200 chars, hashtags at the end)",
+  facebook: "Facebook post (conversational, engagement-focused, can be longer)",
+  twitter: "Twitter/X post (concise, max 280 chars, punchy, 1-2 hashtags)",
+  linkedin: "LinkedIn post (professional tone, thought leadership, paragraph format)",
+  tiktok: "TikTok caption (short, trendy, use trending hashtags)",
+};
 
-  return Array.from({ length: config.count }, (_, i) => ({
-    id: `mock-${i + 1}`,
-    content: mockContents[i % mockContents.length]!,
-    platform: config.platforms[i % config.platforms.length] ?? "instagram",
-    included: true,
-  }));
+async function generatePostViaAI(
+  topic: string,
+  platform: string,
+  language: string,
+  includeSAContext: boolean,
+  index: number,
+): Promise<string> {
+  const platformGuide = PLATFORM_GUIDELINES[platform] ?? `${platform} post`;
+  const saContext = includeSAContext
+    ? " Include South African cultural references, local slang (e.g., lekker, eish, braai, Mzansi), and SA-specific context where relevant."
+    : "";
+
+  const prompt = `Write a unique ${platformGuide} about the following topic: "${topic}".${saContext}
+
+Post number ${index + 1} — make each post unique with different angles, hooks, and styles. Do not repeat content.
+Write ONLY the post content. Do not include any labels, headers, or explanations.
+Language: ${language === "en" ? "English" : language}`;
+
+  const response = await fetch("/api/ai/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      prompt,
+      system: "You are a social media content creator specializing in engaging, platform-optimized posts. Write only the post content — no labels, no explanations.",
+      temperature: 0.9,
+      maxTokens: 500,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Generation failed" }));
+    throw new Error(error.error ?? `API error (${response.status})`);
+  }
+
+  const data = await response.json();
+  return data.content?.trim() ?? "";
+}
+
+async function generateAIPosts(
+  config: BulkConfig,
+  onPostUpdate: (index: number, post: Partial<GeneratedPost>) => void,
+): Promise<void> {
+  // Generate all posts, updating state per-post as they complete
+  const promises = Array.from({ length: config.count }, async (_, i) => {
+    const platform = config.platforms[i % config.platforms.length] ?? "instagram";
+    const postId = `ai-${Date.now()}-${i}`;
+
+    // Initialize post in loading state
+    onPostUpdate(i, {
+      id: postId,
+      content: "",
+      platform,
+      included: true,
+      isLoading: true,
+    });
+
+    try {
+      const content = await generatePostViaAI(
+        config.topic,
+        platform,
+        config.language,
+        config.includeSAContext,
+        i,
+      );
+
+      onPostUpdate(i, {
+        id: postId,
+        content,
+        platform,
+        included: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Generation failed";
+      onPostUpdate(i, {
+        id: postId,
+        content: `⚠️ Failed to generate: ${message}`,
+        platform,
+        included: false,
+        isLoading: false,
+        error: message,
+      });
+    }
+  });
+
+  await Promise.allSettled(promises);
 }
 
 /* ─── Component ─── */
@@ -143,16 +224,35 @@ export function BulkGenerator({
 
   async function handleGenerate() {
     setIsGenerating(true);
-    // Simulate generation delay — real AI generation happens via Puter.js in Phase 4
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const posts = generateMockPosts(config);
-    setGeneratedPosts(posts);
-    setIsGenerating(false);
+
+    // Initialize empty posts array with correct count
+    const initialPosts: GeneratedPost[] = Array.from(
+      { length: config.count },
+      (_, i) => ({
+        id: `pending-${i}`,
+        content: "",
+        platform: config.platforms[i % config.platforms.length] ?? "instagram",
+        included: true,
+        isLoading: true,
+      }),
+    );
+    setGeneratedPosts(initialPosts);
     setStep(2);
+
+    // Generate posts via AI, updating each as it completes
+    await generateAIPosts(config, (index, update) => {
+      setGeneratedPosts((prev) => {
+        const next = [...prev];
+        next[index] = { ...next[index], ...update } as GeneratedPost;
+        return next;
+      });
+    });
+
+    setIsGenerating(false);
   }
 
   function handleScheduleAll() {
-    const includedPosts = generatedPosts.filter((p) => p.included);
+    const includedPosts = generatedPosts.filter((p) => p.included && !p.error);
     onComplete({
       posts: includedPosts,
       startDate,
@@ -385,7 +485,9 @@ export function BulkGenerator({
         {step === 2 && (
           <div className="mt-6 flex flex-col gap-4" data-testid="step-2">
             <p className="text-sm text-text-muted">
-              Review generated posts. Uncheck any you don&apos;t want to include.
+              {isGenerating
+                ? "Generating posts with AI... each post will appear as it's ready."
+                : "Review generated posts. Uncheck any you don't want to include."}
             </p>
 
             <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
@@ -396,9 +498,13 @@ export function BulkGenerator({
                     key={post.id}
                     className={cn(
                       "flex gap-3 rounded-none border p-3",
-                      post.included
-                        ? "border-border bg-surface"
-                        : "border-border/50 bg-surface-inset opacity-60",
+                      post.isLoading
+                        ? "border-border/50 bg-surface-inset animate-pulse"
+                        : post.error
+                          ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950"
+                          : post.included
+                            ? "border-border bg-surface"
+                            : "border-border/50 bg-surface-inset opacity-60",
                     )}
                   >
                     <input
@@ -407,6 +513,7 @@ export function BulkGenerator({
                       onChange={() => togglePostInclusion(post.id)}
                       aria-label={`Include post ${post.id}`}
                       className="mt-0.5 h-4 w-4 rounded border-border text-brand"
+                      disabled={post.isLoading}
                     />
                     <div className="flex flex-1 flex-col gap-1">
                       <span
@@ -415,7 +522,35 @@ export function BulkGenerator({
                       >
                         {plat?.label ?? post.platform}
                       </span>
-                      <p className="text-sm text-text">{post.content}</p>
+                      {post.isLoading ? (
+                        <div className="flex items-center gap-2 text-sm text-text-muted">
+                          <svg
+                            className="h-4 w-4 animate-spin"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            aria-hidden="true"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          Generating with AI...
+                        </div>
+                      ) : (
+                        <p className="text-sm text-text whitespace-pre-wrap">
+                          {post.content}
+                        </p>
+                      )}
                     </div>
                     <button
                       type="button"
@@ -435,13 +570,20 @@ export function BulkGenerator({
             </div>
 
             <div className="flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(1)}>
+              <Button
+                variant="ghost"
+                onClick={() => setStep(1)}
+                disabled={isGenerating}
+              >
                 Back
               </Button>
               <Button
                 variant="primary"
                 onClick={() => setStep(3)}
-                disabled={!generatedPosts.some((p) => p.included)}
+                disabled={
+                  isGenerating ||
+                  !generatedPosts.some((p) => p.included && !p.error)
+                }
               >
                 Next: Schedule
               </Button>
@@ -454,7 +596,7 @@ export function BulkGenerator({
           <div className="mt-6 flex flex-col gap-5" data-testid="step-3">
             <p className="text-sm text-text-muted">
               Set the start time and posting interval for your{" "}
-              {generatedPosts.filter((p) => p.included).length} posts.
+              {generatedPosts.filter((p) => p.included && !p.error).length} posts.
             </p>
 
             {/* Start date/time */}

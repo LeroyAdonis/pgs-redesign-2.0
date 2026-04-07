@@ -15,7 +15,7 @@ export async function GET() {
     
     if (!membership[0]) return NextResponse.json({ members: [], org: null });
 
-    const orgId = membership[0].organizationId;
+    const orgId = membership[0].orgId;
 
     // Get all members
     const members = await db
@@ -25,11 +25,11 @@ export async function GET() {
         email: user.email,
         image: user.image,
         role: organizationMember.role,
-        joinedAt: organizationMember.createdAt,
+        joinedAt: organizationMember.joinedAt,
       })
       .from(organizationMember)
       .innerJoin(user, eq(user.id, organizationMember.userId))
-      .where(eq(organizationMember.organizationId, orgId));
+      .where(eq(organizationMember.orgId, orgId));
 
     // Get org info
     const org = await db.select().from(organization).where(eq(organization.id, orgId)).limit(1);

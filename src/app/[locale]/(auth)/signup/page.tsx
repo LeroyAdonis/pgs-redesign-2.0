@@ -50,7 +50,6 @@ function SignupContent() {
           continueWithGoogle: t("continueWithGoogle"),
           continueWithGithub: t("continueWithGithub"),
           or: "or",
-          name: "Name",
         }}
       />
     </div>

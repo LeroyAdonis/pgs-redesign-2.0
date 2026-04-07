@@ -113,6 +113,7 @@ let POST: (request: NextRequest) => Promise<Response>;
 
 beforeEach(async () => {
   vi.clearAllMocks();
+  process.env.POLAR_WEBHOOK_SECRET = "test-webhook-secret";
   mockActivateSubscription.mockResolvedValue(undefined);
   mockDeactivateSubscription.mockResolvedValue(undefined);
   mockAddCredits.mockResolvedValue({ success: true, newBalance: 100 });
