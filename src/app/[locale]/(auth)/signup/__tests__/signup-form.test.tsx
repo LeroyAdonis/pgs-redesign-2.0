@@ -34,6 +34,7 @@ const defaultLabels = {
   email: "Email",
   password: "Password",
   signUp: "Sign up",
+  signingUp: "Signing up...",
   continueWithGoogle: "Continue with Google",
   continueWithGithub: "Continue with GitHub",
   or: "or",
@@ -50,7 +51,8 @@ describe("SignupForm", () => {
 
   it("shows a success message after successful sign-up", async () => {
     // Mock signUp.email to call onSuccess from the options argument
-    vi.mocked(signUp.email).mockImplementation(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (vi.mocked(signUp.email) as any).mockImplementation(
       async (_data: unknown, options?: { onSuccess?: () => void }) => {
         options?.onSuccess?.();
       },
@@ -78,7 +80,8 @@ describe("SignupForm", () => {
 
   it("does NOT show success message when sign-up errors", async () => {
     // Mock signUp.email to call onError instead
-    vi.mocked(signUp.email).mockImplementation(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (vi.mocked(signUp.email) as any).mockImplementation(
       async (
         _data: unknown,
         options?: { onError?: (ctx: { error: { message: string } }) => void },
