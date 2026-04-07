@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth-client";
+import { authClient, signOut } from "@/lib/auth-client";
 import { Avatar } from "@/components/ui/Avatar";
 import { LanguageSelector } from "@/components/ui/language-selector";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -223,7 +223,7 @@ function DashboardHeader({
                   try {
                     await authClient.signOut({
                       fetchOptions: {
-                        onError(context) {
+                        onError(context: { error: { message?: string } }) {
                           console.error("Sign out error:", context.error);
                         },
                       },
