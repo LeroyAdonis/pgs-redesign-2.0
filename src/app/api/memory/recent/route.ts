@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
-const sql = neon(process.env.DATABASE_URL!);
+/** Lazy connection — avoids crash during Next.js build when DATABASE_URL is absent */
+function getSql() {
+  return neon(process.env.DATABASE_URL!);
+}
 
 export async function GET(request: Request) {
   try {
@@ -11,6 +14,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const sql = getSql();
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "10");
     const category = searchParams.get("category") || undefined;

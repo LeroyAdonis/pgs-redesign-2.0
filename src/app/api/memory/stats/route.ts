@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.DATABASE_URL!);
+/** Lazy connection — avoids crash during Next.js build when DATABASE_URL is absent */
+function getSql() {
+  return neon(process.env.DATABASE_URL!);
+}
 
 interface CategoryRow {
   category: string;
@@ -19,6 +22,7 @@ interface DateRow {
 
 export async function GET() {
   try {
+    const sql = getSql();
     const countResult = await sql`SELECT COUNT(*) as total FROM agent_memory`;
     const categoryResult = await sql`SELECT category, COUNT(*) as count FROM agent_memory GROUP BY category`;
     const dateResult = await sql`SELECT MIN(created_at) as oldest, MAX(created_at) as newest FROM agent_memory`;

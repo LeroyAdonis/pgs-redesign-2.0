@@ -2,24 +2,24 @@
  * Memory API Routes
  * 
  * POST /api/memory/store - Store a new memory
- * GET /api/memory/search?q=...&category=...&limit=... - Search memories
- * GET /api/memory/recent?limit=...&category=... - Get recent memories
- * GET /api/memory/stats - Get memory statistics
  */
 
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
-const sql = neon(process.env.DATABASE_URL!);
-const NIM_API_KEY = process.env.NIM_API_KEY!;
+/** Lazy connection — avoids crash during Next.js build when env vars are absent */
+function getSql() {
+  return neon(process.env.DATABASE_URL!);
+}
+
 const NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
 async function getEmbedding(text: string): Promise<number[]> {
   const res = await fetch(`${NIM_BASE_URL}/embeddings`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${NIM_API_KEY}`,
+      "Authorization": `Bearer ${process.env.NIM_API_KEY!}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -47,6 +47,7 @@ export async function POST(request: Request) {
 
     const embedding = await getEmbedding(content);
     const embStr = `[${embedding.join(",")}]`;
+    const sql = getSql();
 
     const result = await sql`
       INSERT INTO agent_memory (content, embedding, category, metadata, session_id)

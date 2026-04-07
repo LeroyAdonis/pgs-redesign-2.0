@@ -2,15 +2,18 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
-const sql = neon(process.env.DATABASE_URL!);
-const NIM_API_KEY = process.env.NIM_API_KEY!;
+/** Lazy connection — avoids crash during Next.js build when env vars are absent */
+function getSql() {
+  return neon(process.env.DATABASE_URL!);
+}
+
 const NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
 async function getEmbedding(text: string): Promise<number[]> {
   const res = await fetch(`${NIM_BASE_URL}/embeddings`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${NIM_API_KEY}`,
+      "Authorization": `Bearer ${process.env.NIM_API_KEY!}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -42,6 +45,7 @@ export async function GET(request: Request) {
 
     const embedding = await getEmbedding(query);
     const embStr = `[${embedding.join(",")}]`;
+    const sql = getSql();
 
     const results = category
       ? await sql`SELECT id, content, category, metadata, created_at, 1 - (embedding <=> ${embStr}::vector) as similarity FROM agent_memory WHERE category = ${category} ORDER BY embedding <=> ${embStr}::vector LIMIT ${limit}`
