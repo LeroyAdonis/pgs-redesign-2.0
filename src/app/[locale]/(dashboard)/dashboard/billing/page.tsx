@@ -9,7 +9,7 @@
  * Data is fetched server-side via the credit and subscription services.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { getBalance, getTransactionHistory } from "@/lib/credits";
 import { getCurrentSubscription } from "@/lib/payments/subscription-service";

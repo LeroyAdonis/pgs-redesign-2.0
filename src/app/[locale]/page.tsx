@@ -10,7 +10,7 @@
  * own CSS-driven entrance animations.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import {
   LandingNavbar,
   HeroSection,

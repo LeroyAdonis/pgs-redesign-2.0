@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * ContentStudio — Main AI content generation interface
  *
@@ -19,6 +21,7 @@ import type { ContentType, GenerationState } from "@/lib/ai/types";
 // ── Main Component ──────────────────────────────────────────────
 
 export function ContentStudio() {
+  const t = useTranslations("generate");
   // ── State ─────────────────────────────────────────────────
   const [generationState, setGenerationState] = useState<GenerationState>("idle");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"]);

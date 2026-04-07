@@ -8,7 +8,7 @@
  * a helpful empty state guiding the user to connect accounts first.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import Link from "next/link";
 import { db } from "@/db";

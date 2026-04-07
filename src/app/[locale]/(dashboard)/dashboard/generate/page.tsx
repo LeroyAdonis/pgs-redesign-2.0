@@ -8,7 +8,7 @@
  * ContentStudio client component for interactive generation.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { ContentStudio } from "./_components/ContentStudio";
 
@@ -17,9 +17,10 @@ type Props = {
 };
 
 export async function generateMetadata() {
+  const t = await getTranslations("generate");
   return {
-    title: "Content Studio | Purple Glow Social",
-    description: "Generate AI-powered social media content for South African audiences",
+    title: `${t("title")} | Purple Glow Social`,
+    description: t("description"),
   };
 }
 

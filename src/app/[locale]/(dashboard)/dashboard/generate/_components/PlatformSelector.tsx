@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * PlatformSelector — Multi-select pill/chip selector for social platforms
  *

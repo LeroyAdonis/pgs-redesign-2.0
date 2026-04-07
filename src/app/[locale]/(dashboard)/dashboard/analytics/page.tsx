@@ -8,7 +8,7 @@
  * component that fetches its own data from the analytics API.
  */
 
-import { setRequestLocale } from "next-intl/server";
+import { setRequestLocale, getTranslations } from "next-intl/server";
 import {
   AnalyticsOverview,
   EngagementChart,
