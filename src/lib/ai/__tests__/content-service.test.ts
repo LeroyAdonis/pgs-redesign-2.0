@@ -7,15 +7,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock the puter-client module
-vi.mock("../puter-client", () => ({
-  isPuterAvailable: vi.fn(() => ({
-    available: true,
-    aiAvailable: true,
-  })),
+// Mock the openrouter-client module (used by content-service for AI generation)
+vi.mock("../openrouter-client", () => ({
   generateText: vi.fn(),
   generateImage: vi.fn(),
   generateVideo: vi.fn(),
+  isOpenRouterConfigured: vi.fn(() => true),
 }));
 
 import {
@@ -23,7 +20,7 @@ import {
   generatePostImage,
   generatePostVideo,
 } from "../content-service";
-import { generateText, generateImage, generateVideo } from "../puter-client";
+import { generateText, generateImage, generateVideo } from "../openrouter-client";
 import type {
   TextGenerationRequest,
   ImageGenerationRequest,
