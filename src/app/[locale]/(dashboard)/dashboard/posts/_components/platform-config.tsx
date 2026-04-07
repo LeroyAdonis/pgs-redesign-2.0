@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 /**
  * Platform configuration — icons, colors, and labels.
  *
