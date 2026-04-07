@@ -22,6 +22,7 @@ const defaultLabels = {
   newPassword: "New password",
   confirmPassword: "Confirm password",
   resetPassword: "Reset password",
+  resetting: "Resetting...",
   passwordResetSuccess: "Your password has been reset successfully.",
   backToLogin: "Back to sign in",
   passwordsMustMatch: "Passwords must match",
