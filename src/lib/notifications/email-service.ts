@@ -33,7 +33,7 @@ export async function sendNotificationEmail(
   html: string,
 ): Promise<SendEmailResult> {
   if (!resend) {
-    logger.warn("email", "Resend not configured, skipping email", { to, subject });
+    logger.warn("Resend not configured, skipping email", { to, subject });
     return { success: false, messageId: "stub", error: "No API key" };
   }
 
@@ -46,14 +46,14 @@ export async function sendNotificationEmail(
     });
 
     if (error) {
-      logger.error("email", "Resend error", { error, to, subject });
+      logger.error("Resend error", { error, to, subject });
       return { success: false, messageId: "error", error: error.message };
     }
 
-    logger.info("email", "Email sent", { messageId: data?.id, to, subject });
+    logger.info("Email sent", { messageId: data?.id, to, subject });
     return { success: true, messageId: data?.id || "sent" };
   } catch (err) {
-    logger.error("email", "Email send failed", { err, to, subject });
+    logger.error("Email send failed", { err, to, subject });
     return { success: false, messageId: "error", error: String(err) };
   }
 }
