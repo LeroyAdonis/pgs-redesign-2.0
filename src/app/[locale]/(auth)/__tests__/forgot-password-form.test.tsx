@@ -21,6 +21,7 @@ import { ForgotPasswordForm } from "@/app/[locale]/(auth)/forgot-password/forgot
 const defaultLabels = {
   email: "Email address",
   sendResetLink: "Send reset link",
+  sending: "Sending...",
   resetLinkSent: "Check your email for a reset link",
   resetLinkSentDescription:
     "If an account exists with that email, we've sent a password reset link.",
