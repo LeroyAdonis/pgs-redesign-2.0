@@ -55,7 +55,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url }) => {
+    sendResetPassword: async ({ user, url }: { user: { email: string; name: string }; url: string }) => {
       const { sendNotificationEmail } = await import("@/lib/notifications/email-service");
       await sendNotificationEmail(
         user.email,
@@ -63,7 +63,7 @@ export const auth = betterAuth({
         `<p>Hi ${escapeHtml(user.name)},</p><p>Click <a href="${url}">here</a> to reset your password.</p><p>If you didn't request this, ignore this email.</p>`,
       );
     },
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, url }: { user: { email: string; name: string }; url: string }) => {
       const { sendNotificationEmail } = await import("@/lib/notifications/email-service");
       await sendNotificationEmail(
         user.email,
