@@ -91,13 +91,29 @@ const MOCK_SCHEDULES: CalendarSchedule[] = [
 
 const mockFetch = vi.fn();
 
+/** Build API response matching the shape CalendarView expects */
+function apiResponse(schedules: CalendarSchedule[]) {
+  return {
+    ok: true,
+    json: () =>
+      Promise.resolve({
+        success: true,
+        schedules: schedules.map((s) => ({
+          id: s.id,
+          postId: s.postId,
+          socialAccountId: s.socialAccountId,
+          scheduledAt: s.scheduledAt,
+          post: { content: s.content, platform: s.platform, status: s.status },
+        })),
+        total: schedules.length,
+      }),
+  };
+}
+
 // ─── Setup / Teardown ───────────────────────────────────────────
 
 beforeEach(() => {
-  mockFetch.mockResolvedValue({
-    ok: true,
-    json: () => Promise.resolve(MOCK_SCHEDULES),
-  });
+  mockFetch.mockResolvedValue(apiResponse(MOCK_SCHEDULES));
   vi.stubGlobal("fetch", mockFetch);
 });
 
@@ -121,7 +137,7 @@ import { DragDropProvider } from "../_components/DragDropContext";
 describe("CalendarView", () => {
   it("renders with loading state initially", () => {
     // Make fetch hang so loading stays visible
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    mockFetch.mockReturnValue(new Promise(() => {}) as never);
     render(<CalendarView />);
 
     expect(screen.getByTestId("calendar-loading")).toBeInTheDocument();
@@ -163,7 +179,8 @@ describe("CalendarView", () => {
 
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/schedule?startDate="),
+        expect.stringContaining("/api/schedule?dateFrom="),
+        expect.anything(),
       );
     });
   });
