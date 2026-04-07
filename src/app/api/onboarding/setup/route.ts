@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         name: orgName.trim(),
         slug,
         ownerId: session.user.id,
-        tier: (tier as string) || "seedling",
+        tier: (tier as "seedling" | "hustler" | "grower" | "mogul") || "seedling",
       })
       .returning({ id: organization.id });
 
