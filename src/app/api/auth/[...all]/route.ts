@@ -49,9 +49,9 @@ function getRateLimitForPath(pathname: string) {
 }
 
 function wrapWithRateLimit(
-  handler: (req: NextRequest) => Promise<NextResponse>,
+  handler: (req: Request) => Promise<Response>,
 ) {
-  return async (req: NextRequest): Promise<NextResponse> => {
+  return async (req: NextRequest): Promise<Response> => {
     const ip = getClientIp(req);
     const pathname = new URL(req.url).pathname;
     const limit = getRateLimitForPath(pathname);
