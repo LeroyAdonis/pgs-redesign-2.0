@@ -1,7 +1,7 @@
 /**
  * AI content engine — shared type definitions
  *
- * Types used by the AI generation layer (prompt builder, puter client,
+ * Types used by the AI generation layer (prompt builder, NIM client,
  * content service) and the UI components that consume them.
  */
 
@@ -192,16 +192,20 @@ export interface FeedbackStats {
 /** Generation state for UI components */
 export type GenerationState = "idle" | "generating" | "success" | "error";
 
-/** OpenRouter API availability status */
-export interface OpenRouterAvailability {
-  /** Whether the OPENROUTER_API_KEY env var is set */
-  configured: boolean;
+/** NVIDIA NIM API availability status */
+export interface NIMAvailability {
+  /** Whether the NIM_API_KEY env var is set */
+  configured?: boolean;
+  /** Whether the API is reachable */
+  available: boolean;
+  /** Whether the AI module is available */
+  aiAvailable: boolean;
   /** Reason if unavailable */
   reason?: string;
 }
 
-/** @deprecated Use OpenRouterAvailability instead */
-export type PuterAvailability = OpenRouterAvailability;
+/** @deprecated Use NIMAvailability instead */
+export type PuterAvailability = NIMAvailability;
 
 // ── Brand profile subset for AI prompts ─────────────────────────
 

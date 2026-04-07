@@ -12,18 +12,21 @@ import { neon } from "@neondatabase/serverless";
 import { getServerSession } from "@/lib/auth-session";
 
 const sql = neon(process.env.DATABASE_URL!);
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY!;
+const NIM_API_KEY = process.env.NIM_API_KEY!;
+const NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
 async function getEmbedding(text: string): Promise<number[]> {
-  const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
+  const res = await fetch(`${NIM_BASE_URL}/embeddings`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${OPENROUTER_KEY}`,
+      "Authorization": `Bearer ${NIM_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "openai/text-embedding-3-small",
-      input: text.substring(0, 8000),
+      model: "nvidia/nv-embedqa-e5-v5",
+      input: [text.substring(0, 2048)],
+      input_type: "query",
+      encoding_format: "float",
     }),
   });
   const data = await res.json();

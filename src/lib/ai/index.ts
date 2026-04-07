@@ -2,7 +2,7 @@
  * AI content engine — barrel exports
  *
  * Public API for the AI generation layer. Uses server-side
- * OpenRouter API for text generation (replaces Puter.js).
+ * NVIDIA NIM API for text and image generation.
  */
 
 // ── Types ───────────────────────────────────────────────────────
@@ -24,7 +24,8 @@ export type {
   AIFeedbackData,
   FeedbackStats,
   GenerationState,
-  OpenRouterAvailability,
+  NIMAvailability,
+  /** @deprecated Use NIMAvailability instead */
   PuterAvailability,
   BrandContext,
 } from "./types";
@@ -44,13 +45,13 @@ export {
   buildVideoPrompt,
 } from "./prompt-builder";
 
-// ── OpenRouter client (server-only) ─────────────────────────────
+// ── NIM client (server-only) ────────────────────────────────────
 export {
-  isOpenRouterConfigured,
+  isNimConfigured,
   generateText,
   generateImage,
   generateVideo,
-} from "./openrouter-client";
+} from "./nim-client";
 
 // ── Content service (server-only) ───────────────────────────────
 export {

@@ -1,7 +1,7 @@
 /**
  * POST /api/ai/generate
  *
- * Server-side API route for text generation using OpenRouter.
+ * Server-side API route for text generation using NVIDIA NIM.
  * Replaces client-side Puter.js calls with a secure server-side proxy.
  *
  * Auth: requires a valid session (same as all dashboard API routes).
@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth-session";
-import { generateText } from "@/lib/ai/openrouter-client";
+import { generateText } from "@/lib/ai/nim-client";
 import { logger } from "@/lib/logger";
 import { createRateLimiter } from "@/lib/security/rate-limit";
 

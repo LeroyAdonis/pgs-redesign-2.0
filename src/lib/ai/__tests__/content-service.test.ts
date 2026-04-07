@@ -1,21 +1,18 @@
 /**
  * Tests for the AI content generation orchestrator
  *
- * Mocks the puter-client to test the orchestration flow:
+ * Mocks the nim-client to test the orchestration flow:
  * prompt building → generation → post-processing.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock the puter-client module
-vi.mock("../puter-client", () => ({
-  isPuterAvailable: vi.fn(() => ({
-    available: true,
-    aiAvailable: true,
-  })),
+// Mock the nim-client module (used by content-service for AI generation)
+vi.mock("../nim-client", () => ({
   generateText: vi.fn(),
   generateImage: vi.fn(),
   generateVideo: vi.fn(),
+  isNimConfigured: vi.fn(() => true),
 }));
 
 import {
@@ -23,7 +20,7 @@ import {
   generatePostImage,
   generatePostVideo,
 } from "../content-service";
-import { generateText, generateImage, generateVideo } from "../puter-client";
+import { generateText, generateImage, generateVideo } from "../nim-client";
 import type {
   TextGenerationRequest,
   ImageGenerationRequest,
@@ -75,7 +72,7 @@ describe("generatePostContent", () => {
   it("returns a successful result with content", async () => {
     vi.mocked(generateText).mockResolvedValueOnce({
       content: "🔥 Weekend braai special! Join us for lekker vibes #Braai #Mzansi",
-      model: "gpt-4o-mini",
+      model: "meta/llama-3.3-70b-instruct",
     });
 
     const result = await generatePostContent(textRequest);
@@ -83,14 +80,14 @@ describe("generatePostContent", () => {
     expect(result.success).toBe(true);
     expect(result.contentType).toBe("text");
     expect(result.content).toContain("braai");
-    expect(result.model).toBe("gpt-4o-mini");
+    expect(result.model).toBe("meta/llama-3.3-70b-instruct");
     expect(result.durationMs).toBeGreaterThanOrEqual(0);
   });
 
   it("extracts hashtags from generated content", async () => {
     vi.mocked(generateText).mockResolvedValueOnce({
       content: "Join us! #Braai #Weekend #Mzansi",
-      model: "gpt-4o-mini",
+      model: "meta/llama-3.3-70b-instruct",
     });
 
     const result = await generatePostContent(textRequest);
@@ -102,7 +99,7 @@ describe("generatePostContent", () => {
   it("appends SA hashtags when SA culture is enabled", async () => {
     vi.mocked(generateText).mockResolvedValueOnce({
       content: "Lekker braai this weekend!",
-      model: "gpt-4o-mini",
+      model: "meta/llama-3.3-70b-instruct",
     });
 
     const result = await generatePostContent(textRequest);
@@ -115,7 +112,7 @@ describe("generatePostContent", () => {
   it("calculates a cultural score", async () => {
     vi.mocked(generateText).mockResolvedValueOnce({
       content: "Lekker braai in Joburg this weekend! #Mzansi #Braai",
-      model: "gpt-4o-mini",
+      model: "meta/llama-3.3-70b-instruct",
     });
 
     const result = await generatePostContent(textRequest);
@@ -127,7 +124,7 @@ describe("generatePostContent", () => {
   it("passes brand profile to prompt builder", async () => {
     vi.mocked(generateText).mockResolvedValueOnce({
       content: "Casual braai vibes!",
-      model: "gpt-4o-mini",
+      model: "meta/llama-3.3-70b-instruct",
     });
 
     const result = await generatePostContent(textRequest, brandProfile);
@@ -166,7 +163,7 @@ describe("generatePostImage", () => {
   it("returns a successful result with image URL", async () => {
     vi.mocked(generateImage).mockResolvedValueOnce({
       imageDataUrl: "data:image/png;base64,mockimage",
-      model: "dall-e-3",
+      model: "stabilityai/stable-diffusion-xl",
     });
 
     const result = await generatePostImage(imageRequest);
@@ -174,7 +171,7 @@ describe("generatePostImage", () => {
     expect(result.success).toBe(true);
     expect(result.contentType).toBe("image");
     expect(result.imageDataUrl).toBe("data:image/png;base64,mockimage");
-    expect(result.model).toBe("dall-e-3");
+    expect(result.model).toBe("stabilityai/stable-diffusion-xl");
   });
 
   it("uses default dimensions when not specified", async () => {

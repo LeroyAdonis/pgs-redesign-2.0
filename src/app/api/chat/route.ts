@@ -2,7 +2,7 @@
  * POST /api/chat — Chatbot AI endpoint
  *
  * Accepts a conversation (messages array) and returns an AI response
- * via Google Gemini API. Used by the floating ChatbotWidget.
+ * via NVIDIA NIM API (OpenAI-compatible). Used by the floating ChatbotWidget.
  *
  * This route is intentionally public (no auth required) so that
  * unauthenticated visitors can interact with the chatbot on the
@@ -18,11 +18,11 @@ import { sanitizeText } from "@/lib/security/sanitize";
 
 const rateLimiter = createRateLimiter({ maxRequests: 20, windowMs: 60_000 });
 
-// ── Gemini API config ───────────────────────────────────────────
+// ── NIM API config ──────────────────────────────────────────────
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = "gemini-2.0-flash";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const NIM_API_KEY = process.env.NIM_API_KEY;
+const NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
+const NIM_CHAT_MODEL = "meta/llama-3.1-8b-instruct"; // fast model for chatbot
 
 const SYSTEM_PROMPT = [
   "You are the Purple Glow Social assistant, a friendly South African chatbot.",
@@ -56,32 +56,6 @@ interface ChatErrorResponse {
 
 type ChatResponse = ChatSuccessResponse | ChatErrorResponse;
 
-// ── Gemini API types ────────────────────────────────────────────
-
-interface GeminiPart {
-  text: string;
-}
-
-interface GeminiContent {
-  role: "user" | "model";
-  parts: GeminiPart[];
-}
-
-interface GeminiCandidate {
-  content: {
-    parts: GeminiPart[];
-    role: string;
-  };
-}
-
-interface GeminiApiResponse {
-  candidates?: GeminiCandidate[];
-  error?: {
-    message: string;
-    code: number;
-  };
-}
-
 // ── Helpers ─────────────────────────────────────────────────────
 
 /** Extract client IP for rate limiting */
@@ -92,14 +66,6 @@ function getClientIp(request: Request): string {
   }
   // Fallback for local development
   return "127.0.0.1";
-}
-
-/** Convert our message format to Gemini's format */
-function toGeminiContents(messages: ChatRequestMessage[]): GeminiContent[] {
-  return messages.map((m) => ({
-    role: m.role === "assistant" ? ("model" as const) : ("user" as const),
-    parts: [{ text: m.content }],
-  }));
 }
 
 /** Validate the incoming request body */
@@ -167,8 +133,8 @@ export async function POST(
 ): Promise<NextResponse<ChatResponse>> {
   try {
     // Check API key availability
-    if (!GEMINI_API_KEY) {
-      logger.error("GEMINI_API_KEY not configured");
+    if (!NIM_API_KEY) {
+      logger.error("NIM_API_KEY not configured");
       return NextResponse.json(
         { error: "Chat service is not configured. Please try again later." },
         { status: 503 },
@@ -198,31 +164,38 @@ export async function POST(
 
     const { messages } = validation.data;
 
-    // Call Gemini API
-    const geminiResponse = await fetch(`${GEMINI_URL}?key=${GEMINI_API_KEY}`, {
+    // Build OpenAI-compatible messages array with system prompt
+    const nimMessages = [
+      { role: "system" as const, content: SYSTEM_PROMPT },
+      ...messages.map((m) => ({
+        role: m.role as "user" | "assistant",
+        content: m.content,
+      })),
+    ];
+
+    // Call NIM API (OpenAI-compatible chat completions)
+    const nimResponse = await fetch(`${NIM_BASE_URL}/chat/completions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${NIM_API_KEY}`,
+      },
       body: JSON.stringify({
-        systemInstruction: {
-          role: "system",
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        contents: toGeminiContents(messages),
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        },
+        model: NIM_CHAT_MODEL,
+        messages: nimMessages,
+        temperature: 0.7,
+        max_tokens: 500,
       }),
     });
 
-    if (!geminiResponse.ok) {
-      const errorBody = await geminiResponse.text().catch(() => "Unknown error");
-      logger.error("Gemini API error", {
-        status: geminiResponse.status,
+    if (!nimResponse.ok) {
+      const errorBody = await nimResponse.text().catch(() => "Unknown error");
+      logger.error("NIM API error", {
+        status: nimResponse.status,
         body: errorBody.slice(0, 500),
       });
 
-      if (geminiResponse.status === 429) {
+      if (nimResponse.status === 429) {
         return NextResponse.json(
           { error: "The AI assistant is busy right now. Please try again in a moment." },
           { status: 429 },
@@ -235,14 +208,14 @@ export async function POST(
       );
     }
 
-    const geminiData = (await geminiResponse.json()) as GeminiApiResponse;
+    const nimData = await nimResponse.json();
 
-    // Extract the reply text
-    const replyText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Extract the reply text (OpenAI format)
+    const replyText = nimData.choices?.[0]?.message?.content;
 
     if (!replyText) {
-      logger.warn("Gemini returned empty response", {
-        candidates: JSON.stringify(geminiData.candidates ?? []).slice(0, 200),
+      logger.warn("NIM returned empty response", {
+        choices: JSON.stringify(nimData.choices ?? []).slice(0, 200),
       });
       return NextResponse.json(
         { error: "I didn't get a response. Could you try rephrasing your question?" },

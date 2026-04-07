@@ -4,7 +4,7 @@
  * ContentStudio — Main AI content generation interface
  *
  * Two-panel layout: controls (left) and preview (right).
- * Uses server-side API routes (/api/ai/generate) powered by OpenRouter.
+ * Uses server-side API routes (/api/ai/generate) powered by NVIDIA NIM.
  * Manages all generation state internally.
  */
 
@@ -32,7 +32,7 @@ export function ContentStudio() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [lastAiModel, setLastAiModel] = useState("openrouter");
+  const [lastAiModel, setLastAiModel] = useState("nim");
 
   // ── Build prompt with SA context ──────────────────────────
   function buildPrompt(): string {
@@ -81,16 +81,31 @@ export function ContentStudio() {
 
         const data = await response.json();
         setGeneratedContent(data.content);
-        setLastAiModel(data.model || "openrouter");
+        setLastAiModel(data.model || "nim");
         setGenerationState("success");
       } else if (contentType === "image") {
-        // Image generation is not available via OpenRouter free models
-        throw new Error(
-          "Image generation is not currently available. " +
-          "Please use text generation or connect an image generation service."
-        );
+        // Image generation via NIM Stability AI SDXL
+        const response = await fetch("/api/ai/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: fullPrompt, contentType: "image" }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({ error: "Image generation failed" }));
+          throw new Error(error.error || "Image generation failed");
+        }
+
+        const data = await response.json();
+        if (data.imageDataUrl) {
+          setGeneratedImageUrl(data.imageDataUrl);
+          setLastAiModel(data.model || "stabilityai/sdxl");
+          setGenerationState("success");
+        } else {
+          throw new Error("Image generation is not currently available. Please use text generation.");
+        }
       } else if (contentType === "video") {
-        // Video generation is not available via OpenRouter
+        // Video generation is not yet available
         throw new Error(
           "Video generation is not currently available. " +
           "Please use text generation or connect a video generation service."

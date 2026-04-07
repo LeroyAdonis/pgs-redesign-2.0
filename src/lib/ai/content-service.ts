@@ -1,15 +1,15 @@
 /**
  * AI content generation orchestrator
  *
- * High-level service that ties together prompt-builder and openrouter-client
+ * High-level service that ties together prompt-builder and nim-client
  * to generate complete social media content with SA cultural context.
  *
- * Server-side only — uses OpenRouter API for AI generation.
+ * Server-side only — uses NVIDIA NIM API for AI generation.
  */
 
 import { suggestSAHashtags, calculateSACulturalScore } from "@/lib/brand/sa-context";
 import { buildTextPrompt, buildImagePrompt, buildVideoPrompt } from "./prompt-builder";
-import { generateText, generateImage, generateVideo } from "./openrouter-client";
+import { generateText, generateImage, generateVideo } from "./nim-client";
 import { getDefaultDimensions } from "./dimensions";
 import type {
   TextGenerationRequest,
@@ -27,7 +27,7 @@ import type {
  * Generate a social media post with SA cultural context.
  *
  * 1. Builds an SA-aware prompt from the request + brand profile
- * 2. Calls OpenRouter text generation
+ * 2. Calls NIM text generation
  * 3. Post-processes: appends SA hashtags, calculates cultural score
  */
 export async function generatePostContent(
@@ -40,7 +40,7 @@ export async function generatePostContent(
     // Build the prompt
     const prompt = buildTextPrompt(request, brandProfile);
 
-    // Generate via OpenRouter
+    // Generate via NIM
     const { content, model } = await generateText(prompt, {
       temperature: 0.8,
     });
@@ -107,9 +107,7 @@ export async function generatePostContent(
 /**
  * Generate a social media image with brand visual style.
  *
- * Note: OpenRouter free text models don't support image generation.
- * This will return an error result — consider integrating a dedicated
- * image generation service for production use.
+ * Uses Stability AI SDXL on NVIDIA NIM for image generation.
  */
 export async function generatePostImage(
   request: ImageGenerationRequest,
@@ -124,7 +122,7 @@ export async function generatePostImage(
     // Build the prompt
     const prompt = buildImagePrompt(request, brandProfile);
 
-    // Generate via OpenRouter
+    // Generate via NIM
     const { imageDataUrl, model } = await generateImage(prompt);
 
     const durationMs = Math.round(performance.now() - startTime);
@@ -160,7 +158,7 @@ export async function generatePostImage(
 /**
  * Generate a social media video with brand context.
  *
- * Note: OpenRouter does not support video generation.
+ * Note: Video generation is not yet available.
  * This will return an error result — consider integrating a dedicated
  * video generation service for production use.
  */
@@ -177,7 +175,7 @@ export async function generatePostVideo(
     // Build the prompt
     const prompt = buildVideoPrompt(request, brandProfile);
 
-    // Generate via OpenRouter
+    // Generate via NIM
     const { videoUrl, model } = await generateVideo(prompt);
 
     const durationMs = Math.round(performance.now() - startTime);

@@ -1,20 +1,23 @@
 /**
- * OpenRouter API client (server-side)
+ * NVIDIA NIM API client (server-side)
  *
- * Replaces the Puter.js client-side AI with server-side OpenRouter calls.
- * Uses fetch() for Next.js serverless compatibility.
- * Supports model fallback: hunter-alpha → healer-alpha → minimax free.
+ * Unified AI provider using NVIDIA NIM for all AI tasks:
+ * - Text generation via chat completions (OpenAI-compatible)
+ * - Image generation via Stability AI SDXL Turbo on NIM
+ *
+ * Single API key (NIM_API_KEY) replaces OpenRouter, OpenAI, and Gemini.
  */
 
 // ── Constants ───────────────────────────────────────────────────
 
-const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+const NIM_BASE_URL = "https://integrate.api.nvidia.com/v1";
+const NIM_IMAGE_URL =
+  "https://ai.api.nvidia.com/v1/genai/stabilityai/stable-diffusion-xl";
 
 const FALLBACK_MODELS = [
-  "xiaomi/mimo-v2-pro",        // Formerly Hunter Alpha
-  "openrouter/auto",           // OpenRouter's auto-router fallback
-  "minimax/minimax-m2.5:free", // Free minimax fallback
-  "openai/gpt-4o-mini",        // Fast GPT fallback
+  "meta/llama-3.3-70b-instruct",             // Best quality
+  "nvidia/llama-3.1-nemotron-70b-instruct",   // NVIDIA-tuned
+  "meta/llama-3.1-8b-instruct",               // Fast / cheap fallback
 ] as const;
 
 const DEFAULT_MAX_RETRIES = 1; // per-model retries
@@ -40,26 +43,27 @@ export interface GenerateTextResult {
 
 // ── Internal ────────────────────────────────────────────────────
 
-function getApiKey(): string {
-  const key = process.env.OPENROUTER_API_KEY;
+function getNimApiKey(): string {
+  const key = process.env.NIM_API_KEY;
   if (!key) {
     throw new Error(
-      "OPENROUTER_API_KEY environment variable is not set. " +
-      "Add it to your .env.local or Vercel environment variables.",
+      "NIM_API_KEY environment variable is not set. " +
+        "Add it to your .env.local or Vercel environment variables.",
     );
   }
   return key;
 }
 
 /**
- * Call OpenRouter chat completions for a single model.
+ * Call NIM chat completions for a single model.
+ * NIM is OpenAI-compatible, so we use the standard chat format.
  */
 async function callModel(
   model: string,
   prompt: string,
   options: GenerateTextOptions,
 ): Promise<string> {
-  const apiKey = getApiKey();
+  const apiKey = getNimApiKey();
 
   const messages: Array<{ role: string; content: string }> = [];
   if (options.system) {
@@ -71,13 +75,11 @@ async function callModel(
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+    const response = await fetch(`${NIM_BASE_URL}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://purpleglowsocial.com",
-        "X-Title": "Purple Glow Social",
       },
       body: JSON.stringify({
         model,
@@ -91,7 +93,7 @@ async function callModel(
     if (!response.ok) {
       const errorBody = await response.text().catch(() => "Unknown error");
       throw new Error(
-        `OpenRouter API error (${response.status}): ${errorBody}`,
+        `NIM API error (${response.status}): ${errorBody}`,
       );
     }
 
@@ -99,9 +101,7 @@ async function callModel(
 
     const content = data.choices?.[0]?.message?.content;
     if (!content) {
-      throw new Error(
-        `OpenRouter returned empty content for model ${model}`,
-      );
+      throw new Error(`NIM returned empty content for model ${model}`);
     }
 
     return content;
@@ -138,10 +138,10 @@ function sleep(ms: number): Promise<void> {
 // ── Public API ──────────────────────────────────────────────────
 
 /**
- * Generate text using OpenRouter API with model fallback.
+ * Generate text using NVIDIA NIM API with model fallback.
  *
  * If a specific model is provided, only that model is tried.
- * Otherwise, falls back through: hunter-alpha → healer-alpha → minimax free.
+ * Otherwise, falls back through the model chain.
  *
  * Each model gets up to (maxRetries + 1) attempts with exponential backoff.
  *
@@ -153,9 +153,7 @@ export async function generateText(
   prompt: string,
   options?: GenerateTextOptions,
 ): Promise<GenerateTextResult> {
-  const models = options?.model
-    ? [options.model]
-    : [...FALLBACK_MODELS];
+  const models = options?.model ? [options.model] : [...FALLBACK_MODELS];
 
   const maxRetries = DEFAULT_MAX_RETRIES;
   const errors: string[] = [];
@@ -183,45 +181,100 @@ export async function generateText(
     // Move to next fallback model
   }
 
-  throw new Error(
-    `All models failed. Errors:\n${errors.join("\n")}`,
-  );
+  throw new Error(`All models failed. Errors:\n${errors.join("\n")}`);
 }
 
 /**
- * Check if OpenRouter is configured (API key present).
+ * Check if NIM is configured (API key present).
  */
-export function isOpenRouterConfigured(): boolean {
-  return !!process.env.OPENROUTER_API_KEY;
+export function isNimConfigured(): boolean {
+  return !!process.env.NIM_API_KEY;
 }
 
 /**
- * Image generation placeholder.
+ * Generate an image using Stability AI SDXL on NVIDIA NIM.
  *
- * OpenRouter's free text models don't support image generation.
- * This returns a helpful error. For image gen, integrate a dedicated
- * service like Replicate, Stability AI, or DALL-E via OpenAI.
+ * Returns a base64-encoded data URL of the generated image.
+ *
+ * @param prompt - Text description of the image to generate
+ * @returns Object with base64 data URL and model identifier
  */
 export async function generateImage(
-  _prompt: string,
+  prompt: string,
 ): Promise<{ imageDataUrl: string; model: string }> {
-  throw new Error(
-    "Image generation is not available via OpenRouter free models. " +
-    "Use a dedicated image generation service (Replicate, Stability AI, etc.) " +
-    "or upgrade to a model that supports image output.",
-  );
+  const apiKey = getNimApiKey();
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000);
+
+  try {
+    const response = await fetch(NIM_IMAGE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        text_prompts: [
+          {
+            text: prompt,
+            weight: 1,
+          },
+        ],
+        cfg_scale: 5,
+        height: 1024,
+        width: 1024,
+        steps: 25,
+        sampler: "K_DPM_2_ANCESTRAL",
+        seed: 0,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "Unknown error");
+      throw new Error(
+        `NIM Image API error (${response.status}): ${errorBody}`,
+      );
+    }
+
+    const data = await response.json();
+
+    const b64Image = data.artifacts?.[0]?.base64;
+    if (!b64Image) {
+      throw new Error("NIM image generation returned no image data");
+    }
+
+    const imageDataUrl = `data:image/png;base64,${b64Image}`;
+
+    return {
+      imageDataUrl,
+      model: "stabilityai/stable-diffusion-xl",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 /**
- * Video generation placeholder.
+ * Video generation is not yet available via API.
  *
- * OpenRouter does not support video generation.
+ * Services like Runway ML, Pika, and Kling offer video generation
+ * but do not yet provide stable public APIs suitable for production
+ * integration. This will be updated when a reliable video generation
+ * API becomes available.
+ *
+ * @param _prompt - Text description (unused)
+ * @throws Always throws with an informative error message
  */
 export async function generateVideo(
   _prompt: string,
 ): Promise<{ videoUrl: string; model: string }> {
   throw new Error(
-    "Video generation is not available via OpenRouter. " +
-    "Use a dedicated video generation service.",
+    "Video generation is not yet available. " +
+      "AI video generation requires a dedicated service such as Runway ML, Pika, or Kling, " +
+      "which do not yet offer stable public APIs for production use. " +
+      "This feature will be enabled once a reliable video generation API is integrated.",
   );
 }
