@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { OnboardingLabels, OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
+import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 
 /* ─── Mocks ─── */
 
@@ -15,11 +15,17 @@ vi.mock('next/navigation', () => ({
 
 /* ─── Fixture ─── */
 
-const LABELS: OnboardingLabels = {
+const LABELS = {
   welcome: {
     title: 'Welcome to Purple Glow',
     subtitle: 'Let\'s set you up',
     getStarted: 'Get Started',
+  },
+  orgName: {
+    title: 'Organization Name',
+    subtitle: 'What should we call your team?',
+    placeholder: 'Enter organization name',
+    hint: 'You can change this later',
   },
   selectTier: {
     title: 'Choose Your Plan',
@@ -44,7 +50,8 @@ const LABELS: OnboardingLabels = {
     title: 'Brand Scan',
     subtitle: 'Analyzing your brand',
     scanning: 'Scanning…',
-    features: ['Tone', 'Vocabulary', 'Hashtags'],
+    complete: 'Scan complete',
+    skip: 'Skip scan',
   },
   generatePost: {
     title: 'Generate a Post',
@@ -68,7 +75,7 @@ const LABELS: OnboardingLabels = {
   navigation: {
     back: 'Back',
     next: 'Next',
-    skip: 'Skip',
+    create: 'Create',
   },
   progress: {
     stepOf: 'Step {current} of {total}',
