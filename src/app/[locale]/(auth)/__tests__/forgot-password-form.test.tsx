@@ -99,6 +99,10 @@ describe("ForgotPasswordForm", () => {
     await user.type(screen.getByLabelText("Email address"), "test@example.com");
     await user.click(screen.getByRole("button", { name: "Send reset link" }));
 
-    expect(screen.getByRole("button", { name: "..." })).toBeDisabled();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /Sending/i }),
+      ).toBeDisabled();
+    });
   });
 });
