@@ -1,19 +1,30 @@
 /**
- * Tests for SignupForm — post-signup success feedback
+ * Tests for SignupForm — sign-up flow and error handling
  *
- * Verifies that after a successful signUp.email() call the user sees
- * an "Account created" confirmation instead of the form.
+ * Verifies that successful signUp.email() triggers router.push("/dashboard")
+ * and that errors are displayed correctly.
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-import { SignupForm } from "../signup-form";
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+
+const pushMock = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: pushMock,
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+}));
 
 vi.mock("@/lib/auth-client", () => ({
   signUp: {
@@ -25,6 +36,7 @@ vi.mock("@/lib/auth-client", () => ({
 }));
 
 import { signUp } from "@/lib/auth-client";
+import { SignupForm } from "../signup-form";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -49,7 +61,7 @@ describe("SignupForm", () => {
     vi.clearAllMocks();
   });
 
-  it("shows a success message after successful sign-up", async () => {
+  it("redirects to dashboard after successful sign-up", async () => {
     // Mock signUp.email to call onSuccess from the options argument
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (vi.mocked(signUp.email) as any).mockImplementation(
@@ -69,16 +81,13 @@ describe("SignupForm", () => {
     // Submit
     await user.click(screen.getByRole("button", { name: /sign up/i }));
 
-    // Expect success feedback
-    expect(
-      screen.getByText(/account created/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/check your email/i),
-    ).toBeInTheDocument();
+    // On success, the component calls router.push("/dashboard")
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith("/dashboard");
+    });
   });
 
-  it("does NOT show success message when sign-up errors", async () => {
+  it("shows error message when sign-up fails", async () => {
     // Mock signUp.email to call onError instead
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (vi.mocked(signUp.email) as any).mockImplementation(
@@ -99,8 +108,12 @@ describe("SignupForm", () => {
 
     await user.click(screen.getByRole("button", { name: /sign up/i }));
 
-    // Error message should appear, not success
-    expect(screen.getByText(/email already taken/i)).toBeInTheDocument();
-    expect(screen.queryByText(/account created/i)).not.toBeInTheDocument();
+    // Error message should appear
+    await waitFor(() => {
+      expect(screen.getByText(/email already taken/i)).toBeInTheDocument();
+    });
+
+    // Should NOT have navigated
+    expect(pushMock).not.toHaveBeenCalled();
   });
 });
