@@ -589,6 +589,26 @@ export const notification = pgTable(
   ],
 );
 
+// --- Notification Preferences ---
+
+export const notificationPreference = pgTable(
+  "notification_preference",
+  {
+    id: cuid2Id(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    inApp: boolean("in_app").notNull().default(true),
+    emailEnabled: boolean("email_enabled").notNull().default(true),
+    emailFrequency: text("email_frequency").notNull().default("daily"),
+    mutedTypes: jsonb("muted_types").$type<string[]>().default([]),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex("notification_pref_user_idx").on(table.userId),
+  ],
+);
+
 // --- AI Feedback ---
 
 export const aiFeedback = pgTable(
@@ -628,13 +648,17 @@ export const aiFeedback = pgTable(
 // Drizzle relations
 // ============================================================
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
   accounts: many(account),
   ownedOrganizations: many(organization),
   organizationMemberships: many(organizationMember),
   posts: many(post),
   notifications: many(notification),
+  notificationPreference: one(notificationPreference, {
+    fields: [user.id],
+    references: [notificationPreference.userId],
+  }),
   aiFeedbacks: many(aiFeedback),
 }));
 
@@ -786,6 +810,16 @@ export const notificationRelations = relations(notification, ({ one }) => ({
     references: [organization.id],
   }),
 }));
+
+export const notificationPreferenceRelations = relations(
+  notificationPreference,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [notificationPreference.userId],
+      references: [user.id],
+    }),
+  }),
+);
 
 export const aiFeedbackRelations = relations(aiFeedback, ({ one }) => ({
   organization: one(organization, {

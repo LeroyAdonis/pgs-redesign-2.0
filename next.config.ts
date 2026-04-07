@@ -11,6 +11,11 @@ const securityHeaders = [
       "default-src 'self'",
       // Next.js requires 'unsafe-inline' for its hydration bootstrap scripts.
       // TODO: Replace with nonce-based CSP via middleware for stricter security.
+      // Migration path to nonce-based CSP:
+      // 1. Create middleware.ts that generates a nonce per request
+      // 2. Pass nonce to Next.js via headers
+      // 3. Replace 'unsafe-inline' with 'nonce-{value}' in CSP
+      // See: https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.fbcdn.net https://*.cdninstagram.com https://pbs.twimg.com https://abs.twimg.com https://*.licdn.com https://*.googleusercontent.com https://avatars.githubusercontent.com",
@@ -48,6 +53,8 @@ const nextConfig: NextConfig = {
    * The integrated checker hangs indefinitely on this codebase (1.8GB RAM)
    * — a known Turbopack issue with large projects.
    */
+  // TypeScript errors are caught by `tsc --noEmit` in CI (see .github/workflows/ci.yml).
+  // Next.js built-in checker is disabled due to memory issues with Turbopack on large codebases.
   typescript: {
     ignoreBuildErrors: true,
   },

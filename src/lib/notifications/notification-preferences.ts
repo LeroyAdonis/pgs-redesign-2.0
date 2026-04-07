@@ -4,11 +4,12 @@
  * Controls per-user notification delivery settings: in-app visibility,
  * email enablement, email frequency, and muted notification types.
  *
- * TODO: Add a `notification_preferences` table (or jsonb column on the
- * user table) and persist via Drizzle ORM. For now, preferences default
- * in-memory and are stored in a runtime map (lost on restart).
+ * Persisted to the `notification_preference` table via Drizzle ORM.
  */
 
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { notificationPreference } from "@/db/schema";
 import { logger } from "@/lib/logger";
 import type { NotificationType } from "./types";
 
@@ -46,53 +47,77 @@ export function getDefaultPreferences(): NotificationPreferences {
 }
 
 // ---------------------------------------------------------------------------
-// In-memory store (temporary)
-// ---------------------------------------------------------------------------
-
-/**
- * Runtime-only preference store.
- * TODO: Replace with DB persistence (Drizzle + notification_preferences table).
- */
-const store = new Map<string, NotificationPreferences>();
-
-// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
 /**
- * Retrieve a user's notification preferences.
+ * Retrieve a user's notification preferences from the database.
  * Returns defaults when no overrides have been saved.
  */
 export async function getPreferences(
   userId: string,
 ): Promise<NotificationPreferences> {
-  const prefs = store.get(userId);
-  if (prefs) {
-    return { ...prefs, mutedTypes: [...prefs.mutedTypes] };
+  const rows = await db
+    .select({
+      inApp: notificationPreference.inApp,
+      emailEnabled: notificationPreference.emailEnabled,
+      emailFrequency: notificationPreference.emailFrequency,
+      mutedTypes: notificationPreference.mutedTypes,
+    })
+    .from(notificationPreference)
+    .where(eq(notificationPreference.userId, userId))
+    .limit(1);
+
+  if (!rows[0]) {
+    return getDefaultPreferences();
   }
-  return getDefaultPreferences();
+
+  const row = rows[0];
+  return {
+    inApp: row.inApp,
+    emailEnabled: row.emailEnabled,
+    emailFrequency: row.emailFrequency as EmailFrequency,
+    mutedTypes: (row.mutedTypes ?? []) as NotificationType[],
+  };
 }
 
 /**
- * Merge partial updates into a user's preferences.
+ * Merge partial updates into a user's preferences (upsert).
  * Creates an entry with defaults if none exists yet.
  */
 export async function updatePreferences(
   userId: string,
   updates: Partial<NotificationPreferences>,
 ): Promise<NotificationPreferences> {
-  const current = store.get(userId) ?? getDefaultPreferences();
+  const current = await getPreferences(userId);
 
   const merged: NotificationPreferences = {
     ...current,
     ...updates,
-    // Always clone mutedTypes to prevent external mutation
     mutedTypes: updates.mutedTypes
       ? [...updates.mutedTypes]
       : [...current.mutedTypes],
   };
 
-  store.set(userId, merged);
+  await db
+    .insert(notificationPreference)
+    .values({
+      userId,
+      inApp: merged.inApp,
+      emailEnabled: merged.emailEnabled,
+      emailFrequency: merged.emailFrequency,
+      mutedTypes: merged.mutedTypes,
+    })
+    .onConflictDoUpdate({
+      target: notificationPreference.userId,
+      set: {
+        inApp: merged.inApp,
+        emailEnabled: merged.emailEnabled,
+        emailFrequency: merged.emailFrequency,
+        mutedTypes: merged.mutedTypes,
+        updatedAt: new Date(),
+      },
+    });
 
   logger.info("[notifications] Preferences updated", {
     userId,

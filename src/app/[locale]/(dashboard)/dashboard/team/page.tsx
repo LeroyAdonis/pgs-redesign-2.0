@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import { MembersList } from "./_components/members-list";
+import { InviteForm } from "./_components/invite-form";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -26,8 +27,8 @@ export default async function TeamPage({ params }: Props) {
       </div>
 
       <div className="rounded-xl border border-border bg-surface p-6">
-        <h2 className="mb-2 text-base font-semibold text-text">Invite Members</h2>
-        <p className="text-sm text-text-muted">Team invitations coming in the next release.</p>
+        <h2 className="mb-4 text-base font-semibold text-text">Invite Members</h2>
+        <InviteForm />
       </div>
     </div>
   );

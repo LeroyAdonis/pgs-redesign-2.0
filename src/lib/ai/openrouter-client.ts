@@ -4,11 +4,15 @@
  * Replaces the Puter.js client-side AI with server-side OpenRouter calls.
  * Uses fetch() for Next.js serverless compatibility.
  * Supports model fallback: hunter-alpha → healer-alpha → minimax free.
+ *
+ * Image generation uses OpenAI DALL-E 3 via direct API.
+ * Video generation is not yet available (requires Runway/Pika).
  */
 
 // ── Constants ───────────────────────────────────────────────────
 
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+const OPENAI_BASE_URL = "https://api.openai.com/v1";
 
 const FALLBACK_MODELS = [
   "xiaomi/mimo-v2-pro",        // Formerly Hunter Alpha
@@ -45,6 +49,18 @@ function getApiKey(): string {
   if (!key) {
     throw new Error(
       "OPENROUTER_API_KEY environment variable is not set. " +
+      "Add it to your .env.local or Vercel environment variables.",
+    );
+  }
+  return key;
+}
+
+function getOpenAIApiKey(): string {
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) {
+    throw new Error(
+      "OPENAI_API_KEY environment variable is not set. " +
+      "Required for DALL-E image generation. " +
       "Add it to your .env.local or Vercel environment variables.",
     );
   }
@@ -196,32 +212,82 @@ export function isOpenRouterConfigured(): boolean {
 }
 
 /**
- * Image generation placeholder.
+ * Generate an image using OpenAI DALL-E 3.
  *
- * OpenRouter's free text models don't support image generation.
- * This returns a helpful error. For image gen, integrate a dedicated
- * service like Replicate, Stability AI, or DALL-E via OpenAI.
+ * Returns a base64-encoded data URL of the generated image.
+ *
+ * @param prompt - Text description of the image to generate
+ * @returns Object with base64 data URL and model identifier
  */
 export async function generateImage(
-  _prompt: string,
+  prompt: string,
 ): Promise<{ imageDataUrl: string; model: string }> {
-  throw new Error(
-    "Image generation is not available via OpenRouter free models. " +
-    "Use a dedicated image generation service (Replicate, Stability AI, etc.) " +
-    "or upgrade to a model that supports image output.",
-  );
+  const apiKey = getOpenAIApiKey();
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000); // DALL-E can take up to 60s
+
+  try {
+    const response = await fetch(`${OPENAI_BASE_URL}/images/generations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        response_format: "b64_json",
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "Unknown error");
+      throw new Error(
+        `OpenAI DALL-E API error (${response.status}): ${errorBody}`,
+      );
+    }
+
+    const data = await response.json();
+
+    const b64Image = data.data?.[0]?.b64_json;
+    if (!b64Image) {
+      throw new Error("DALL-E returned no image data");
+    }
+
+    const imageDataUrl = `data:image/png;base64,${b64Image}`;
+
+    return {
+      imageDataUrl,
+      model: "dall-e-3",
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 /**
- * Video generation placeholder.
+ * Video generation is not yet available via API.
  *
- * OpenRouter does not support video generation.
+ * Services like Runway ML, Pika, and Kling offer video generation
+ * but do not yet provide stable public APIs suitable for production
+ * integration. This will be updated when a reliable video generation
+ * API becomes available.
+ *
+ * @param _prompt - Text description (unused)
+ * @throws Always throws with an informative error message
  */
 export async function generateVideo(
   _prompt: string,
 ): Promise<{ videoUrl: string; model: string }> {
   throw new Error(
-    "Video generation is not available via OpenRouter. " +
-    "Use a dedicated video generation service.",
+    "Video generation is not yet available. " +
+    "AI video generation requires a dedicated service such as Runway ML, Pika, or Kling, " +
+    "which do not yet offer stable public APIs for production use. " +
+    "This feature will be enabled once a reliable video generation API is integrated.",
   );
 }

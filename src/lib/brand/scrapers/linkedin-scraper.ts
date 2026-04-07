@@ -6,8 +6,14 @@
  */
 
 import { logger } from "@/lib/logger";
+import { decrypt } from "@/lib/crypto";
+import { db } from "@/db";
+import { socialAccount } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import type { RawPost, ScrapeOptions, ScrapeResult } from "../types";
 import { BaseScraper } from "./base-scraper";
+
+const LINKEDIN_API_BASE = "https://api.linkedin.com/v2";
 
 const MOCK_POSTS = [
   "Thrilled to announce that our team has grown to 50 members across Johannesburg, Cape Town, and Durban! 🇿🇦\n\nWhen we started 3 years ago, it was just 3 of us in a Braamfontein co-working space. Today, we serve over 500 SA businesses.\n\nKey learnings:\n✅ Invest in your people\n✅ Stay close to your customers\n✅ Never stop innovating\n\n#SABusiness #Growth #ProudlySA #Entrepreneurship",
@@ -23,13 +29,102 @@ export class LinkedInScraper extends BaseScraper {
   readonly platform = "linkedin" as const;
 
   protected async scrapeReal(options: ScrapeOptions): Promise<ScrapeResult> {
-    logger.info("LinkedIn scrape: real API not yet implemented, falling back to mock", {
-      socialAccountId: options.socialAccountId,
-    });
-    // Real implementation would use LinkedIn Marketing API:
-    // GET /v2/posts?author=urn:li:organization:{id}
-    const posts = this.generateMockPosts(options.maxPosts ?? 50);
-    return { posts, isMock: true, totalAvailable: posts.length };
+    try {
+      // Look up the social account to get tokens and org URN
+      const accounts = await db
+        .select()
+        .from(socialAccount)
+        .where(eq(socialAccount.id, options.socialAccountId))
+        .limit(1);
+
+      const account = accounts[0];
+      if (!account?.accessTokenEncrypted) {
+        logger.warn("LinkedIn scrape: no access token, falling back to mock", {
+          socialAccountId: options.socialAccountId,
+        });
+        const posts = this.generateMockPosts(options.maxPosts ?? 50);
+        return { posts, isMock: true, totalAvailable: posts.length };
+      }
+
+      const accessToken = decrypt(account.accessTokenEncrypted);
+      const orgUrn = `urn:li:organization:${account.platformUserId}`;
+      const count = Math.min(options.maxPosts ?? 50, 100);
+
+      // LinkedIn Marketing API: fetch organization posts
+      const url =
+        `${LINKEDIN_API_BASE}/posts?author=${encodeURIComponent(orgUrn)}&count=${count}&q=author`;
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "LinkedIn-Version": "202401",
+          "X-Restli-Protocol-Version": "2.0.0",
+        },
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "Unknown error");
+        throw new Error(`LinkedIn API error (${response.status}): ${errorBody}`);
+      }
+
+      const data = await response.json();
+      const elements = data.elements ?? data.data ?? [];
+
+      if (!Array.isArray(elements)) {
+        throw new Error("LinkedIn API returned unexpected data format");
+      }
+
+      // Normalize LinkedIn API response into RawPost format
+      const posts: RawPost[] = elements
+        .filter((liPost: Record<string, unknown>) => liPost.commentary || liPost.text)
+        .map((liPost: Record<string, unknown>, i: number) => {
+          // LinkedIn v2 uses "commentary" for post text, older API used "text"
+          const content =
+            ((liPost.commentary as Record<string, unknown>)?.text as string) ??
+            (liPost.commentary as string) ??
+            (liPost.text as string) ??
+            "";
+
+          const socialDetail = liPost.socialDetail as Record<string, unknown> | undefined;
+
+          return {
+            platformPostId: (liPost.id as string) ?? `li_${Date.now()}_${i}`,
+            platform: "linkedin" as const,
+            content,
+            publishedAt: liPost.createdAt
+              ? new Date(liPost.createdAt as number).toISOString()
+              : new Date().toISOString(),
+            hashtags: this.extractHashtags(content),
+            emojis: this.extractEmojis(content),
+            likes: (socialDetail?.totalLikes as number) ?? 0,
+            comments: (socialDetail?.totalComments as number) ?? 0,
+            shares: (socialDetail?.totalShares as number) ?? 0,
+            media: [],
+            language: "en",
+          };
+        });
+
+      logger.info("LinkedIn scrape completed via Marketing API", {
+        socialAccountId: options.socialAccountId,
+        postsRetrieved: posts.length,
+      });
+
+      return {
+        posts,
+        isMock: false,
+        totalAvailable: posts.length,
+      };
+    } catch (error) {
+      logger.error("LinkedIn real scrape failed, falling back to mock", {
+        socialAccountId: options.socialAccountId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+
+      // Graceful fallback to mock data on API errors
+      const posts = this.generateMockPosts(options.maxPosts ?? 50);
+      return { posts, isMock: true, totalAvailable: posts.length };
+    }
   }
 
   generateMockPosts(count: number): RawPost[] {

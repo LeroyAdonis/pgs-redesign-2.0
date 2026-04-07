@@ -42,6 +42,7 @@ import {
   creditMonthlyReset,
   creditExpireRollover,
 } from "@/inngest/credit-functions";
+import { refreshExpiringTokens } from "@/inngest/token-refresh-functions";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -71,5 +72,7 @@ export const { GET, POST, PUT } = serve({
     // Credit reset pipeline
     creditMonthlyReset,
     creditExpireRollover,
+    // Token refresh automation
+    refreshExpiringTokens,
   ],
 });

@@ -1,13 +1,19 @@
 /**
  * Facebook scraper — Pages API post extraction
  *
- * In production: uses Facebook Pages API to fetch page posts.
+ * In production: uses Facebook Graph API to fetch page posts.
  * In development: generates realistic SA-themed Facebook posts.
  */
 
 import { logger } from "@/lib/logger";
+import { decrypt } from "@/lib/crypto";
+import { db } from "@/db";
+import { socialAccount } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import type { RawPost, ScrapeOptions, ScrapeResult } from "../types";
 import { BaseScraper } from "./base-scraper";
+
+const GRAPH_API_BASE = "https://graph.facebook.com/v19.0";
 
 const MOCK_POSTS = [
   "🎉 Exciting news Mzansi! We're opening our new branch in Sandton City this Saturday! Come celebrate with us — first 50 customers get a free gift! #Sandton #GrandOpening #ProudlySA",
@@ -26,13 +32,92 @@ export class FacebookScraper extends BaseScraper {
   readonly platform = "facebook" as const;
 
   protected async scrapeReal(options: ScrapeOptions): Promise<ScrapeResult> {
-    logger.info("Facebook scrape: real API not yet implemented, falling back to mock", {
-      socialAccountId: options.socialAccountId,
-    });
-    // Real implementation would use Facebook Graph API:
-    // GET /{page-id}/posts?fields=message,created_time,...
-    const posts = this.generateMockPosts(options.maxPosts ?? 50);
-    return { posts, isMock: true, totalAvailable: posts.length };
+    try {
+      // Look up the social account to get tokens and page ID
+      const accounts = await db
+        .select()
+        .from(socialAccount)
+        .where(eq(socialAccount.id, options.socialAccountId))
+        .limit(1);
+
+      const account = accounts[0];
+      if (!account?.accessTokenEncrypted) {
+        logger.warn("Facebook scrape: no access token, falling back to mock", {
+          socialAccountId: options.socialAccountId,
+        });
+        const posts = this.generateMockPosts(options.maxPosts ?? 50);
+        return { posts, isMock: true, totalAvailable: posts.length };
+      }
+
+      const accessToken = decrypt(account.accessTokenEncrypted);
+      const pageId = account.pageId ?? account.platformUserId;
+      const limit = Math.min(options.maxPosts ?? 50, 100);
+
+      // Facebook Graph API: fetch page posts with engagement metrics
+      const fields = "message,created_time,likes.summary(true),comments.summary(true),shares";
+      const url = `${GRAPH_API_BASE}/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(15_000),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => "Unknown error");
+        throw new Error(`Facebook API error (${response.status}): ${errorBody}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.data || !Array.isArray(data.data)) {
+        throw new Error("Facebook API returned unexpected data format");
+      }
+
+      // Normalize Facebook API response into RawPost format
+      const posts: RawPost[] = data.data
+        .filter((fbPost: Record<string, unknown>) => fbPost.message)
+        .map((fbPost: Record<string, unknown>, i: number) => {
+          const content = fbPost.message as string;
+          const likesData = fbPost.likes as Record<string, unknown> | undefined;
+          const likesSummary = likesData?.summary as Record<string, unknown> | undefined;
+          const commentsData = fbPost.comments as Record<string, unknown> | undefined;
+          const commentsSummary = commentsData?.summary as Record<string, unknown> | undefined;
+          const sharesData = fbPost.shares as Record<string, unknown> | undefined;
+
+          return {
+            platformPostId: (fbPost.id as string) ?? `fb_${Date.now()}_${i}`,
+            platform: "facebook" as const,
+            content,
+            publishedAt: (fbPost.created_time as string) ?? new Date().toISOString(),
+            hashtags: this.extractHashtags(content),
+            emojis: this.extractEmojis(content),
+            likes: (likesSummary?.total_count as number) ?? 0,
+            comments: (commentsSummary?.total_count as number) ?? 0,
+            shares: (sharesData?.count as number) ?? 0,
+            media: [],
+            language: "en",
+          };
+        });
+
+      logger.info("Facebook scrape completed via Graph API", {
+        socialAccountId: options.socialAccountId,
+        postsRetrieved: posts.length,
+      });
+
+      return {
+        posts,
+        isMock: false,
+        totalAvailable: posts.length,
+      };
+    } catch (error) {
+      logger.error("Facebook real scrape failed, falling back to mock", {
+        socialAccountId: options.socialAccountId,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+
+      // Graceful fallback to mock data on API errors
+      const posts = this.generateMockPosts(options.maxPosts ?? 50);
+      return { posts, isMock: true, totalAvailable: posts.length };
+    }
   }
 
   generateMockPosts(count: number): RawPost[] {

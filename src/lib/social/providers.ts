@@ -168,14 +168,14 @@ export const PLATFORM_DISPLAY: Record<Platform, PlatformDisplayInfo> = {
     name: "WhatsApp Business",
     description: "Business messaging, status updates",
     color: "#25D366",
-    available: false,
+    available: true,
   },
   google_business: {
     id: "google_business",
     name: "Google Business",
     description: "Business profile, posts, reviews",
     color: "#4285F4",
-    available: false,
+    available: true,
   },
 };
 

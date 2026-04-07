@@ -12,7 +12,7 @@ import { setRequestLocale } from "next-intl/server";
 import { requireServerSession } from "@/lib/auth-session";
 import Link from "next/link";
 import { db } from "@/db";
-import { organizationMember, socialAccount } from "@/db/schema";
+import { brandProfile, organizationMember, socialAccount } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { BrandProfileView } from "./_components/BrandProfileView";
 
@@ -50,9 +50,51 @@ export default async function BrandPage({ params }: Props) {
     return <EmptyState locale={locale} type="accounts" />;
   }
 
-  // Check if brand profile exists (placeholder for now)
-  // TODO: Query brandProfile table when it has data
-  return <EmptyState locale={locale} type="generate" />;
+  // Query brand profiles for this org
+  const profiles = await db
+    .select()
+    .from(brandProfile)
+    .where(eq(brandProfile.orgId, orgId));
+
+  if (profiles.length === 0) {
+    return <EmptyState locale={locale} type="generate" />;
+  }
+
+  // Use the first profile (primary brand profile)
+  const profile = profiles[0];
+
+  return (
+    <BrandProfileView
+      profile={{
+        id: profile.id,
+        orgId: profile.orgId,
+        language: profile.language,
+        toneFingerprint: profile.toneFingerprint ?? {
+          formal: 0.5,
+          casual: 0.5,
+          humorous: 0.3,
+          professional: 0.7,
+          inspirational: 0.4,
+          educational: 0.5,
+        },
+        vocabularyClusters: profile.vocabularyClusters ?? [],
+        hashtagPatterns: profile.hashtagPatterns ?? [],
+        postingCadence: profile.postingCadence ?? {
+          dayOfWeek: 1,
+          hourOfDay: 9,
+          postsPerWeek: 3,
+        },
+        emojiUsage: profile.emojiUsage ?? [],
+        avgContentLength: profile.avgContentLength ?? 0,
+        visualStyle: profile.visualStyle ?? {
+          colorPalette: [],
+          filterPreferences: [],
+          imageTypes: [],
+        },
+      }}
+      saCulturalScore={0.65}
+    />
+  );
 }
 
 /* ─── Empty State Component ─── */

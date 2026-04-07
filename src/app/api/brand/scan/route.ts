@@ -73,7 +73,7 @@ export async function POST(request: Request): Promise<NextResponse<ScanResponse>
     const { result, profile } = await analyzeBrand(
       body.socialAccountId,
       account.orgId,
-      { useMockData: true },
+      { useMockData: !account.accessTokenEncrypted },
     );
 
     logger.info("Brand scan completed via API", {

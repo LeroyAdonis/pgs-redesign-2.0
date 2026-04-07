@@ -1,5 +1,11 @@
 {
   "framework": "nextjs",
   "buildCommand": "rm -rf .next && npx next build",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "crons": [
+    {
+      "path": "/api/inngest",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }

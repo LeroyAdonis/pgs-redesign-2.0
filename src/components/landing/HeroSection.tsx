@@ -72,18 +72,91 @@ export function HeroSection() {
             </p>
           </div>
 
-          {/* Visual placeholder */}
+          {/* Dashboard mockup visual */}
           <div className="order-first lg:order-last opacity-0 animate-[landing-fade-in-up_1.2s_cubic-bezier(0.16,1,0.3,1)_0.4s_forwards]">
-            <div className="relative w-full max-w-[340px] lg:max-w-[460px] mx-auto rounded-md overflow-hidden">
-              <div className="absolute inset-0 border border-[rgba(255,255,255,0.06)] rounded-md z-[2] pointer-events-none" />
-              <div className="w-full aspect-[3/4] bg-gradient-to-br from-[#111118] via-[#1a1528] to-[#151520] flex items-center justify-center relative">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="rgba(139,92,246,0.2)" strokeWidth="0.4" aria-hidden="true">
-                  <circle cx="12" cy="8" r="5" />
-                  <path d="M20 21a8 8 0 0 0-16 0" />
-                </svg>
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[rgba(8,8,11,0.7)] to-transparent" />
+            <div className="relative w-full max-w-[340px] lg:max-w-[460px] mx-auto">
+              {/* Ambient glow behind the card */}
+              <div className="absolute -inset-4 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(139,92,246,0.12)_0%,transparent_70%)] blur-2xl pointer-events-none" />
+
+              <div className="relative rounded-xl overflow-hidden border border-[rgba(255,255,255,0.08)] bg-gradient-to-br from-[#111118] via-[#16121f] to-[#131318] shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
+                {/* Window chrome */}
+                <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
+                  <div className="ml-3 flex-1 h-5 rounded-md bg-[rgba(255,255,255,0.04)] flex items-center justify-center">
+                    <span className="text-[9px] text-[#3F3F46] tracking-wide">app.purpleglow.social/dashboard</span>
+                  </div>
+                </div>
+
+                {/* Dashboard content mockup */}
+                <div className="p-5 space-y-4">
+                  {/* Stats row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] p-3">
+                      <span className="block text-[9px] text-[#71717A] uppercase tracking-wider">Posts</span>
+                      <span className="block font-display text-xl text-[#F5F5F7] mt-0.5">247</span>
+                      <span className="block text-[9px] text-green-500 mt-0.5">↑ 12%</span>
+                    </div>
+                    <div className="rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] p-3">
+                      <span className="block text-[9px] text-[#71717A] uppercase tracking-wider">Reach</span>
+                      <span className="block font-display text-xl text-[#F5F5F7] mt-0.5">18K</span>
+                      <span className="block text-[9px] text-green-500 mt-0.5">↑ 28%</span>
+                    </div>
+                    <div className="rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] p-3">
+                      <span className="block text-[9px] text-[#71717A] uppercase tracking-wider">Engage</span>
+                      <span className="block font-display text-xl text-[#F5F5F7] mt-0.5">4.2%</span>
+                      <span className="block text-[9px] text-green-500 mt-0.5">↑ 8%</span>
+                    </div>
+                  </div>
+
+                  {/* Mini chart bars */}
+                  <div className="rounded-lg bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] p-4">
+                    <span className="block text-[9px] text-[#71717A] uppercase tracking-wider mb-3">Weekly Performance</span>
+                    <div className="flex items-end gap-1.5 h-16">
+                      {[40, 65, 45, 80, 60, 90, 70].map((h, i) => (
+                        <div key={i} className="flex-1 rounded-sm bg-gradient-to-t from-brand/60 to-brand" style={{ height: `${h}%` }} />
+                      ))}
+                    </div>
+                    <div className="flex justify-between mt-2">
+                      {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+                        <span key={i} className="text-[8px] text-[#3F3F46] flex-1 text-center">{d}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Platform icons row */}
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="flex -space-x-1">
+                      {['#E1306C', '#1DA1F2', '#0A66C2', '#FF0050'].map((color, i) => (
+                        <div key={i} className="w-6 h-6 rounded-full border-2 border-[#111118]" style={{ backgroundColor: color }} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-[#71717A]">4 platforms connected</span>
+                  </div>
+                </div>
+
+                {/* Bottom gradient fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[rgba(8,8,11,0.8)] to-transparent pointer-events-none" />
               </div>
-              <div className="absolute top-6 right-6 text-right z-[3]">
+
+              {/* Floating notification card */}
+              <div className="absolute -bottom-3 -left-3 lg:-left-6 bg-[#1a1a24] border border-[rgba(255,255,255,0.08)] rounded-lg p-3 shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-[3] animate-[landing-fade-in-up_1s_cubic-bezier(0.16,1,0.3,1)_1.2s_both]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <span className="block text-[10px] font-medium text-[#F5F5F7]">Post published</span>
+                    <span className="block text-[8px] text-[#71717A]">Instagram • just now</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Badge overlay */}
+              <div className="absolute top-10 right-5 text-right z-[3]">
                 <span className="block text-[8px] font-semibold tracking-[2.5px] uppercase text-[#71717A] mb-1">
                   {t('badgeLabel')}
                 </span>
