@@ -58,6 +58,11 @@ vi.mock("@/db/schema", () => ({
     socialAccountId: "postSchedule.socialAccountId",
     platformPostId: "postSchedule.platformPostId",
   },
+  socialAccount: {
+    id: "socialAccount.id",
+    orgId: "socialAccount.orgId",
+    platform: "socialAccount.platform",
+  },
 }));
 
 vi.mock("drizzle-orm", () => ({
