@@ -40,18 +40,15 @@ export function ScrollReveal({
   className,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [entered, setEntered] = useState(false);
+  const [entered, setEntered] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
 
   useEffect(() => {
+    if (entered) return;
     const element = ref.current;
     if (!element) return;
-
-    // Skip animation for reduced-motion users — show content immediately
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      setEntered(true);
-      return;
-    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -65,7 +62,7 @@ export function ScrollReveal({
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [entered]);
 
   return (
     <div
@@ -84,5 +81,3 @@ export function ScrollReveal({
     </div>
   );
 }
-
-
